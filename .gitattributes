@@ -1,0 +1,90 @@
+# Normalise line endings — repo is authored on macOS/Linux; CRLF only where required.
+* text=auto eol=lf
+
+# Shell scripts must stay LF even on Windows checkouts.
+*.sh        text eol=lf
+*.bash      text eol=lf
+
+# Windows-native files keep CRLF.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# Source / config — explicit text classification helps diff/merge.
+*.ts        text eol=lf diff=typescript
+*.tsx       text eol=lf diff=typescript
+*.js        text eol=lf
+*.jsx       text eol=lf
+*.json      text eol=lf
+*.jsonc     text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+*.md        text eol=lf
+*.mdx       text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.scss      text eol=lf
+*.sql       text eol=lf merge=union
+*.prisma    text eol=lf
+*.proto     text eol=lf
+*.graphql   text eol=lf
+*.env.example text eol=lf
+Dockerfile  text eol=lf
+*.Dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# Python
+*.py        text eol=lf diff=python
+*.pyi       text eol=lf diff=python
+
+# Telephony config
+*.conf      text eol=lf
+*.cfg       text eol=lf
+*.lua       text eol=lf
+
+# Lockfiles — text, but mark as generated to keep PR diffs tidy in GitHub.
+pnpm-lock.yaml      text eol=lf linguist-generated=true
+package-lock.json   text eol=lf linguist-generated=true
+yarn.lock           text eol=lf linguist-generated=true
+poetry.lock         text eol=lf linguist-generated=true
+uv.lock             text eol=lf linguist-generated=true
+Cargo.lock          text eol=lf linguist-generated=true
+
+# Generated artefacts — collapse in GitHub diffs.
+**/generated/**     linguist-generated=true
+**/openapi-generated/** linguist-generated=true
+**/asyncapi-generated/** linguist-generated=true
+contracts/fixtures/v1-xml/** linguist-generated=true
+
+# Binary assets — never line-end normalise.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.svg   text eol=lf
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+
+# Audio / media fixtures are binary.
+*.wav   binary
+*.mp3   binary
+*.opus  binary
+*.m4a   binary
+*.flac  binary
+*.ogg   binary
+
+# Captures.
+*.pcap   binary
+*.pcapng binary
+
+# Export-ignore — keep these out of `git archive` tarballs.
+.github/        export-ignore
+.gitattributes  export-ignore
+.gitignore      export-ignore
