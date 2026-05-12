@@ -1,0 +1,69 @@
+# S1 — telephony happy path. Boots Kamailio HA pair + rtpengine + Asterisk + baresip softphone.
+# Image versions match ARCHITECTURE.v0.4 §6 and S1 hypothesis (Asterisk 22.9 LTS, Kamailio 6.0).
+
+services:
+  rtpengine:
+    image: drachtio/rtpengine:mr12
+    network_mode: host
+    command: >
+      --interface=127.0.0.1
+      --listen-ng=127.0.0.1:2223
+      --port-min=30000 --port-max=30100
+      --no-fallback
+    healthcheck:
+      test: ["CMD", "pgrep", "rtpengine"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  kamailio-primary:
+    image: ghcr.io/kamailio/kamailio:6.0.0-alpine
+    depends_on:
+      rtpengine:
+        condition: service_healthy
+    volumes:
+      - ./fixtures/kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
+      - ./fixtures/kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+    healthcheck:
+      test: ["CMD", "kamcmd", "core.uptime"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  kamailio-standby:
+    image: ghcr.io/kamailio/kamailio:6.0.0-alpine
+    depends_on:
+      rtpengine:
+        condition: service_healthy
+    volumes:
+      - ./fixtures/kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
+      - ./fixtures/kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro
+    ports:
+      - "5061:5060/udp"
+      - "5061:5060/tcp"
+
+  asterisk:
+    image: andrius/asterisk:22.9-current
+    depends_on:
+      - kamailio-primary
+    volumes:
+      - ./fixtures/asterisk:/etc/asterisk:ro
+    ports:
+      - "8088:8088"  # ARI HTTP
+    healthcheck:
+      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  baresip:
+    image: ghcr.io/baresip/baresip:latest
+    depends_on:
+      asterisk:
+        condition: service_healthy
+    volumes:
+      - ./fixtures/baresip:/root/.baresip:ro
+    command: ["-f", "/root/.baresip"]
