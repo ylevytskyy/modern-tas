@@ -10,7 +10,7 @@
 
 The multi-tenant data isolation design (ARCH v0.4 §6) layers PostgreSQL Row-Level Security on top of `app.tenant_id` set per transaction via `SET LOCAL app.tenant_id = '<uuid>'`. RLS policies reference `current_setting('app.tenant_id')`. This design is sound only if the connection pooler honours `SET LOCAL` boundaries — the setting must not leak across transactions on the same pooled server connection.
 
-PgBouncer 1.22+ in transaction mode is the documented baseline that honours this. Supavisor (the Elixir/Postgrex clean-room reimplementation Supabase uses) markets transaction-mode parity but does not state `SET LOCAL` boundary behaviour explicitly in its docs. RISKS v0.2 §3 flags this — community-assumed behaviour, no vendor assertion, no open issues either way.
+PgBouncer 1.22+ in transaction mode is the documented baseline that honours this. Supavisor (the Elixir/Postgrex clean-room reimplementation Supabase uses) markets transaction-mode parity but does not state `SET LOCAL` boundary behaviour explicitly in its docs. RISKS v0.2 §1 (N6) flags this — community-assumed behaviour, no vendor assertion, no open issues either way.
 
 If `SET LOCAL` leaks, every multi-tenant query becomes a cross-tenant data leak waiting to happen. The entire RLS-as-defence-in-depth design relies on this.
 

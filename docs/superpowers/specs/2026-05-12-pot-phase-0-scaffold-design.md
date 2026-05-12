@@ -142,7 +142,7 @@ ADR → spike → source mapping:
 | 0013 | Two-pass redaction pipeline (forced-align + NER + over-bleep) | S4 | RISKS §1, ARCH §9 |
 | 0015 | Temporal Cloud Enterprise tier with EU namespace | S7 | ARCH §9 |
 | 0016 | ARI leader 100 ms hard-stop heartbeat design | S3 | ARCH v0.3 + v0.4 §9 |
-| 0018 | Supavisor as transaction-mode pooler (PgBouncer fallback) | S5 | RISKS §3, ARCH §9 |
+| 0018 | Supavisor as transaction-mode pooler (PgBouncer fallback) | S5 | RISKS §1 (N6), ARCH §9 |
 | 0019 | Caddy 2.10+ on-demand TLS posture + LE rate-limit exemption | S8 | RISKS §4, ARCH §9 |
 | 0024 | Queue dequeue latency budget = 200 ms p95 (NestJS-arbitrated) | S2 | ARCH §9 |
 
