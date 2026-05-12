@@ -1,0 +1,8 @@
+# S7 — STUB. Sales/legal correspondence, no infra at PoT time.
+# This compose file exists only so `docker compose config` validates.
+
+services:
+  noop:
+    image: alpine:3.20
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["manual"]
