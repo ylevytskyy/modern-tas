@@ -1,0 +1,5 @@
+results/*
+!results/.gitkeep
+fixtures/*.wav
+fixtures/*.mp3
+fixtures/ground-truth.jsonl
