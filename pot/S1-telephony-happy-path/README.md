@@ -43,4 +43,4 @@ Per ARCH v0.4 §2.3: extend reconciliation window to match measured value, docum
 
 ## ADR linkage
 
-Evidence flows into [ADR-0016 (ARI leader hard-stop)](../../docs/adr/0016-ari-leader-design.md) for the channel-reconciliation parameter.
+S1 has no primary ADR. Yellow/Red results may inform an amendment to [ADR-0016 (ARI leader hard-stop)](../../docs/adr/0016-ari-leader-design.md) — owned by S3 — if observed channel-reconciliation exceeds the documented 7 s window. Coordinate with S3 before proposing amendments.

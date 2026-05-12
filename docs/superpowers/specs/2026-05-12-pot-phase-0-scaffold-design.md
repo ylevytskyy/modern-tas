@@ -96,7 +96,7 @@ Five runnable compose files. Concrete images and versions are baked in from the 
 | Spike | Services |
 |---|---|
 | S1 | `kamailio:6.0` (config volume), `rtpengine:mr12.0` (Unix socket to Kamailio), `asterisk:22.9-lts` (ARI Outbound WS pre-configured), `baresip` softphone client |
-| S2 | `postgres:17`, `redis:7`, `nats:2.10`, `sipp:3.7` (driver), thin NestJS arbiter container (multi-stage Dockerfile in same dir) — reuses Asterisk from S1 via `extends:` to avoid duplication |
+| S2 | `postgres:17`, `redis:7`, `nats:2.10`, `andrius/asterisk:22.9-current`, thin NestJS arbiter container (Dockerfile under `arbiter/`), `sipp:3.7` (driver) — own Asterisk service (spikes run independently; cross-compose `extends:` would require a shared compose file outside the spike dir, so each spike pins its own image) |
 | S3 | `asterisk:22.9-lts`, `redis:7`, two leader-stub Node containers with `@ipcom/asterisk-ari`. Chaos via `docker pause`/`unpause`. |
 | S5 | `postgres:17`, `supavisor:1.1+`, lightweight `node:20-alpine` test runner. Self-contained, ~5 min boot-to-result. |
 | S8 | `caddy:2.10+` (`permission http` configured), `haproxy:3.0` (rate-limit upstream), `k6:0.50` load generator. |

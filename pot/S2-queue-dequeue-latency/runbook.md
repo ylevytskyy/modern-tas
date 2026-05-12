@@ -6,7 +6,7 @@
 make up
 ```
 
-Boots: postgres:17, redis:7, nats:2.10, asterisk (extends from S1's), nestjs-arbiter (built from `arbiter/`), sipp (driver, runs on demand).
+Boots: postgres:17, redis:7, nats:2.10, asterisk (S2-owned, same image as S1), nestjs-arbiter (built from `arbiter/`), sipp (driver, runs on demand).
 
 ## Test
 
