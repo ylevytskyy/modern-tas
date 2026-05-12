@@ -1966,8 +1966,7 @@ Step-by-step in [`runbook.md`](./runbook.md).
 ## Recording protocol
 
 `results/<timestamp>/`:
-- `probe-output.txt` — raw psql output of both transactions
-- `connection-id-trace.txt` — `pg_backend_pid()` proves both transactions reused the same server connection
+- `probe-output.txt` — raw psql output of both transactions, including `pg_backend_pid()` for each (proves both transactions reused the same server connection)
 - `summary.md` — one paragraph: Green or Red, exact value seen in transaction 2
 
 ## Yellow remediation
