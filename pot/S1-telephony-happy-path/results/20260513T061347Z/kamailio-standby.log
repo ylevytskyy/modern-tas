@@ -1,0 +1,374 @@
+kamailio-standby-1  |  0(1) INFO: <core> [core/sctp_core.c:74]: sctp_core_check_support(): SCTP API not enabled - if you want to use it, load sctp module
+kamailio-standby-1  |  0(1) INFO: <core> [core/tcp_main.c:5205]: init_tcp(): using epoll_lt as the io watch method (auto detected)
+kamailio-standby-1  | Listening on 
+kamailio-standby-1  |              udp: 0.0.0.0 [0.0.0.0]:5060
+kamailio-standby-1  | Aliases: 
+kamailio-standby-1  | 
+kamailio-standby-1  |  0(1) INFO: rr [../outbound/api.h:53]: ob_load_api(): unable to import bind_ob - maybe module is not loaded
+kamailio-standby-1  |  0(1) INFO: rr [rr_mod.c:185]: mod_init(): outbound module not available
+kamailio-standby-1  |  0(1) INFO: <core> [main.c:3189]: main(): processes (at least): 8 - shm size: 67108864 - pkg size: 8388608
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:163]: probe_max_receive_buffer(): SO_RCVBUF is initially 212992 for fd 5
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:233]: probe_max_receive_buffer(): SO_RCVBUF is finally 425984 on fd 5
+kamailio-standby-1  |  6(12) INFO: ctl [io_listener.c:215]: io_listen_loop(): io_listen_loop:  using epoll_lt io watch method (config)
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=01efc8e7-55f9-4945-ad00-4f9d50a8af28
+kamailio-standby-1  | Call-ID: 1-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:1]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=c1d1f399-2ba4-4aa7-9a45-76e4bde35af4
+kamailio-standby-1  | Call-ID: 2-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:2]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=01efc8e7-55f9-4945-ad00-4f9d50a8af28
+kamailio-standby-1  | Call-ID: 1-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=2354cd32-5c52-46dc-b52c-6b29977adf67
+kamailio-standby-1  | Call-ID: 3-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:3]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=c1d1f399-2ba4-4aa7-9a45-76e4bde35af4
+kamailio-standby-1  | Call-ID: 2-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=e74a367e-d8a8-492c-b72b-d6d7914bc1c9
+kamailio-standby-1  | Call-ID: 4-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:4]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=2354cd32-5c52-46dc-b52c-6b29977adf67
+kamailio-standby-1  | Call-ID: 3-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8ff56d76-0738-484a-bfe7-a2841a7d223f
+kamailio-standby-1  | Call-ID: 5-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:5]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=e74a367e-d8a8-492c-b72b-d6d7914bc1c9
+kamailio-standby-1  | Call-ID: 4-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=fbbb49f9-0536-4feb-98e5-8366ddea952c
+kamailio-standby-1  | Call-ID: 6-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:6]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8ff56d76-0738-484a-bfe7-a2841a7d223f
+kamailio-standby-1  | Call-ID: 5-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=abcccbaa-0d3d-4cc9-a09a-9c18b802a9cb
+kamailio-standby-1  | Call-ID: 7-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=fbbb49f9-0536-4feb-98e5-8366ddea952c
+kamailio-standby-1  | Call-ID: 6-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8263f855-a0c3-4b35-8773-758e30941d5f
+kamailio-standby-1  | Call-ID: 8-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:8]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=abcccbaa-0d3d-4cc9-a09a-9c18b802a9cb
+kamailio-standby-1  | Call-ID: 7-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=4dac7194-c27e-4d49-b7ff-b96adff09c79
+kamailio-standby-1  | Call-ID: 9-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:9]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8263f855-a0c3-4b35-8773-758e30941d5f
+kamailio-standby-1  | Call-ID: 8-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=07272a05-d98f-45c5-8bfd-d76b43295da6
+kamailio-standby-1  | Call-ID: 10-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=4dac7194-c27e-4d49-b7ff-b96adff09c79
+kamailio-standby-1  | Call-ID: 9-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=07272a05-d98f-45c5-8bfd-d76b43295da6
+kamailio-standby-1  | Call-ID: 10-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: ]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  0(1) NOTICE: <core> [main.c:750]: handle_sigs(): Thank you for flying kamailio!!!
+kamailio-standby-1  |  2(8) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  1(7) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  4(10) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  5(11) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  6(12) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  7(13) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  3(9) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  0(1) INFO: <core> [core/sctp_core.c:53]: sctp_core_destroy(): SCTP API not initialized
+kamailio-standby-1  |  0(1) INFO: <core> [core/sctp_core.c:74]: sctp_core_check_support(): SCTP API not enabled - if you want to use it, load sctp module
+kamailio-standby-1  | Listening on 
+kamailio-standby-1  |              udp: 0.0.0.0 [0.0.0.0]:5060
+kamailio-standby-1  | Aliases: 
+kamailio-standby-1  | 
+kamailio-standby-1  |  0(1) INFO: <core> [core/tcp_main.c:5205]: init_tcp(): using epoll_lt as the io watch method (auto detected)
+kamailio-standby-1  |  0(1) INFO: rr [../outbound/api.h:53]: ob_load_api(): unable to import bind_ob - maybe module is not loaded
+kamailio-standby-1  |  0(1) INFO: rr [rr_mod.c:185]: mod_init(): outbound module not available
+kamailio-standby-1  |  0(1) INFO: <core> [main.c:3189]: main(): processes (at least): 8 - shm size: 67108864 - pkg size: 8388608
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:163]: probe_max_receive_buffer(): SO_RCVBUF is initially 212992 for fd 5
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:233]: probe_max_receive_buffer(): SO_RCVBUF is finally 425984 on fd 5
+kamailio-standby-1  |  6(12) INFO: ctl [io_listener.c:215]: io_listen_loop(): io_listen_loop:  using epoll_lt io watch method (config)
+kamailio-standby-1  |  0(1) NOTICE: <core> [main.c:750]: handle_sigs(): Thank you for flying kamailio!!!
+kamailio-standby-1  |  1(7) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  2(8) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  4(10) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  5(11) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  6(12) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  3(9) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  7(13) INFO: <core> [main.c:874]: sig_usr(): signal 15 received
+kamailio-standby-1  |  0(1) INFO: <core> [core/sctp_core.c:53]: sctp_core_destroy(): SCTP API not initialized
+kamailio-standby-1  |  0(1) INFO: <core> [core/sctp_core.c:74]: sctp_core_check_support(): SCTP API not enabled - if you want to use it, load sctp module
+kamailio-standby-1  | Listening on 
+kamailio-standby-1  |              udp: 0.0.0.0 [0.0.0.0]:5060
+kamailio-standby-1  |  0(1) INFO: <core> [core/tcp_main.c:5205]: init_tcp(): using epoll_lt as the io watch method (auto detected)
+kamailio-standby-1  | Aliases: 
+kamailio-standby-1  | 
+kamailio-standby-1  |  0(1) INFO: rr [../outbound/api.h:53]: ob_load_api(): unable to import bind_ob - maybe module is not loaded
+kamailio-standby-1  |  0(1) INFO: rr [rr_mod.c:185]: mod_init(): outbound module not available
+kamailio-standby-1  |  0(1) INFO: <core> [main.c:3189]: main(): processes (at least): 8 - shm size: 67108864 - pkg size: 8388608
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:163]: probe_max_receive_buffer(): SO_RCVBUF is initially 212992 for fd 5
+kamailio-standby-1  |  0(1) INFO: <core> [core/udp_server.c:233]: probe_max_receive_buffer(): SO_RCVBUF is finally 425984 on fd 5
+kamailio-standby-1  |  6(12) INFO: ctl [io_listener.c:215]: io_listen_loop(): io_listen_loop:  using epoll_lt io watch method (config)
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8b3a1b1b-064b-4f43-afad-1f3bd38238da
+kamailio-standby-1  | Call-ID: 1-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:1]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=e7a70d97-45bc-40af-89bf-e0785796dd70
+kamailio-standby-1  | Call-ID: 2-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:2]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=8b3a1b1b-064b-4f43-afad-1f3bd38238da
+kamailio-standby-1  | Call-ID: 1-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=70c3b743-f98c-4dd5-be5f-b5f0644c3a39
+kamailio-standby-1  | Call-ID: 3-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:3]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=e7a70d97-45bc-40af-89bf-e0785796dd70
+kamailio-standby-1  | Call-ID: 2-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=25932f9d-2eda-475e-a9ad-d981a389676b
+kamailio-standby-1  | Call-ID: 4-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:4]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=70c3b743-f98c-4dd5-be5f-b5f0644c3a39
+kamailio-standby-1  | Call-ID: 3-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=250da563-9a37-4f2a-94ec-a7336b368ce9
+kamailio-standby-1  | Call-ID: 5-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:5]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=25932f9d-2eda-475e-a9ad-d981a389676b
+kamailio-standby-1  | Call-ID: 4-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=a0cd8d01-9e47-45f3-87ca-89cdf4d0d4e1
+kamailio-standby-1  | Call-ID: 6-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:6]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=250da563-9a37-4f2a-94ec-a7336b368ce9
+kamailio-standby-1  | Call-ID: 5-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=b8e9d34c-5e91-460b-a2ae-0f54c306ec42
+kamailio-standby-1  | Call-ID: 7-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=a0cd8d01-9e47-45f3-87ca-89cdf4d0d4e1
+kamailio-standby-1  | Call-ID: 6-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=c5950e3e-2a6f-4a0f-bf9c-6a30a9da7c86
+kamailio-standby-1  | Call-ID: 8-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:8]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=b8e9d34c-5e91-460b-a2ae-0f54c306ec42
+kamailio-standby-1  | Call-ID: 7-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=1e466db6-73be-4680-b8b6-c802bf04ce41
+kamailio-standby-1  | Call-ID: 9-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:9]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=c5950e3e-2a6f-4a0f-bf9c-6a30a9da7c86
+kamailio-standby-1  | Call-ID: 8-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=5f7d7d4c-aa8c-441a-9dba-08fbebb31d7c
+kamailio-standby-1  | Call-ID: 10-1@172.19.0.6
+kamailio-standby-1  | CSeq: 1 ACK
+kamailio-standby-1  | Contact: <sip:]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  2(8) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=1e466db6-73be-4680-b8b6-c802bf04ce41
+kamailio-standby-1  | Call-ID: 9-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: 7]
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  2(8) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/parse_addr_spec.c:822]: parse_addr_spec(): unexpected char [;/59] in status 0: [] .
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:166]: get_hdr_field(): bad to header
+kamailio-standby-1  |  1(7) ERROR: <core> [core/parser/msg_parser.c:339]: parse_headers(): bad header field [To: ;tag=5f7d7d4c-aa8c-441a-9dba-08fbebb31d7c
+kamailio-standby-1  | Call-ID: 10-1@172.19.0.6
+kamailio-standby-1  | CSeq: 2 BYE
+kamailio-standby-1  | Max-Forwards: ]
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:389]: receive_msg(): parsing relevant headers failed
+kamailio-standby-1  |  1(7) ERROR: <core> [core/receive.c:450]: receive_msg(): required headers not found in request

@@ -1,0 +1,64 @@
+------------------------------ Scenario Screen -------- [1-9]: Change Screen --
+  Call rate (length)   Port   Total-time  Total-calls  Remote-host
+  10.0(0 ms)/1.000s   5060      10.30 s          100  172.19.0.4:5060(UDP)
+
+  Call limit 100 hit, 0.0 s period        0 ms scheduler resolution            
+  0 calls (limit 30)                      Peak was 4 calls, after 0 s
+  0 Running, 102 Paused, 236 Woken up
+  0 dead call msg (discarded)             0 out-of-call msg (discarded)
+  0 open sockets                          0/0/0 UDP errors (send/recv/cong)
+  0 open sockets                          0/0/0 UDP errors (send/recv/cong)
+
+                                 Messages  Retrans   Timeout   Unexpected-Msg
+      INVITE ---------->         100       0         0                         
+         100 <----------         100       0         0         0               
+         180 <----------         0         0         0         0               
+         183 <----------         0         0         0         0               
+         200 <----------  E-RTD1 100       0         0         0               
+         ACK ---------->         100       0                                   
+       Pause [    300ms]         100                           0        
+         BYE ---------->         100       0         0                         
+         200 <----------         100       0         0         0               
+
+------- Waiting for active calls to end. Press [q] again to force exit. -------
+----------------------------- Statistics Screen ------- [1-9]: Change Screen --
+  Start Time             | 2026-05-13	06:14:25.422573	1778652865.422573         
+  Last Reset Time        | 2026-05-13	06:14:35.732650	1778652875.732650         
+  Current Time           | 2026-05-13	06:14:35.732879	1778652875.732879         
+-------------------------+---------------------------+--------------------------
+  Counter Name           | Periodic value            | Cumulative value
+-------------------------+---------------------------+--------------------------
+  Elapsed Time           | 00:00:10:310000           | 00:00:10:310000          
+  Call Rate              |    0.000 cps              |    9.699 cps             
+-------------------------+---------------------------+--------------------------
+  Incoming calls created |        0                  |        0                 
+  Outgoing calls created |        0                  |      100                 
+  Total Calls created    |                           |      100                 
+  Current Calls          |        0                  |                          
+-------------------------+---------------------------+--------------------------
+  Successful call        |        0                  |      100                 
+  Failed call            |        0                  |        0                 
+-------------------------+---------------------------+--------------------------
+  Response Time 1        | 00:00:00:002000           | 00:00:00:002000          
+  Call Length            | 00:00:00:304000           | 00:00:00:304000          
+------- Waiting for active calls to end. Press [q] again to force exit. -------
+---------------------------- Repartition Screen ------- [1-9]: Change Screen --
+  Average Response Time Repartition 1                                          
+             0 ms <= n <          5 ms :         98
+             5 ms <= n <         10 ms :          1
+            10 ms <= n <         20 ms :          1
+            20 ms <= n <         50 ms :          0
+            50 ms <= n <        100 ms :          0
+           100 ms <= n <        200 ms :          0
+           200 ms <= n <        400 ms :          0
+           400 ms <= n <        800 ms :          0
+           800 ms <= n <       1500 ms :          0
+                   n >=       1500 ms :          0
+  Average Call Length Repartition                                              
+             0 ms <= n <         10 ms :          0
+            10 ms <= n <         50 ms :          0
+            50 ms <= n <        100 ms :          0
+           100 ms <= n <        500 ms :        100
+           500 ms <= n <       1000 ms :          0
+                   n >=       1000 ms :          0
+------- Waiting for active calls to end. Press [q] again to force exit. -------

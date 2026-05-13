@@ -18,7 +18,7 @@ PHASE 2 — MVP BUILD                    9–11 months
 
 | # | Spike | Owner role | Compose | Status |
 |---|---|---|---|---|
-| [S1](./S1-telephony-happy-path/) | End-to-end telephony happy path | Telephony eng | runnable | Not started |
+| [S1](./S1-telephony-happy-path/) | End-to-end telephony happy path | Telephony eng | runnable | Green (Layer 1) |
 | [S2](./S2-queue-dequeue-latency/) | NestJS-arbitrated queue dequeue latency | Telephony + backend | runnable | Green |
 | [S3](./S3-ari-leader-hard-stop/) | ARI leader 100 ms hard-stop | Telephony eng | runnable | Green |
 | [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Not started |
