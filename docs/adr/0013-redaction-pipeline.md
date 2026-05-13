@@ -30,6 +30,8 @@ Adopt a two-pass redaction pipeline:
 
 Pending PoT spike S4 — see [`pot/S4-redaction-accuracy/results/`](../../pot/S4-redaction-accuracy/results/). Target signal: recall ≥ 95% on 90 planted PII spans across 30 fixtures, F1 ≥ 0.92, mean over-bleep ≤ 1.5 s, manual-QA backlog ≤ 2% of spans.
 
+**Phase-0 status (2026-05-13):** S4 Deferred — vendor + fixtures unavailable; see [`pot/pot-readout.md` §S4](../../pot/pot-readout.md) for the deferral reasoning and Sprint-0 unblock plan. ADR-0013 stays Proposed; ratification gated on Sprint-0 S4 execution or an explicit de-scope decision (skip recording on HIPAA tenants, or accept the operational manual-QA backlog as the redaction strategy and remove the ML pipeline from MVP).
+
 ## Alternatives considered
 
 - **Single-pass ASR-bleep only.** Documented to miss digit-by-digit numbers and accented speakers. Rejected: insufficient for HIPAA medical workloads.
