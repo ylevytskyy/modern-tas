@@ -1,7 +1,7 @@
 # ADR-0024: Queue dequeue latency budget = 200 ms p95 (NestJS-arbitrated)
 
-- **Status:** Proposed (pending user confirmation to flip to Accepted)
-- **Date:** 2026-05-12
+- **Status:** Accepted
+- **Date:** 2026-05-12 (ratified 2026-05-13)
 - **Deciders:** Backend lead, Telephony lead
 - **Consulted:** Senior architect, Product
 - **Informed:** All MVP engineers
