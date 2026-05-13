@@ -34,12 +34,22 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 
 ## S3 — ARI leader 100 ms hard-stop
 
-- **Status:** Not started
-- **Run dates:** —
-- **Owner:** —
-- **Result:** —
-- **Evidence:** `pot/S3-ari-leader-hard-stop/results/`
-- **ADR(s) updated:** ADR-0016
+- **Status:** Green
+- **Run dates:** 2026-05-13
+- **Owner:** Telephony engineer (Claude / lion@levytskyy)
+- **Result:** Chaos pause of leader-A produced **wire close-latency = 1 ms** (Asterisk-side FIN at +1 ms after leader-A's `heartbeat lost` event), well under the 100 ms budget. Standby took over within 1.4 s of chaos start (lease acquired + WS open + reconcile-done at +1474 ms) and hung up all 20 orphan channels (10 Local pairs × 2 halves) via `GET /ari/applications/pot-leader-test`'s `channel_ids` → bulk `DELETE /ari/channels/{id}` — well under the 7 s reconciliation budget. `channels-pre` 20 → `channels-post` 0 confirmed end-to-end cleanup.
+- **Probe note:** the original scaffold was un-runnable end-to-end. Fixes needed before any signal:
+    1. `andrius/asterisk:22.9-current` doesn't exist (same as S2); replaced with a local `asterisk-image/` build (Ubuntu 24.04 + `asterisk` + `tcpdump` + `iproute2` + `curl`).
+    2. The Asterisk image's `/var/lib/asterisk` is owned by `asterisk:asterisk` per the Ubuntu package, but compose's `cap_add: [NET_RAW, NET_ADMIN]` interacts with Asterisk's startup capability handling such that DAC_OVERRIDE gets dropped — Asterisk running as `root` (per `asterisk.conf`'s `runuser = root`) then can't open `astdb.sqlite3` and exits with "Unable to open Asterisk database". Re-chowning those dirs to `root:root` in the Dockerfile sidesteps it.
+    3. `fixtures/asterisk/` was empty; authored the minimal config set (`asterisk.conf`, `modules.conf`, `logger.conf`, `http.conf`, `ari.conf`, `extensions.conf`, `rtp.conf`, `musiconhold.conf`). No PJSIP needed — channels are created via ARI `POST /channels` with a Local endpoint into a tiny `s3-test` dialplan context.
+    4. The `s3-test` dialplan extension *must* call `Answer()` before `Wait(120)` — otherwise the Local pair's `;2` half never completes entering Stasis, and `/ari/applications/pot-leader-test` reports zero channels even though `core show channels` shows the pair alive. Without `Answer()` the orphan-reconciliation path is structurally unreachable.
+    5. `make test` was a `@false` stub. Wrote `scripts/run-test.sh` (originates channels, captures pcap, pauses + unpauses the elected leader, copies evidence out) and `scripts/summarise.sh` (parses pcap with the asterisk container's own tcpdump, correlates with the structured JSON logs both leaders write, emits the verdict).
+    6. The original leader stub connected to ARI but had no reconciliation code path, and listed channels via `client.channels.list()` filtered by `dialplan.app_name === ARI_APP`. That filter is structurally wrong — ari-client v2's `dialplan.app_name` is the *dialplan* app currently executing (Wait, AppDial2, …), not the Stasis app. Rewrote reconcile to use `applications.get({applicationName})` and walk its `channel_ids`, which is the canonical "channels in this Stasis app" source.
+- **Findings against ADR-0016 to address in the ratification turn:**
+    1. **Heartbeat = TTL is racy.** The ADR's literal "SET … PX 1000 once per second" + "EXPIRE to 1 s on every heartbeat" causes both leaders to flap because the heartbeat fires *at* the TTL boundary — the `GET key` in renew returns nil and leadership is spuriously lost. Stable PoT config: 500 ms heartbeat with 1500 ms TTL (3:1 ratio). ADR-0016 §Decision needs revising.
+    2. **Asterisk *accepts* a second WS for the same Stasis app.** ADR-0016 §Consequences claims "the second connection rejects" — but on Asterisk 20.6 the standby's WS opens successfully while the deposed leader's WS is still alive. The standby reconciles during the chaos pause, ~3.7 s *before* the FIN ever lands. This is *better* than the ADR assumed; the Decision can be tightened (orphan window is bounded by lease TTL, not by lease TTL + close-latency + new-WS handshake).
+- **Evidence:** `pot/S3-ari-leader-hard-stop/results/20260513T052041Z/` (`pause.pcap`, `leader-a.log`, `leader-b.log`, `channels-pre.txt`, `channels-post.txt`, `chaos-meta.json`, `summary.md`).
+- **ADR(s) updated:** ADR-0016 (pending Decision rewrite + status flip on user confirmation).
 
 ## S4 — Two-pass redaction accuracy on 8 kHz μ-law
 

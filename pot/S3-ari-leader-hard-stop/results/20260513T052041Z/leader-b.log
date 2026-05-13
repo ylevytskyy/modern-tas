@@ -1,0 +1,69 @@
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649626461}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649626956}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649627455}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649627961}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649628465}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649628970}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649629474}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649629980}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649630491}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649630993}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649631494}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649631999}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649632504}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649633011}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649633514}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649634016}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649634518}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649635020}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649635526}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649636024}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649636528}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649637027}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649637531}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649638035}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649638546}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649639053}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649639559}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649640064}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649640573}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649641074}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649641576}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649642081}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649642584}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649643087}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649643588}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649644090}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649644594}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649645097}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649645600}
+leader-b-1  | {"instance":"leader-b","event":"standby","ts":1778649646103}
+leader-b-1  | {"instance":"leader-b","event":"acquired","ts":1778649646605}
+leader-b-1  | {"instance":"leader-b","event":"ws-open-attempt","ts":1778649646605,"attempt":1}
+leader-b-1  | [
+leader-b-1  |   'This API is using a deprecated version of Swagger!  Please see http://github.com/wordnik/swagger-core/wiki for more info'
+leader-b-1  | ]
+leader-b-1  | {"instance":"leader-b","event":"ws-open-success","ts":1778649646653,"attempt":1}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-start","ts":1778649646653}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-enumerate","ts":1778649646656,"mine":20}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646658,"channelId":"s3-test-01","ms":2}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646659,"channelId":"s3-test-01;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646661,"channelId":"s3-test-02","ms":2}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646662,"channelId":"s3-test-02;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646664,"channelId":"s3-test-03","ms":2}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646665,"channelId":"s3-test-03;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646666,"channelId":"s3-test-04","ms":1}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646667,"channelId":"s3-test-04;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646668,"channelId":"s3-test-05","ms":1}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646670,"channelId":"s3-test-05;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646670,"channelId":"s3-test-06","ms":0}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646671,"channelId":"s3-test-06;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646673,"channelId":"s3-test-07","ms":2}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646674,"channelId":"s3-test-07;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646675,"channelId":"s3-test-08","ms":1}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646676,"channelId":"s3-test-08;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646676,"channelId":"s3-test-09","ms":0}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646678,"channelId":"s3-test-09;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup","ts":1778649646679,"channelId":"s3-test-10","ms":1}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-hangup-failed","ts":1778649646680,"channelId":"s3-test-10;2","error":"{\n  \"message\": \"Channel not found\"\n}"}
+leader-b-1  | {"instance":"leader-b","event":"reconcile-done","ts":1778649646680,"hungUp":20}
