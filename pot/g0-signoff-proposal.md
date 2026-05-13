@@ -292,11 +292,18 @@ pot/scaffold? (original 8-spike skeleton — unchecked)
 
 ## Annex C — How "Deferred-with-fallback-plan" is captured if Path B is signed
 
-If Path B is adopted, ARCH v0.4 §2.4 should be amended in Sprint 0 to add the new gate outcome:
+The amendment to ARCH v0.4 §2.4 has been drafted and committed as `b948a9e` (`docs(arch): extend G0 enum with Deferred-with-fallback-plan (pending ratification)`) ahead of this sign-off, so signatories can review the actual amendment text alongside this proposal. It extends the gate enum's first bullet:
 
-> "All 8 spikes Green, **or** any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead, **or any Deferred-with-fallback-plan has a documented fallback in the spike's ADR and is signed off by the same approvers**. **Red blocks MVP kickoff.**"
+> "All 8 spikes Green, **or** any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead, **or any Deferred-with-fallback-plan has its documented fallback (in the spike's primary ADR or spike README) adopted as the MVP implementation path and signed off by the same approvers**. **Red blocks MVP kickoff.**"
 
-The amendment is mechanical (one clause added to the enum). It should land as a separate `docs(arch): extend G0 enum with Deferred-with-fallback-plan` commit referencing this proposal as the rationale.
+The amendment also adds an explanatory blockquote scoping the new clause to its intended use (vendor-prereq blocks where synthesis would erase the measurement) and requiring a one-line forensic note in `pot/pot-readout.md` per invocation. Read it inline in [ARCHITECTURE.v0.4.md](../ARCHITECTURE.v0.4.md) §2.4.
+
+Two divergences from the original draft wording that previously appeared here:
+
+- **"Primary ADR or spike README"** instead of just "ADR". S6 has no primary ADR — its fallback is documented in the spike README — so without this generalisation S6's close-out path would be uncovered.
+- **A forensic-note-per-invocation requirement** was added. Prevents the enum extension from being misused later as a routine excuse for incomplete PoT work; every Deferred close-out must record *which* fallback was chosen and *why* in `pot/pot-readout.md`.
+
+The amendment is marked **pending G0 sign-off ratification**. Signatures on this proposal legitimise it. If Path A is chosen instead, commit `b948a9e` can be reverted in the same turn the gate decision lands; no other state needs unwinding.
 
 ---
 
