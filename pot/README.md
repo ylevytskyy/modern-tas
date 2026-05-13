@@ -21,13 +21,13 @@ PHASE 2 — MVP BUILD                    9–11 months
 | [S1](./S1-telephony-happy-path/) | End-to-end telephony happy path | Telephony eng | runnable | Green (Layer 1) |
 | [S2](./S2-queue-dequeue-latency/) | NestJS-arbitrated queue dequeue latency | Telephony + backend | runnable | Green |
 | [S3](./S3-ari-leader-hard-stop/) | ARI leader 100 ms hard-stop | Telephony eng | runnable | Green |
-| [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Not started |
+| [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Deferred (vendor + fixtures) |
 | [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Green |
 | [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
 | [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Not started |
 | [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Not started |
 
-Update the **Status** column inline as spikes execute. Statuses: Not started · In progress · Green · Yellow · Red.
+Update the **Status** column inline as spikes execute. Statuses: Not started · In progress · Green · Yellow · Red · Deferred (blocked on external prereqs that can't be synthesised without invalidating the measurement; carries to Sprint 0).
 
 ## Running a spike (human)
 

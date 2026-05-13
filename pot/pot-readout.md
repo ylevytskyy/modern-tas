@@ -67,12 +67,21 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 
 ## S4 — Two-pass redaction accuracy on 8 kHz μ-law
 
-- **Status:** Not started
+- **Status:** Deferred (vendor + fixtures)
 - **Run dates:** —
-- **Owner:** —
-- **Result:** —
-- **Evidence:** `pot/S4-redaction-accuracy/results/`
-- **ADR(s) updated:** ADR-0013
+- **Owner:** Backend + compliance (deferred to Sprint 0)
+- **Result:** Phase 0 attempt skipped. Two external prereqs are unavailable and cannot be synthesised without invalidating the measurement:
+    1. **AssemblyAI Universal-3 Pro Medical API key.** Gated by vendor sales (medical-tier SKU, not self-serve). No drop-in substitute: replacing it with Whisper / faster-whisper / a non-medical AssemblyAI tier produces numbers about *that* ASR's WER on 8 kHz μ-law, not about the production component the ADR commits us to. The hazard ADR-0013 names (medical-domain ASR boundary accuracy under telephony band-limiting) is the same hazard the substitution erases.
+    2. **30 audio fixtures @ 8 kHz μ-law with annotated PII spans.** Real telephony recordings of medical PII are not publicly available (HIPAA reasons) and the user has not yet captured them. Synthesising the corpus (TTS scripts → 8 kHz μ-law downsample) was considered and rejected: digit-by-digit number reading, accent variation, and codec artifacts are precisely the failure modes ADR-0013 calls out, and synthetic audio loses all three. A "Green" verdict on synthetic input would echo the S5 two-`psql` trap upstream — a runnable pipeline that doesn't exercise the named hazard.
+    3. (Presidio container is cheap — open-source image, not a blocker on its own.)
+- **G0 implication:** ARCHITECTURE v0.4 §2.4 requires every PoT spike Green-or-accepted-Yellow before G0 closes. A Deferred S4 is not on that enum. Sprint 0 must either land the prereqs (AssemblyAI medical key + fixture capture) and execute S4 inline, or de-scope ADR-0013 from MVP (e.g. ship without recording on HIPAA tenants, or accept the operational manual-QA backlog as the redaction strategy and skip the ML pipeline). The senior architect + compliance lead need to sign which path before G0 can be declared.
+- **Sprint-0 carry-over checklist (when prereqs land):**
+    - Define the ground-truth JSONL schema (the spike README mentions `start_ms, end_ms, kind, value` but no formal schema or example) and commit a `fixtures/ground-truth.example.jsonl` alongside it.
+    - Pin `mcr.microsoft.com/presidio-analyzer` from `:latest` to a versioned tag for reproducibility.
+    - Add a health check to the Presidio service in `docker-compose.yml` so the harness has a ready signal.
+    - Author the harness probe (Steps 1–5 in `runbook.md` — none of this code exists yet; the scaffold is structurally honest about being a stub).
+- **Evidence:** `pot/S4-redaction-accuracy/results/` (empty — nothing run).
+- **ADR(s) updated:** ADR-0013 stays Proposed; ratification gated on Sprint-0 S4 execution or ADR-0013 de-scope.
 
 ## S5 — Supavisor `SET LOCAL` parity
 

@@ -1,6 +1,6 @@
 # S4 — Two-pass redaction accuracy on 8 kHz μ-law
 
-> **Status: STUB — external dependencies required before this spike runs.** See §Prereqs.
+> **Status: DEFERRED (2026-05-13) — Phase 0 attempt skipped because external prereqs are unavailable.** Revisit during Sprint 0 once the AssemblyAI Universal-3 Pro Medical key and the 30-fixture audio corpus land. See §Prereqs for what's blocking. Substituting Whisper for AssemblyAI or TTS-then-downsample for real telephony audio was considered and rejected — it would produce a runnable pipeline whose Green/Red verdict does not bind on ADR-0013 (the substituted ASR's WER on 8 kHz μ-law is the *exact* hazard the spike must measure, and synthetic audio loses the accent + codec artifacts that ADR-0013 calls out as load-bearing). See `pot-readout.md` §S4 for the Sprint-0 carry-over note and G0 implications.
 
 ## Hypothesis
 
