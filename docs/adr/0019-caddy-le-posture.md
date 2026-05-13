@@ -1,7 +1,7 @@
 # ADR-0019: Caddy 2.10+ on-demand TLS posture + LE rate-limit exemption
 
-- **Status:** Proposed
-- **Date:** 2026-05-12
+- **Status:** Accepted
+- **Date:** 2026-05-12 (Proposed); ratified 2026-05-13 after PoT S8 Green
 - **Deciders:** SRE
 - **Consulted:** Senior architect, Security eng
 - **Informed:** Platform team
