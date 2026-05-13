@@ -1,0 +1,13 @@
+=== transaction 1 ===
+BEGIN
+SET
+t1_value|pid_t1
+tenant-A|134
+(1 row)
+COMMIT
+=== transaction 2 ===
+BEGIN
+t2_value|pid_t2
+|134
+(1 row)
+COMMIT

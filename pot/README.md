@@ -22,7 +22,7 @@ PHASE 2 — MVP BUILD                    9–11 months
 | [S2](./S2-queue-dequeue-latency/) | NestJS-arbitrated queue dequeue latency | Telephony + backend | runnable | Not started |
 | [S3](./S3-ari-leader-hard-stop/) | ARI leader 100 ms hard-stop | Telephony eng | runnable | Not started |
 | [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Not started |
-| [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Not started |
+| [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Green |
 | [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
 | [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Not started |
 | [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Not started |

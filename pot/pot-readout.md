@@ -44,12 +44,13 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 
 ## S5 — Supavisor `SET LOCAL` parity
 
-- **Status:** Not started
-- **Run dates:** —
-- **Owner:** —
-- **Result:** —
-- **Evidence:** `pot/S5-supavisor-set-local/results/`
-- **ADR(s) updated:** ADR-0018
+- **Status:** Green
+- **Run dates:** 2026-05-13
+- **Owner:** SRE (Claude / lion@levytskyy)
+- **Result:** Supavisor 1.1.66 in transaction mode honours the `SET LOCAL` boundary across transactions on a reused server backend. Two transactions in a single psql client session (tenant `pot`, `pool_size=1`, `mode_type=transaction`, `require_user=true`) both ran on backend pid 134; transaction 1 set `app.tenant_id = 'tenant-A'` via `SET LOCAL`; transaction 2 read `current_setting('app.tenant_id', true)` and got NULL/empty. No leak across the COMMIT boundary on the shared backend.
+- **Probe note:** the original scaffold's probe (two separate psql invocations) was structurally invalid — distinct client sessions land on distinct server backends even at `pool_size=1`, so any "no leak" result would have been trivially true and unrelated to the `SET LOCAL` mechanic. The probe was corrected to run both transactions in a single psql client session and assert `pid_t1 == pid_t2`; the scaffold also gained `fixtures/init.sql` (creates `_supavisor` database + schema), a `supavisor-migrate` one-shot compose service (runs `bin/supavisor eval "Supavisor.Release.migrate"`), and a JWT-minting step in `fixtures/probe.sh` (Supavisor's admin API rejects literal `Bearer dev`; it expects HS256 signed with `API_JWT_SECRET`).
+- **Evidence:** `pot/S5-supavisor-set-local/results/20260513T033050Z/` (`probe-output.txt`, `summary.md`, `tenant-create.json`)
+- **ADR(s) updated:** ADR-0018 (pending Decision flip from Proposed → Accepted on user confirmation)
 
 ## S6 — `/v1` byte-for-byte fixture capture
 
