@@ -1,6 +1,6 @@
 # ADR-0015: Temporal workflow engine — self-host MVP-baseline, Cloud upgrade path
 
-- **Status:** Proposed (rewritten 2026-05-13; pending G0 sign-off ratification per [`pot/g0-signoff-proposal.md`](../../pot/g0-signoff-proposal.md))
+- **Status:** Accepted (rewritten + ratified 2026-05-13; per Sprint-0 evidence in [`docs/adr/0015-selfhost-baseline-log.md`](./0015-selfhost-baseline-log.md) and [`docs/adr/0015-sdk-identity-evidence.md`](./0015-sdk-identity-evidence.md). Conditional on G0 sign-off Path B; reverts cleanly with commit `13ca47b` if Path A chosen instead.)
 - **Date:** 2026-05-12 (original); 2026-05-13 (Decision rewrite)
 - **Deciders:** Compliance lead, Backend lead
 - **Consulted:** Senior architect, Security eng, Platform lead
@@ -32,6 +32,7 @@ Adopt **self-hosted Temporal via the v1.0.0 Helm chart on EU-residency Kubernete
 - **+0.5–1 FTE platform-engineering** — cluster operation, version upgrades, Postgres + Elasticsearch operation, observability, backup/restore drills. Material but bounded; experienced platform engineers can operate Temporal v1.0.0 + PG + ES.
 - **Operational risk** — history-shard tuning, replication setup, and disaster-recovery rehearsal are owned by us rather than the vendor. Mitigation: keep the cluster simple (single-region MVP) and lean on Temporal's documented operational runbooks.
 - **SDK identity claim is load-bearing.** If Sprint-0 validation fails, the ADR Decision is renegotiated and downstream work may need rework.
+- **Open Risk #4 (Sprint-0 residual):** SDK identity between Temporal Cloud and self-host endpoints validated only on the self-host side (per [`docs/adr/0015-sdk-identity-evidence.md`](./0015-sdk-identity-evidence.md) partial check). Cloud-side validation deferred until a Cloud sandbox is available. Mitigation: first MVP workflow module (M30) catches divergence in passing; retroactive Cloud-side validation upgrades the evidence to full when sandbox lands.
 
 **Neutral:**
 - EU-residency cluster handles both EU and US tenants in MVP; per-region splits become a Sprint-N regulatory question, not an MVP-baseline question.
