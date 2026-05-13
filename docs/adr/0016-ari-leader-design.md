@@ -16,19 +16,19 @@ The risk: a leader that pauses (long GC, kernel scheduling, Redis stall) for >10
 
 Implement leader election with a Redis-held lease + 100 ms hard-stop:
 
-1. Each NestJS instance attempts `SET pot:ari-leader:<asterisk-id> <instance-id> NX PX 1000` once per second.
-2. Holder maintains `EXPIRE` to 1 s on every heartbeat.
-3. If a heartbeat fails or returns "lost lease," the holder closes its ARI WS within 100 ms (`process.nextTick` after the failure callback, no awaiting outstanding handlers).
-4. Replacement leader observes the missing key on its next heartbeat (1 s window) and opens its own WS.
+1. Each NestJS instance attempts `SET pot:ari-leader:<asterisk-id> <instance-id> NX PX <TTL>` every `HB` ms. **TTL must be strictly greater than HB** to keep the heartbeat `GET` off the TTL boundary; recommended ratio `TTL ≥ 3 × HB`. PoT used `HB = 500 ms` and `TTL = 1500 ms`; deployments should treat 3:1 as the minimum.
+2. Holder refreshes the lease with `PEXPIRE … <TTL>` on every successful heartbeat.
+3. If a heartbeat fails or returns "lost lease," the holder closes its ARI WS within 100 ms (`process.nextTick` after the failure callback, no awaiting outstanding handlers) **and drops any in-flight event handlers** — the close-latency budget is about stopping the deposed leader from acting on events, not about freeing an Asterisk-side slot (see Consequences).
+4. Replacement leader observes the missing key on its next heartbeat (≤ `HB` ms after expiry) and opens its own WS.
 5. Asterisk's `WebSocketEvent` log records the close at the Asterisk side; tcpdump confirms FIN within 100 ms of the simulated leader pause.
 
-Total worst-case unmanaged-event window: 1.1 s (1 s detection + 100 ms close + new leader's WS handshake). For our call volume this is acceptable; tighter windows require Asterisk-side leader awareness which doesn't exist.
+Total worst-case unmanaged-event window: `TTL + HB` (lease expiry + next standby heartbeat) before the standby holds the lease. With `HB = 500 ms` / `TTL = 1500 ms` that's ≤ 2 s. Because Asterisk 20.6 accepts multiple concurrent WS for the same Stasis app (see Consequences), the standby's WS handshake and reconciliation overlap the deposed leader's pause window rather than appending to it — the wall-clock unmanaged window is therefore the lease cycle alone. For our call volume this is acceptable; tighter windows require Asterisk-side leader awareness which doesn't exist.
 
 ## Consequences
 
 - **Positive:** Deterministic leader transfer. Bounded event-loss window. No Asterisk modifications required.
-- **Negative / cost:** Adds a Redis dependency to every Asterisk leader/standby NestJS instance. Network partitions between NestJS and Redis cause split-brain; mitigated by Asterisk only accepting one WS per Stasis app (the second connection rejects).
-- **Neutral:** 100 ms is a soft target — measurement may show 80 ms is achievable, or 150 ms is necessary. Spike tunes the actual number before the ADR moves to Accepted.
+- **Negative / cost:** Adds a Redis dependency to every Asterisk leader/standby NestJS instance. Network partitions between NestJS and Redis can cause split-brain. **Asterisk 20.6 accepts multiple concurrent WS subscribers for the same Stasis app**, so split-brain cannot be mitigated by relying on Asterisk to reject the standby's WS. Mitigation lives entirely on the NestJS side: (a) the deposed leader's hard-stop callback drops in-flight handlers within 100 ms of detecting "lost lease," and (b) the standby's reconciliation must be idempotent against any actions the deposed leader's drained handlers may have already taken. Asterisk's event-fanout ordering across multiple WS is implementation-defined; the design must not assume only one consumer receives any given event.
+- **Neutral:** 100 ms is a soft target — measurement may show 80 ms is achievable, or 150 ms is necessary. PoT S3 measured 1 ms wire close-latency, leaving generous headroom; production tuning may relax this if handler-drop latency dominates.
 
 ## Evidence
 
@@ -36,10 +36,10 @@ PoT spike S3 ran 2026-05-13. A 5-second `docker compose pause` chaos on the elec
 
 Evidence dir: [`pot/S3-ari-leader-hard-stop/results/20260513T052041Z/`](../../pot/S3-ari-leader-hard-stop/results/20260513T052041Z/) — `pause.pcap`, `leader-a.log`, `leader-b.log`, `channels-pre.txt`, `channels-post.txt`, `chaos-meta.json`, `summary.md`. Probe + scaffold-repair notes in [`pot/pot-readout.md` §S3](../../pot/pot-readout.md).
 
-Two findings against this ADR's current text surfaced during the spike and need resolving before the status flip:
+Two findings against this ADR's initial draft surfaced during the spike. Both have been folded into the Decision and Consequences sections above:
 
-1. **Heartbeat = TTL = 1 s is racy.** With the literal Decision wording, the heartbeat `GET key` fires at the exact TTL boundary, sees the key already evicted, and leadership flaps. The PoT used 500 ms heartbeat with 1500 ms TTL (3:1 ratio) for a stable run. The Decision should specify TTL > heartbeat — recommended 3:1.
-2. **Asterisk accepts multiple WS for the same Stasis app.** The Consequences section asserts "the second connection rejects" — observed behaviour on Asterisk 20.6 is the opposite. The standby's WS opens successfully while the deposed leader's WS is still alive, so the standby can reconcile during the deposed leader's pause window. The orphan window is therefore bounded by lease TTL (~1.5 s), not by `lease TTL + close-latency + new-WS handshake`. The Consequences text and the split-brain mitigation argument both need updating.
+1. **Heartbeat = TTL = 1 s is racy.** With the original Decision wording, the heartbeat `GET key` fires at the exact TTL boundary, sees the key already evicted, and leadership flaps. The PoT used 500 ms heartbeat with 1500 ms TTL (3:1 ratio) for a stable run. Decision §1 now requires `TTL > HB` with `TTL ≥ 3 × HB` recommended.
+2. **Asterisk accepts multiple WS for the same Stasis app.** The original Consequences section asserted "the second connection rejects." Observed behaviour on Asterisk 20.6 is the opposite — the standby's WS opens successfully while the deposed leader's WS is still alive, so the standby reconciles during the deposed leader's pause window. The orphan window is therefore bounded by the lease cycle (`TTL + HB`), not by `lease TTL + close-latency + new-WS handshake`. Consequences now requires NestJS-side split-brain mitigation (close-on-lease-loss + idempotent reconcile) and explicitly rejects reliance on Asterisk-level WS rejection.
 
 ## Alternatives considered
 
