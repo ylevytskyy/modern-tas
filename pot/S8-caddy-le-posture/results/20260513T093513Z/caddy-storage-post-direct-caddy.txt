@@ -1,0 +1,16 @@
+9
+---
+68.0K	/data/caddy
+---
+total 24
+drwx------    2 root     root          4096 May 13 09:34 .
+drwx------    3 root     root          4096 May 13 09:34 ..
+-rw-------    1 root     root           676 May 13 09:34 intermediate.crt
+-rw-------    1 root     root           227 May 13 09:34 intermediate.key
+-rw-------    1 root     root           627 May 13 09:34 root.crt
+-rw-------    1 root     root           227 May 13 09:34 root.key
+---
+total 12
+drwx------    3 root     root          4096 May 13 09:35 .
+drwxrwxrwt    5 root     root          4096 May 13 09:35 ..
+drwx------    3 root     root          4096 May 13 09:35 local
