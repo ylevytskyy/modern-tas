@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@temporalio/activity':
-        specifier: ^1.10.0
-        version: 1.17.1
       '@temporalio/client':
         specifier: ^1.10.0
         version: 1.17.1
