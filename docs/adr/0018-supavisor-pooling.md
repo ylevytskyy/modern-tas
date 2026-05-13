@@ -1,7 +1,8 @@
 # ADR-0018: Supavisor as transaction-mode pooler (PgBouncer fallback)
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-05-12
+- **Ratified:** 2026-05-13 (PoT spike S5 Green)
 - **Deciders:** SRE, Backend lead
 - **Consulted:** Senior architect, Security eng
 - **Informed:** All backend engineers
@@ -28,7 +29,11 @@ If S5 returns Red (parity not honoured), fall back to **PgBouncer 1.22+ in trans
 
 ## Evidence
 
-Pending PoT spike S5 — see [`pot/S5-supavisor-set-local/results/`](../../pot/S5-supavisor-set-local/results/). Target signal: a two-transaction probe (`BEGIN; SET LOCAL app.tenant_id = '...'; ...; COMMIT;` then a second transaction's `current_setting('app.tenant_id', true)` returns NULL/empty on the same pooler connection) returns Green.
+PoT spike S5 executed 2026-05-13 against `supabase/supavisor:1.1.66` in transaction mode at `pool_size=1`. **Result: Green** — two transactions in a single psql client session (which forces a shared server backend at `pool_size=1`) confirmed the `SET LOCAL` boundary held across `COMMIT`: transaction 1 set `app.tenant_id='tenant-A'`; transaction 2 (same backend, `pid_t1 == pid_t2 == 134`) read NULL/empty via `current_setting('app.tenant_id', true)`.
+
+Evidence files: [`pot/S5-supavisor-set-local/results/20260513T033050Z/`](../../pot/S5-supavisor-set-local/results/20260513T033050Z/) — `probe-output.txt`, `summary.md`, `tenant-create.json`.
+
+**Probe caveat (CI gate constraint):** the probe MUST run both transactions in a single psql/pg client session. Separate client sessions land on distinct server backends even at `pool_size=1`, which would make any "no leak" result trivially true and unrelated to the `SET LOCAL` mechanic. The corrected probe in [`pot/S5-supavisor-set-local/fixtures/probe.sh`](../../pot/S5-supavisor-set-local/fixtures/probe.sh) asserts `pid_t1 == pid_t2` before evaluating `t2_value`; this assertion is mandatory for every Supavisor upgrade re-run.
 
 ## Alternatives considered
 
