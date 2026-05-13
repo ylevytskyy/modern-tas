@@ -1,0 +1,78 @@
+# Temporal chart values for local-baseline.
+# External PG (bitnami/postgresql release: temporal-pg) +
+# External ES  (bitnami/elasticsearch release: temporal-es, ES 8.x).
+#
+# Architecture: three chained Helm releases in namespace "temporal":
+#   1. temporal-pg    → bitnami/postgresql   (values.postgresql.yaml)
+#   2. temporal-es    → bitnami/elasticsearch (values.elasticsearch.yaml)
+#   3. temporal-baseline → temporal/temporal  (this file)
+#
+# In-cluster DNS names:
+#   PG:  temporal-pg-postgresql.temporal.svc.cluster.local:5432  (bitnami/postgresql)
+#   ES:  elasticsearch-master.temporal.svc.cluster.local:9200    (elastic/elasticsearch official chart)
+#
+# NOTE: bitnami/elasticsearch uses image from Docker Hub which is behind Bitnami paywall
+# (August 2025). We use elastic/elasticsearch Helm chart (https://helm.elastic.co)
+# which uses docker.elastic.co images (free).
+# IMPORTANT: The official Elastic chart names the service "elasticsearch-master" (not
+# "<release>-master"). The release name is NOT prepended to the service name.
+#
+# Secret auto-created by bitnami/postgresql:
+#   name: temporal-pg-postgresql   key: postgres-password
+
+server:
+  replicaCount: 1
+  config:
+    persistence:
+      defaultStore: default
+      visibilityStore: visibility
+      # numHistoryShards cannot be changed after initial deployment.
+      numHistoryShards: 512
+      datastores:
+        default:
+          sql:
+            createDatabase: true
+            manageSchema: true
+            pluginName: postgres12
+            driverName: postgres12
+            databaseName: temporal
+            connectAddr: "temporal-pg-postgresql.temporal.svc.cluster.local:5432"
+            connectProtocol: tcp
+            user: postgres
+            existingSecret: temporal-pg-postgresql
+            secretKey: postgres-password
+        visibility:
+          elasticsearch:
+            # v8 = ES 8.x (bitnami/elasticsearch chart 21.x, app 8.18.0).
+            # Temporal 1.20+ supports ES v8; Temporal 1.31 (this chart) is confirmed compatible.
+            version: v8
+            url:
+              scheme: http
+              host: "elasticsearch-master.temporal.svc.cluster.local:9200"
+            logLevel: error
+            indices:
+              visibility: temporal_visibility_v1
+
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 500m
+
+web:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+
+# NOTE: prometheus/grafana/cassandra/elasticsearch/mysql top-level keys are all rejected
+# by temporal/temporal chart v1.0.0+. Those subcharts were removed in v1.0.0-rc.2.
+# Metrics: configure via server.metrics.annotations or server.metrics.serviceMonitor instead.
