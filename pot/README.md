@@ -23,7 +23,7 @@ PHASE 2 — MVP BUILD                    9–11 months
 | [S3](./S3-ari-leader-hard-stop/) | ARI leader 100 ms hard-stop | Telephony eng | runnable | Green |
 | [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Deferred (vendor + fixtures) |
 | [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Green |
-| [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
+| [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Deferred (vendor + endpoint inventory) |
 | [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Deferred (vendor correspondence) |
 | [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Green |
 

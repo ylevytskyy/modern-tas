@@ -4,7 +4,7 @@
 
 ## TL;DR
 
-**Five of eight spikes are Green and ratified.** Two are Deferred-Blocked on vendor dependencies (S4: AssemblyAI medical key + telephony fixture corpus; S7: Temporal sales letter). One is genuinely unstarted but vendor-dependent in the same shape (S6: live nCall instance access).
+**Five of eight spikes are Green and ratified.** Three are Deferred-Blocked on vendor dependencies (S4: AssemblyAI medical key + telephony fixture corpus; S6: live nCall instance access + CRM-consumed-endpoint inventory; S7: Temporal sales letter). No spike remains genuinely unstarted.
 
 ARCHITECTURE v0.4 §2.4 declares G0 closeable only when "All 8 spikes Green, or any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead. **Red blocks MVP kickoff.**" The gate enum does not include "Deferred" — so G0 cannot close cleanly today; Sprint 0 must either land the vendor dependencies, adopt documented fallbacks, or expand the gate enum with senior-architect + compliance-lead sign-off.
 
@@ -19,7 +19,7 @@ Two ADRs were amended-then-ratified this session (ADR-0016 from S3 findings; ADR
 | S3 | ARI leader 100 ms hard-stop | **Green** | `pot/S3` | `pot/S3-ari-leader-hard-stop` | ADR-0016 | `pot/S3-ari-leader-hard-stop/results/20260513T052041Z/` | Wire close 1 ms vs 100 ms; reconcile 1474 ms vs 7 s. **Two ADR-0016 findings amended**: TTL > HB (3:1 ratio), Asterisk accepts multi-WS. Ratified. |
 | S4 | Two-pass redaction accuracy on 8 kHz μ-law | **Deferred** | — | `pot/S4-redaction-accuracy` | ADR-0013 | empty | Blocked: AssemblyAI Universal-3 Pro Medical key + 30 annotated telephony fixtures. Synthesis erases the exact hazard ADR names. |
 | S5 | Supavisor `SET LOCAL` parity | **Green** | `pot/S5` | `pot/S5-supavisor-set-local` | ADR-0018 | `pot/S5-supavisor-set-local/results/20260513T033050Z/` | Same backend pid across transactions; no leak across COMMIT. Ratified. |
-| S6 | `/v1` byte-for-byte fixture capture | **Not started** | — | (off main) | (none — feeds M25 module) | empty | Vendor-dependent (live nCall access). Has documented Yellow fallback (scrape existing CRM cache). Likely Deferred-Blocked when cold-read. |
+| S6 | `/v1` byte-for-byte fixture capture | **Deferred** | — | `pot/S6-ncall-fixture-capture` | (none — feeds M25 module) | empty | Blocked: live nCall instance access + CRM-consumed-endpoint inventory. Synthesis erases the hazard (unknown spec/reality deviation). Yellow fallback documented (scrape existing CRM cache). |
 | S7 | Temporal Cloud BAA + EU namespace | **Deferred** | — | `pot/S7-temporal-baa` (current branch) | ADR-0015 | empty | Sales/legal correspondence — 2–6 week cycle, not initiated. Self-host fallback documented in ADR-0015. |
 | S8 | Caddy 2.10+ permission + LE rate-limit | **Green** | `pot/S8` | `pot/S8-caddy-le-posture` | ADR-0019 | `pot/S8-caddy-le-posture/results/20260513T093513Z/` | HAProxy dreq 58 193/59 597; 0 cert files written for 59 k declined. **Three ADR-0019 findings amended**: Caddy LRU claim false (storage short-circuit is the real mechanism); permission endpoint is layer 2; threshold tunability footnote. Ratified. |
 
@@ -67,7 +67,7 @@ Spikes are scoped to the named hazard; some risks were out of scope for Phase 0 
 
 ## Commit chain (forensic trail for this session)
 
-Branch chain off `main`: pot/scaffold? → S5 → S2 → S3 → S1 → S4 → S8 → S7 (current).
+Branch chain off `main`: pot/scaffold? → S5 → S2 → S3 → S1 → S4 → S8 → S7 → S6 (current).
 
 Five ADR ratifications landed in this session: 0018 (S5), 0024 (S2), 0016 (S3, with two text amendments), 0019 (S8, with three text amendments).
 
@@ -77,4 +77,4 @@ No tags in `main` yet; merging the spike chain into `main` and deleting the spik
 
 ---
 
-*Last updated 2026-05-13 by the session that closed out S8 and deferred S7. Update inline as Sprint-0 decisions land.*
+*Last updated 2026-05-13 by the session that closed out S8 and deferred S7 + S6. Update inline as Sprint-0 decisions land.*

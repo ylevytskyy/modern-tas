@@ -95,12 +95,22 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 
 ## S6 — `/v1` byte-for-byte fixture capture
 
-- **Status:** Not started
+- **Status:** Deferred (vendor + endpoint inventory)
 - **Run dates:** —
-- **Owner:** —
-- **Result:** —
-- **Evidence:** `pot/S6-ncall-fixture-capture/results/`
-- **ADR(s) updated:** —
+- **Owner:** Compliance + backend (deferred to Sprint 0 / Sprint 1)
+- **Result:** Phase 0 attempt skipped. Two external prereqs are unavailable and cannot be synthesised without invalidating the measurement:
+    1. **Live nCall instance access.** Either a vendor-provided sandbox or an existing tenant with a read-only test user (HTTP Basic Auth creds for `NCALL_BASE_URL` / `NCALL_USER` / `NCALL_PASS`). The hazard S6 exists to surface is the *unknown deviation* between PRD §7.5 spec and what production nCall actually returns over the wire. Any substitute (mock server, PRD-driven response generator, in-house stub) erases that deviation by construction — the Green verdict would echo only the spec back, not what the M25 `/v1` compatibility module will encounter in production.
+    2. **CRM-consumed-endpoint inventory.** The runbook lists a starting set (`time`, `me`, `Users`, `Calls`, `Messages`, `Contacts`, `Clients`, `todo`, `KPI`, per-client `billing` — per [[crm-api-compat]] memory + PRD §7.5) but the authoritative list comes from the existing CRM's source / access logs / developer interview; none of these inputs has been gathered. The Green threshold "200 fixtures" is aspirational and must be recalibrated against the actual CRM-consumed surface area before execution.
+    3. The probe itself — curl loop over `fixtures/v1-xml/<resource>/<query-fingerprint>.xml` + a quirks diff against PRD §7.5 — is trivially writable once prereqs land. The README correctly defers `fixtures/capture.sh.template` to spike-execution time, since live response shapes (Basic Auth flow, pagination, error format) drive the script's structure.
+- **G0 implication:** ARCHITECTURE v0.4 §2.4 requires every PoT spike Green-or-accepted-Yellow before G0 closes. A Deferred S6 joins S4 + S7 outside that enum — three of eight spikes are now Phase-0-blocked on external vendor / data prereqs. S6 has no primary ADR (the spike feeds the M25 module spec directly, not an ADR), so there is no ADR ratification gated on the outcome. However, M25 itself is downstream of S6's fixtures and cannot start construction without them. Sprint 0 must either land the prereqs and execute S6 inline (preferred), or accept the documented Yellow remediation per the spike README (scrape the existing CRM's response cache — lower fidelity, captures only endpoints the CRM uses today, but extractable without vendor cooperation). Senior architect + compliance lead need to sign which path before G0 can be declared.
+- **Sprint-0 carry-over checklist (when prereqs land):**
+    - Gather the CRM-consumed-endpoint inventory first (source grep / access-log scrape / interview); that list determines `capture.sh`'s structure.
+    - Author `fixtures/capture.sh.template` (currently referenced in README + runbook but missing). Curl loop iterating over the inventory × known query shapes (`field_names.xml`, `find.xml`, `find.xml?<field>=<value>` with date / `greater_than_X` / `less_than_X` / `output_fields=` variations).
+    - Author `results/quirks.md` template (referenced in §Recording protocol but missing).
+    - Pin the planned long-term destination — `/contracts/fixtures/v1-xml/<resource>/<query-fingerprint>.xml` — and decide on the fingerprint scheme (the README implies a query-sanitisation step but doesn't formalise it).
+    - Recalibrate the Green threshold against the actual CRM-consumed surface; the README's 200 is a placeholder.
+- **Evidence:** `pot/S6-ncall-fixture-capture/results/` (empty — nothing run).
+- **ADR(s) updated:** none. S6 has no primary ADR; fixtures carry forward into `/contracts/fixtures/v1-xml/` at Sprint-0/1 execution.
 
 ## S7 — Temporal Cloud BAA + EU namespace
 
