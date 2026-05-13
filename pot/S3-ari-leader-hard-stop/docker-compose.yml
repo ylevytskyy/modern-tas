@@ -2,16 +2,20 @@
 
 services:
   asterisk:
-    image: andrius/asterisk:22.9-current
+    build: ./asterisk-image
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
     volumes:
       - ./fixtures/asterisk:/etc/asterisk:ro
     ports:
       - "8088:8088"
     healthcheck:
-      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
+      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' 2>/dev/null | grep -q 'System uptime'"]
       interval: 10s
       timeout: 3s
-      retries: 6
+      retries: 18
+      start_period: 30s
 
   redis:
     image: redis:7-alpine

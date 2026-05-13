@@ -1,22 +1,35 @@
-.PHONY: up test teardown snapshot-results status
-TIMESTAMP := $(shell date -u +%Y%m%dT%H%M%SZ)
+# S3 — ARI leader 100 ms hard-stop
+.PHONY: up smoke test teardown snapshot-results status
 
 up:
 	docker compose up -d --build
-	@sleep 10
+	@echo "Waiting for asterisk + redis healthchecks..."
+	@for i in $$(seq 1 30); do \
+	  if [ "$$(docker compose ps --format json | grep -c '"Health":"healthy"')" -ge 2 ]; then \
+	    echo "core services healthy"; break; \
+	  fi; \
+	  sleep 2; \
+	done
+	@echo "Waiting 6 s for leader election to settle..."
+	@sleep 6
 	docker compose ps
 
-test:
-	@echo "S3 chaos test: see runbook.md — pcap capture is host-side, run manually."
-	@false
+smoke:
+	@echo "[smoke] current lease holder:"
+	@docker compose exec -T redis redis-cli GET pot:ari-leader:asterisk-1 || true
+	@echo "[smoke] leader-a last 10 log lines:"
+	@docker compose logs --no-color --tail=10 leader-a
+	@echo "[smoke] leader-b last 10 log lines:"
+	@docker compose logs --no-color --tail=10 leader-b
 
-teardown:
-	docker compose down -v
+test:
+	bash scripts/run-test.sh
 
 snapshot-results:
-	mkdir -p results/$(TIMESTAMP)
-	docker compose logs > results/$(TIMESTAMP)/leader-logs.txt 2>&1
-	@echo "Snapshot at results/$(TIMESTAMP)/"
+	@ls -1 results/ 2>/dev/null | tail -5 || echo "no results yet"
+
+teardown:
+	docker compose down -v --remove-orphans
 
 status:
 	@docker compose ps
