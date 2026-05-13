@@ -1,10 +1,12 @@
 # Temporal chart values for local-baseline.
 # External PG (bitnami/postgresql release: temporal-pg) +
-# External ES  (bitnami/elasticsearch release: temporal-es, ES 8.x).
+# External ES  (elastic/elasticsearch release: temporal-es, ES 8.5.1).
 #
 # Architecture: three chained Helm releases in namespace "temporal":
 #   1. temporal-pg    → bitnami/postgresql   (values.postgresql.yaml)
-#   2. temporal-es    → bitnami/elasticsearch (values.elasticsearch.yaml)
+#   2. temporal-es    → elastic/elasticsearch (values.elasticsearch.yaml — switched
+#                       from bitnami/elasticsearch due to the August 2025 paywall on
+#                       bitnami/os-shell init container images)
 #   3. temporal-baseline → temporal/temporal  (this file)
 #
 # In-cluster DNS names:
@@ -43,7 +45,7 @@ server:
             secretKey: postgres-password
         visibility:
           elasticsearch:
-            # v8 = ES 8.x (bitnami/elasticsearch chart 21.x, app 8.18.0).
+            # v8 = ES 8.x (elastic/elasticsearch chart 8.5.1, app 8.5.1).
             # Temporal 1.20+ supports ES v8; Temporal 1.31 (this chart) is confirmed compatible.
             version: v8
             url:

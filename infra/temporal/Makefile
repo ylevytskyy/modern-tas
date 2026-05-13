@@ -31,12 +31,18 @@ ES_RELEASE      := temporal-es
 ES_VERSION      := 8.5.1
 
 .PHONY: cluster-up
-cluster-up:
+cluster-up: check-prereqs
 	kind create cluster --config kind-cluster.yaml
 	kubectl cluster-info --context kind-$(CLUSTER_NAME)
 
+.PHONY: check-prereqs
+check-prereqs:
+	@command -v kind    >/dev/null 2>&1 || { echo "ERROR: kind not found. Install: brew install kind"; exit 1; }
+	@command -v helm    >/dev/null 2>&1 || { echo "ERROR: helm not found. Install: brew install helm"; exit 1; }
+	@command -v kubectl >/dev/null 2>&1 || { echo "ERROR: kubectl not found. Install: brew install kubectl"; exit 1; }
+
 .PHONY: chart-repos
-chart-repos:
+chart-repos: check-prereqs
 	helm repo add temporal $(TEMPORAL_REPO)
 	helm repo add bitnami  $(BITNAMI_REPO)
 	helm repo add elastic  $(ELASTIC_REPO)
@@ -80,10 +86,13 @@ pods:
 .PHONY: port-forward
 port-forward:
 	@echo "Forwarding 7233 (gRPC) and 8080 (Web UI). Ctrl-C to stop."
+	@echo "If Ctrl-C leaves orphan kubectl processes, kill them with: pkill -f 'kubectl port-forward'"
 	kubectl port-forward -n $(NAMESPACE) svc/$(TEMPORAL_RELEASE)-frontend 7233:7233 & \
 	kubectl port-forward -n $(NAMESPACE) svc/$(TEMPORAL_RELEASE)-web 8080:8080 & \
 	wait
 
+# Assumes /sprint-0/temporal-sdk-validation/ exists at the expected path
+# relative to this Makefile (sibling of infra/, two levels up). Fails if moved.
 .PHONY: hello
 hello:
 	cd ../../sprint-0/temporal-sdk-validation && pnpm run hello

@@ -104,7 +104,7 @@ make down    # deletes the kind cluster (all data lost — expected for local ba
 |------|---------|
 | `kind-cluster.yaml` | kind cluster config, ports 7233 + 8080 mapped to host |
 | `values.postgresql.yaml` | bitnami/postgresql values (no persistence, local only) |
-| `values.elasticsearch.yaml` | bitnami/elasticsearch values (single-node, ES 8.x) |
+| `values.elasticsearch.yaml` | elastic/elasticsearch values (single-node, ES 8.5.1) |
 | `values.local.yaml` | temporal/temporal values (external PG + ES, local baseline) |
 | `values.yaml` | Production-target values (UNRUN — EU HA + mTLS + external managed PG/ES) |
 | `Chart.lock` | Pinned chart versions for reproducibility |

@@ -6,8 +6,11 @@
 # gate (effective August 2025). We use the official Elastic Helm chart instead.
 # The Makefile targets elastic/elasticsearch (repo: https://helm.elastic.co).
 #
-# Service created by this chart: <release-name>-master (port 9200)
-# For release "temporal-es": temporal-es-master.temporal.svc.cluster.local:9200
+# Service created by this chart: elasticsearch-master (port 9200)
+# NOTE: the official Elastic chart names the service from `clusterName` (default
+# "elasticsearch"), NOT from the Helm release name. So the in-cluster DNS is
+# elasticsearch-master.<namespace>.svc.cluster.local:9200 regardless of release name.
+# For namespace "temporal": elasticsearch-master.temporal.svc.cluster.local:9200
 #
 # Security: disabled for local baseline (no TLS, no x-pack auth).
 # Protocol: http (not https — createCert: false + xpack.security.enabled: false).
