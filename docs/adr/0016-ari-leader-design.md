@@ -1,6 +1,6 @@
 # ADR-0016: ARI leader 100 ms hard-stop heartbeat
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-05-12
 - **Deciders:** Telephony lead, Backend lead
 - **Consulted:** SRE, Senior architect
