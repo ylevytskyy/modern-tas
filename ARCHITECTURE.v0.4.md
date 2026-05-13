@@ -100,9 +100,11 @@ Total: ~2 FTE for 4–6 weeks. Sprint 0 ADR work runs on the senior architect + 
 
 ### 2.4 PoT exit gate G0
 
-- All 8 spikes Green, **or** any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead. **Red blocks MVP kickoff.**
+- All 8 spikes Green, **or** any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead, **or any Deferred-with-fallback-plan has its documented fallback (in the spike's primary ADR or spike README) adopted as the MVP implementation path and signed off by the same approvers**. **Red blocks MVP kickoff.**
 - The 8 spike directories are tagged `pot/<spike>` in git for forensic reference and then deleted from `main` (their fixtures and ADR evidence carry forward).
 - `docs/pot-readout.md` committed with one paragraph per spike + measurement traces.
+
+> **Amendment 2026-05-13** — the third clause ("Deferred-with-fallback-plan") was added to the gate enum after three of eight PoT spikes (S4 redaction-accuracy, S6 `/v1` fixture-capture, S7 Temporal BAA) hit vendor-prereq blocks that could not be synthesised without invalidating the named hazard. **Deferred-with-fallback-plan** is reserved for spikes whose hazard cannot be measured in Phase 0 because external prereqs (vendor access, annotated fixtures, sales/legal correspondence) cannot be synthesised without erasing the measurement, AND where the affected ADR or spike README documents a fallback that closes the named hazard at MVP-acceptable cost. Adopting it commits the project to the fallback path; the live-vendor path becomes a Sprint-N upgrade. Each invocation requires a one-line forensic note in `pot/pot-readout.md` recording which Deferred outcome was chosen and on what basis. See `pot/g0-signoff-proposal.md` for the rationale, precedent, and per-spike fallback inventory. The amendment is **pending G0 sign-off ratification** — senior architect + compliance lead signatures on the proposal legitimise it.
 
 If any spike trends Yellow → Red beyond week 4, the PoT may extend to 6 weeks **or** the affected design is renegotiated in an ADR amendment before MVP kickoff. **Sprint 1 does not start until G0 is signed off.**
 
