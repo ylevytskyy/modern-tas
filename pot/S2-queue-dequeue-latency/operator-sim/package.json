@@ -1,0 +1,13 @@
+{
+  "name": "pot-s2-operator-sim",
+  "version": "0.0.1",
+  "private": true,
+  "description": "PoT-only operator-WS simulator. Sends accepts at a fixed rate and logs ring events to CSV.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

@@ -1,4 +1,5 @@
-# S2 — queue dequeue latency. Boots Postgres + Redis + NATS + minimal NestJS arbiter + Asterisk.
+# S2 — queue dequeue latency. Boots Postgres + Redis + NATS + arbiter + Asterisk;
+# operator-sim and SIPp run on demand under the `driver` profile.
 
 services:
   postgres:
@@ -26,23 +27,23 @@ services:
     ports:
       - "8222:8222"  # monitoring
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8222/healthz"]
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8222/healthz || exit 1"]
       interval: 5s
       timeout: 2s
       retries: 5
 
   asterisk:
-    image: andrius/asterisk:22.9-current
+    build: ./asterisk-image
     volumes:
       - ./fixtures/asterisk:/etc/asterisk:ro
     ports:
       - "8088:8088"
-      - "5060:5060/udp"
     healthcheck:
-      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
+      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' 2>/dev/null | grep -q 'System uptime'"]
       interval: 10s
       timeout: 3s
-      retries: 6
+      retries: 18
+      start_period: 30s
 
   arbiter:
     build: ./arbiter
@@ -62,13 +63,27 @@ services:
       ARI_USER: pot
       ARI_PASS: pot
       ARI_APP: pot-queue
+      QUEUE_ID: pot-queue
     ports:
       - "3000:3000"  # operator WS
 
   sipp:
-    image: ctaloi/sipp:3.7
-    profiles: ["driver"]   # only runs when explicitly invoked
+    build: ./sipp-image
+    profiles: ["driver"]
     depends_on:
       - asterisk
     volumes:
       - ./fixtures/sipp:/sipp:ro
+
+  operator-sim:
+    build: ./operator-sim
+    profiles: ["driver"]
+    depends_on:
+      - arbiter
+    environment:
+      ARBITER_URL: ws://arbiter:3000
+      ACCEPT_RATE_PER_SEC: "10"
+      OPERATOR_COUNT: "10"
+      DURATION_MS: "580000"   # 580 s emitting; 20 s warmup → 10 min total wall clock
+      WARMUP_MS: "20000"
+      OUTPUT_DIR: /app/results
