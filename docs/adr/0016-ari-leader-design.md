@@ -32,7 +32,14 @@ Total worst-case unmanaged-event window: 1.1 s (1 s detection + 100 ms close + n
 
 ## Evidence
 
-Pending PoT spike S3 — see [`pot/S3-ari-leader-hard-stop/results/`](../../pot/S3-ari-leader-hard-stop/results/). Target signal: chaos-paused leader observed close WS within 100 ms via Asterisk WebSocketEvent log + tcpdump; replacement leader closes orphaned channels within 7 s.
+PoT spike S3 ran 2026-05-13. A 5-second `docker compose pause` chaos on the elected leader produced **wire close-latency = 1 ms** (Asterisk-side FIN observed via in-container tcpdump on port 8088, vs the 100 ms budget) and **reconcile-from-chaos = 1.474 s** (standby acquired the lease, opened its WS, and hung up all 20 orphan channels in a 10-Local-pair test fixture, vs the 7 s budget). `channels-pre` 20 → `channels-post` 0 confirmed the cleanup actually happened, not a counter-reset.
+
+Evidence dir: [`pot/S3-ari-leader-hard-stop/results/20260513T052041Z/`](../../pot/S3-ari-leader-hard-stop/results/20260513T052041Z/) — `pause.pcap`, `leader-a.log`, `leader-b.log`, `channels-pre.txt`, `channels-post.txt`, `chaos-meta.json`, `summary.md`. Probe + scaffold-repair notes in [`pot/pot-readout.md` §S3](../../pot/pot-readout.md).
+
+Two findings against this ADR's current text surfaced during the spike and need resolving before the status flip:
+
+1. **Heartbeat = TTL = 1 s is racy.** With the literal Decision wording, the heartbeat `GET key` fires at the exact TTL boundary, sees the key already evicted, and leadership flaps. The PoT used 500 ms heartbeat with 1500 ms TTL (3:1 ratio) for a stable run. The Decision should specify TTL > heartbeat — recommended 3:1.
+2. **Asterisk accepts multiple WS for the same Stasis app.** The Consequences section asserts "the second connection rejects" — observed behaviour on Asterisk 20.6 is the opposite. The standby's WS opens successfully while the deposed leader's WS is still alive, so the standby can reconcile during the deposed leader's pause window. The orphan window is therefore bounded by lease TTL (~1.5 s), not by `lease TTL + close-latency + new-WS handshake`. The Consequences text and the split-brain mitigation argument both need updating.
 
 ## Alternatives considered
 
