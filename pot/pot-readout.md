@@ -104,12 +104,16 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 
 ## S7 — Temporal Cloud BAA + EU namespace
 
-- **Status:** Not started
+- **Status:** Deferred (vendor correspondence)
 - **Run dates:** —
-- **Owner:** —
-- **Result:** —
-- **Evidence:** `pot/S7-temporal-baa/results/`
-- **ADR(s) updated:** ADR-0015
+- **Owner:** Compliance lead (deferred to Sprint 0)
+- **Result:** Phase 0 attempt skipped. S7 is structurally a sales/legal correspondence spike — `make up` is a no-op, `make test` exits 1, the only "fixture" is the email template in `runbook.md`. The hazard ("does Temporal Cloud sign a BAA + confirm EU-namespace metadata residency?") is resolved only by receiving a signed letter from Temporal sales, which has a 2–6 week calendar turnaround and has not been initiated. There is nothing to substitute or synthesise (analogous to S4 — no probe alteration would produce a meaningful verdict; the verdict is the letter itself).
+- **Sprint-0 carry-over options:**
+    1. **Initiate sales contact per `runbook.md`** (preferred if Temporal Cloud Enterprise is the operating-model intent): send the outreach email to `sales@temporal.io`, log responses in `results/correspondence.md`, attach the BAA letter as `results/baa-letter.pdf` when received, flip Status → Green and ADR-0015 → Accepted.
+    2. **Adopt ADR-0015's documented Yellow/Red fallback directly** (self-hosted Temporal via v1.0.0 Helm chart on EU-residency Kubernetes): rewrite ADR-0015 §Decision to point at the self-host path, close S7 as N/A, accept the +0.5–1 FTE platform-engineering cost as MVP-baseline rather than contingent. Application-layer SDK code is identical; only the connection string changes.
+- **G0 implication:** ARCHITECTURE v0.4 §2.4 requires every PoT spike Green-or-accepted-Yellow before G0 closes. Two Deferred spikes (S4 + S7) are not on that enum. Sprint 0 must either land both vendor dependencies in-flight or take the documented fallbacks for each (de-scope ADR-0013 or accept manual-QA-only redaction for S4; adopt the self-host fallback for ADR-0015 / S7). The senior architect + compliance lead need to sign which path before G0 can be declared.
+- **Evidence:** `pot/S7-temporal-baa/results/` (empty — nothing run).
+- **ADR(s) updated:** ADR-0015 stays Proposed; ratification gated on Sprint-0 S7 execution OR explicit adoption of the self-host fallback.
 
 ## S8 — Caddy 2.10+ permission + LE rate-limit
 

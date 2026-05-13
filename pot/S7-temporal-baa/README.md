@@ -1,6 +1,6 @@
 # S7 — Temporal Cloud BAA + EU namespace metadata egress
 
-> **Status: STUB — sales/legal correspondence, no infra.**
+> **Status: DEFERRED (2026-05-13) — Phase 0 attempt skipped because the spike's outcome depends on receiving a sales letter from Temporal Technologies (2–6 week calendar), which has not been initiated.** Revisit during Sprint 0 either by (a) sending the outreach email per `runbook.md` and waiting for the BAA letter, or (b) adopting the ADR-0015 Yellow/Red fallback directly (self-hosted Temporal via v1.0.0 Helm chart on EU-residency Kubernetes) and removing the dependency on Temporal sales entirely. See `pot-readout.md` §S7 for the deferral reasoning + G0 implications.
 
 ## Hypothesis
 

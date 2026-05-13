@@ -24,8 +24,8 @@ PHASE 2 — MVP BUILD                    9–11 months
 | [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Deferred (vendor + fixtures) |
 | [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Green |
 | [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
-| [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Not started |
-| [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Green (ADR amendments pending) |
+| [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Deferred (vendor correspondence) |
+| [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Green |
 
 Update the **Status** column inline as spikes execute. Statuses: Not started · In progress · Green · Yellow · Red · Deferred (blocked on external prereqs that can't be synthesised without invalidating the measurement; carries to Sprint 0).
 
