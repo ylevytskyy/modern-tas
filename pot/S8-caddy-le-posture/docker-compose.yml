@@ -1,42 +1,87 @@
-# S8 — Caddy 2.10+ permission + LE rate-limit posture.
+# S8 — Caddy 2.10+ on-demand TLS posture spike.
+#
+# Topology:
+#   k6 ─┬─► HAProxy (172.30.8.30:443) ─► Caddy (172.30.8.20:443) ─► permission:8080
+#       └─► Caddy   (172.30.8.20:443) ─►                           ─► permission:8080
+#
+# Two k6 scenarios share the script; the test runner picks which target via
+# the `--hosts` flag at invocation. HAProxy and Caddy get static IPs so the
+# host mapping is deterministic.
+#
+# k6 is profile-gated so it doesn't boot at `make up`; the runner does
+# `docker compose run --rm k6 ...` once the stack is healthy.
+
+networks:
+  s8:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.8.0/24
+
+volumes:
+  caddy-data:
+  caddy-config:
 
 services:
   permission:
-    image: python:3.12-alpine
-    command: ["python", "-m", "http.server", "8080"]
+    build:
+      context: ./fixtures/permission
+    image: pot-s8/permission:dev
+    networks:
+      - s8
+    volumes:
+      - ./results/_live/permission:/var/log/permission
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080 >/dev/null"]
+      test: ["CMD", "python3", "/app/healthcheck.py"]
       interval: 5s
       timeout: 2s
-      retries: 5
+      retries: 10
 
   caddy:
-    image: caddy:2.10-alpine
+    image: caddy:2.10.2-alpine
     depends_on:
       permission:
         condition: service_healthy
+    networks:
+      s8:
+        ipv4_address: 172.30.8.20
+    ports:
+      - "2019:2019"   # admin API for metrics scraping by run-test.sh
     volumes:
       - ./fixtures/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-    ports:
-      - "8081:80"
-      - "8443:443"
-      - "2019:2019"  # admin API
+      - caddy-data:/data/caddy
+      - caddy-config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:2019/config/ >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
 
   haproxy:
-    image: haproxy:3.0-alpine
+    image: haproxy:3.0.6-alpine
     depends_on:
-      - caddy
+      caddy:
+        condition: service_healthy
+    networks:
+      s8:
+        ipv4_address: 172.30.8.30
+    ports:
+      - "8404:8404"   # stats CSV for run-test.sh
     volumes:
       - ./fixtures/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-    ports:
-      - "8082:80"
-      - "8444:443"
-      - "8404:8404"  # stats
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8404/stats >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
 
   k6:
     image: grafana/k6:0.50.0
     profiles: ["driver"]
+    networks:
+      - s8
     volumes:
       - ./fixtures/k6:/scripts:ro
       - ./results:/results
-    entrypoint: ["sleep", "infinity"]
+    # Entrypoint kept as the k6 default so `docker compose run --rm k6 run …`
+    # works without an entrypoint override.

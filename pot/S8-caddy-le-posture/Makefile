@@ -2,25 +2,31 @@
 TIMESTAMP := $(shell date -u +%Y%m%dT%H%M%SZ)
 
 up:
-	docker compose up -d
-	@sleep 5
+	docker compose up -d --build
+	@echo "Waiting for services to become healthy..."
+	@for i in $$(seq 1 30); do \
+	  unhealthy=$$(docker compose ps --format json | grep -c 'unhealthy\|"Health":"starting"' || true); \
+	  if [ "$$unhealthy" = "0" ]; then \
+	    echo "All healthy."; break; \
+	  fi; \
+	  sleep 2; \
+	done
 	docker compose ps
 
 test:
-	@echo "S8 load test: see runbook.md — k6 scenario script lands at spike-execution time."
-	@echo "Manual: docker compose --profile driver run k6 run /scripts/sni-flood.js"
-	@exit 1
+	@mkdir -p results/$(TIMESTAMP)
+	@./scripts/run-test.sh $(TIMESTAMP)
+	@echo "==> Results: results/$(TIMESTAMP)/"
 
 teardown:
-	docker compose down -v
+	docker compose down -v --remove-orphans
 
 snapshot-results:
-	mkdir -p results/$(TIMESTAMP)
-	docker compose logs > results/$(TIMESTAMP)/all-logs.txt 2>&1
-	@curl -sS http://localhost:2019/metrics > results/$(TIMESTAMP)/caddy-metrics.txt 2>/dev/null || true
-	@curl -sS http://localhost:8404/stats\;csv > results/$(TIMESTAMP)/haproxy-stats.csv 2>/dev/null || true
-	@echo "Snapshot at results/$(TIMESTAMP)/"
+	@latest=$$(ls -1t results/ 2>/dev/null | grep -v '^_' | head -1); \
+	  if [ -z "$$latest" ]; then echo "No results yet."; exit 1; fi; \
+	  echo "Latest results: results/$$latest/"; \
+	  ls -la results/$$latest/
 
 status:
-	@docker compose ps
-	@ls -1 results/ 2>/dev/null | tail -5 || echo "no results yet"
+	@docker compose ps 2>/dev/null || echo "not booted"
+	@ls -1 results/ 2>/dev/null | grep -v '^_' | tail -5 || echo "no results yet"
