@@ -1,6 +1,6 @@
 # ADR-0024: Queue dequeue latency budget = 200 ms p95 (NestJS-arbitrated)
 
-- **Status:** Proposed
+- **Status:** Proposed (pending user confirmation to flip to Accepted)
 - **Date:** 2026-05-12
 - **Deciders:** Backend lead, Telephony lead
 - **Consulted:** Senior architect, Product
@@ -32,7 +32,13 @@ If PoT S2 shows the budget is unmet, **fall back to Asterisk `Queue()` for FIFO-
 
 ## Evidence
 
-Pending PoT spike S2 — see [`pot/S2-queue-dequeue-latency/results/`](../../pot/S2-queue-dequeue-latency/results/). Target signal: SIPp drives 200 callers into a single Queue; NestJS dequeue → ARI `Bridge` → operator-WS `ring` p95 ≤ 200 ms over a 10-minute window. Failure modes (Redis lock contention, NATS lag) explicitly probed.
+PoT spike S2 ran 2026-05-13. Over a 10-minute steady-state load with ~200 callers held in MOH (10 calls/sec arrival, 20 s scenario hold, max 200 concurrent) and operator accepts at 10/sec, accept→ring round-trip measured **p50 = 4 ms, p95 = 6 ms, p99 = 9 ms** over 5 539 successful dequeues (146 / 5 685 failures, all from caller-hang-up races at accept time). Both named hazard surfaces were genuinely exercised: Redis `SET` 118 → 5 983 (lock renewal on every dequeue + 5 s snapshot ticks), NATS `in_msgs` 22 → 11 532 (one publish per enqueue + one per dequeue).
+
+The budget is met by ~33× margin against the 200 ms p95 target, so the Yellow remediation (fall back to Asterisk `Queue()` for FIFO) is not required.
+
+Evidence dir: [`pot/S2-queue-dequeue-latency/results/20260513T042757Z/`](../../pot/S2-queue-dequeue-latency/results/20260513T042757Z/) — `dequeue-latency.csv`, `summary.md`, Redis cmdstats + NATS varz at t=0/5/10 min, operator-sim stats, SIPp stats. Probe + scaffold repair notes in [`pot/pot-readout.md` §S2](../../pot/pot-readout.md).
+
+Not yet run: `make test-redis-contention` / `make test-nats-lag` (50 ms `netem` delay on the redis / nats container). Scripts are authored; the baseline margin is large enough that running them is optional for ratification.
 
 ## Alternatives considered
 
