@@ -17,15 +17,16 @@ RISKS v0.2 §4 flags both. Either failure can degrade the entire tenant-domain f
 
 ## Decision
 
-1. Run **Caddy 2.10+** with `on_demand_tls.ask` pointing at our `permission http` endpoint. The endpoint returns 200 only for tenant-confirmed domains; everything else gets 403, which Caddy LRU-caches as declined.
-2. Front Caddy with **HAProxy 3.0** rate-limiting unknown SNI to 1k/sec/source — trips before storage thrash even if Caddy LRU misses.
-3. Submit the ISRG rate-limit exemption application before Sprint 8 (when custom domains first ship). 2–4 week turnaround is acceptable.
+1. Run **Caddy 2.10+** with `on_demand_tls.ask` pointing at our **permission endpoint**. The endpoint returns 200 only for tenant-confirmed domains; everything else gets 403. Caddy does **not** cache the `ask` decision (no decline-LRU exists in Caddy 2.10's `on_demand_tls`; confirmed in PoT S8 — 59 243 permission calls for 51 distinct SNIs); the storage-thrash hazard is instead mitigated by Caddy **short-circuiting storage I/O when `ask` returns non-2xx**. Declined-SNI TLS handshakes never reach certmagic's `LoadCertificate` and produce zero file-system activity (PoT S8 verified: 0 new cert files written for 59 k declined requests). Consequence: the permission endpoint itself becomes the request amplification surface and must be hardened at its own tier (see §Consequences).
+2. Front Caddy with **HAProxy 3.0** in TCP mode rate-limiting **unknown** SNI per source IP using a `stick-table` with `gpc0_rate(1s)` — increment GPC0 only when `req.ssl_sni` is not in the allow-list, then `reject` once `sc_gpc0_rate(0)` exceeds 1 k/sec/source. PoT S8 validated the mechanism at the 800/sec threshold (macOS Docker caps k6 at ~1000/sec sustained — production threshold stays 1000/sec; Sprint-0 re-test on a Linux host to confirm fires identically at the production number). When the rate-limit trips, HAProxy never opens a TCP connection to Caddy for the offending source/SNI, so the permission endpoint is shielded too.
+3. **Harden the permission endpoint** as the load-bearing layer of this defence chain: it must absorb the unknown-SNI volume that gets past HAProxy. PoT measured ~1 k decisions/sec without degradation on a single-process Python `ThreadingHTTPServer`; production target is the same per pod with horizontal scaling and a Redis-backed declined-domain rate-limiter to shed obvious abuse before the allow-list lookup.
+4. Submit the ISRG rate-limit exemption application before Sprint 8 (when custom domains first ship). 2–4 week turnaround is acceptable.
 
 ## Consequences
 
-- **Positive:** Defence in depth — three independent layers (HAProxy rate limit, Caddy LRU, ISRG exemption) each fail independently. Custom-domain feature ships unblocked.
-- **Negative / cost:** HAProxy adds another network hop. Tuning the LRU + permission cache requires monitoring. ISRG exemption requires writing a defensible production-volume justification.
-- **Neutral:** Caddy 2.10+ is the current stable; pinning is conservative.
+- **Positive:** Defence in depth — three independent layers (a) HAProxy SNI rate-limit, (b) permission-endpoint allow-list + rate-limiter, (c) Caddy storage short-circuit on non-2xx `ask` response. The three layers fail independently: HAProxy alone bounds blast radius from a single-source flood; the permission endpoint alone bounds it from a distributed flood (or any traffic HAProxy passes through); and Caddy's storage short-circuit alone bounds storage-side damage if both upstream layers fail. Custom-domain feature ships unblocked.
+- **Negative / cost:** HAProxy adds another network hop. The permission endpoint becomes a load-bearing tier — needs its own scaling, monitoring, and rate-limiter (Redis-backed). ISRG exemption requires writing a defensible production-volume justification.
+- **Neutral:** Caddy 2.10+ is the current stable; pinning is conservative. The `ask` directive Caddyfile keyword is deprecated in favour of `permission http` (Caddy 2.8+); pinning to `permission http` in production config is a no-op cost.
 
 ## Evidence
 
@@ -35,13 +36,7 @@ PoT spike S8 ran 2026-05-13 against Caddy 2.10.2 + HAProxy 3.0.6 — see [`pot/S
 - **Scenario B (k6 → Caddy direct, 60 s @ ~994 req/s, HAProxy bypassed):** 59 243 permission decisions for 51 distinct SNIs; Caddy storage delta = 0 new files.
 - Storage-thrash hazard (certmagic #174) is **killed** in both scenarios.
 
-**Three findings the spike surfaces against this ADR's text** — these need to land before Status flips Proposed → Accepted (same pattern as S3 → ADR-0016):
-
-1. **§Decision item 1 — "Caddy LRU-caches as declined" is false** on Caddy 2.10.2. Confirmed against Caddy docs: the `ask` directive is even deprecated in favour of `permission http`, and neither is documented to cache `ask` decisions. Empirical evidence: 59 243 permission decisions for 51 distinct SNIs in scenario B = `ask` is called per TLS handshake, not per distinct SNI. The actual mechanism mitigating the storage-thrash hazard is **Caddy short-circuiting storage I/O on non-2xx ask response** — declined-SNI requests never reach certmagic's `LoadCertificate`. Decision §1 needs rewording to describe storage short-circuit, not LRU.
-2. **§Consequences — "Caddy LRU" is not one of the three defence layers.** The actual defence-in-depth is (a) HAProxy SNI rate-limit, (b) **permission endpoint allow-list**, (c) Caddy storage short-circuit on non-2xx ask. Layer (b) needs to be re-attributed from Caddy to the permission endpoint, with a sentence on the endpoint's own scaling posture (absorbed ~1000/s here without degradation; Redis-backed rate-limit at this tier is the suggested mitigation for higher production volume).
-3. **HAProxy rate-limit threshold tunability.** ADR fixes 1000/s/source; PoT validated the mechanism at 800/s/source because macOS Docker caps k6 at ~1000/s sustained. Production threshold stays at the ADR value; a Sprint-0 re-test on a Linux host should confirm the 1000/s threshold fires identically (mechanism is identical; only the absolute number we can reach in this environment is bounded).
-
-Status stays Proposed until the user authorises the three amendments + the flip.
+PoT S8 surfaced three text findings against the original ADR-0019, which §Decision and §Consequences above have been corrected to reflect: (1) Caddy 2.10's `on_demand_tls` has no decline-LRU — the actual mitigation is storage short-circuit on non-2xx `ask`; (2) the three defence layers are HAProxy + permission endpoint + Caddy storage short-circuit, not "HAProxy + Caddy LRU + ISRG exemption"; (3) the PoT HAProxy threshold (800/sec/source) is lower than the production threshold (1000/sec/source) for macOS Docker capacity reasons — Sprint-0 Linux re-test should confirm 1000/sec behaviour matches.
 
 ISRG rate-limit exemption submission remains org-side and outside this spike's runnable scope — separately tracked.
 
