@@ -28,7 +28,7 @@ macOS:               26.4.1
 Temporal Helm chart: temporal-1.2.0  (Temporal server 1.31.0)
 elasticsearch chart: elasticsearch-8.5.1  (official elastic/ chart; see caveat f)
 postgresql chart:    postgresql-18.6.5  (bitnami/)
-@temporalio/worker:  1.17.1
+@temporalio/worker:  1.17.1  (sourced from sprint-0/temporal-sdk-validation/pnpm-lock.yaml — env capture script's `pnpm ls` parse left this field blank in /tmp/temporal-env.log; version corroborated by the @temporalio/common@1.17.1 path in /tmp/temporal-hello.log)
 ```
 
 ---
