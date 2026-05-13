@@ -28,6 +28,8 @@ If sales declines the BAA or cannot confirm EU metadata residency, fall back to 
 
 Pending PoT spike S7 — see [`pot/S7-temporal-baa/results/`](../../pot/S7-temporal-baa/results/). Target signal: signed sales letter attached confirming BAA terms + EU-namespace metadata residency. If Red, this ADR's Decision section flips to the self-hosted path before Sprint 0 closes.
 
+**Phase-0 status (2026-05-13):** S7 Deferred — sales contact with Temporal Technologies has not been initiated and the 2–6 week calendar turnaround is unsuitable for Phase 0; see [`pot/pot-readout.md` §S7](../../pot/pot-readout.md) for deferral reasoning. ADR-0015 stays Proposed. Ratification gated on **either** (a) Sprint-0 sales-letter capture executed per the runbook, **or** (b) explicit adoption of the documented Yellow/Red fallback (self-hosted Temporal via v1.0.0 Helm chart on EU-residency Kubernetes), in which case §Decision rewrites to the self-host path before ratification.
+
 ## Alternatives considered
 
 - **Self-hosted from day one.** Removes vendor risk but adds 0.5–1 FTE of platform-engineering load on day one. Rejected as MVP default — kept as the documented Yellow/Red fallback.
