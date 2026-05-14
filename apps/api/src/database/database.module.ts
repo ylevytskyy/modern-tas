@@ -12,7 +12,7 @@ export const DB_TOKEN = 'DB';
       useFactory: (): Db =>
         makeDb(
           process.env.DATABASE_URL ??
-            'postgres://ncall:ncall@localhost:6543/ncall.ncall',
+            'postgres://ncall.ncall:ncall@localhost:6543/ncall',
         ),
     },
   ],

@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt
 
 COMPOSE_FILE := infra/docker-compose.yml
 
@@ -50,3 +50,17 @@ poc-status:
 # Follow logs for all services.
 poc-logs:
 	docker compose -f $(COMPOSE_FILE) logs -f
+
+# Start the API in debug mode (attach VS Code "Attach to API" on port 9229).
+api-dev:
+	DATABASE_URL=postgres://ncall.ncall:ncall@localhost:6543/ncall \
+	APP_JWT_SECRET=poc-only-not-prod \
+	pnpm --filter @ncall/api run dev
+
+# Mint a short-lived HS256 JWT for smoke-testing /v1 endpoints.
+# Usage: make poc-jwt  — copy the printed token into Authorization: Bearer <token>
+poc-jwt:
+	@HEADER=$$(printf '%s' '{"alg":"HS256","typ":"JWT"}' | openssl base64 -A | tr '+/' '-_' | tr -d '='); \
+	PAYLOAD=$$(printf '%s' '{"sub":"66666666-6666-6666-6666-666666666666","tenantId":"11111111-1111-1111-1111-111111111111","role":"operator","exp":4070908800}' | openssl base64 -A | tr '+/' '-_' | tr -d '='); \
+	SIG=$$(printf '%s' "$$HEADER.$$PAYLOAD" | openssl dgst -sha256 -hmac "poc-only-not-prod" -binary | openssl base64 -A | tr '+/' '-_' | tr -d '='); \
+	echo "$$HEADER.$$PAYLOAD.$$SIG"
