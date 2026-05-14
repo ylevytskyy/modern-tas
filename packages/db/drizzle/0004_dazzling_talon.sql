@@ -14,19 +14,7 @@ ALTER TABLE "queue_call"
 ALTER TABLE "queue_call" ALTER COLUMN "tenant_id" DROP DEFAULT;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "queue_call" ADD CONSTRAINT "queue_call_tenant_id_tenant_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "tenant"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  ALTER TABLE "queue_call" ADD CONSTRAINT "queue_call_call_id_call_id_fk" FOREIGN KEY ("call_id") REFERENCES "call"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "recording" ADD CONSTRAINT "recording_tenant_id_tenant_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "tenant"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
