@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  */
 describe('AriLeaderClient — hard-stop callback path (mock Redis/ARI, no real infrastructure)', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['nextTick', 'setTimeout', 'setInterval', 'Date'] });
   });
 
   afterEach(() => {

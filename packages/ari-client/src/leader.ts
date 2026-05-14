@@ -3,8 +3,8 @@
  *
  * TTL must be ≥ 3× HB (ADR-0016 §Decision item 1, PoT S3 finding).
  *
- * Hard-stop: onLoseLease() called via a Promise microtask after detecting lease loss.
- * The WS is closed in the same microtask, before onLoseLease fires.
+ * Hard-stop: onLoseLease() called via process.nextTick after detecting lease loss.
+ * The WS is closed in the same nextTick, before onLoseLease fires.
  *
  * ADR-0016 split-brain guard: the StasisStart event handler has an `if (!this.isLeader) return`
  * guard so in-flight events from a deposed leader are silently dropped.
@@ -147,11 +147,8 @@ export class AriLeaderClient {
     this.isLeader = false;
     const handle = this.ariHandle;
     this.ariHandle = null;
-    // Use Promise microtask (not process.nextTick) so vi.runAllTicks() can flush it
-    // in unit tests. Semantics are equivalent: fire after current operation, before
-    // next macro-task (setTimeout/I/O). process.nextTick would require toFake:['nextTick']
-    // in vi.useFakeTimers() to be flushed by vi.runAllTicks().
-    void Promise.resolve().then(() => {
+    // Fire on next tick so WS close and onLoseLease run after current operation, before any I/O.
+    process.nextTick(() => {
       // Force-close the WS immediately — do NOT await outstanding handlers.
       if (handle) {
         try {
