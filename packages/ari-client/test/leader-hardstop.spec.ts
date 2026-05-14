@@ -1,4 +1,3 @@
-// RED: fails because packages/ari-client/src/leader.ts does not exist yet.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 /**

@@ -118,6 +118,8 @@ export class AriLeaderClient {
   }
 
   private async _renew(): Promise<boolean> {
+    // Non-atomic GET+PEXPIRE — race window if our key expires between the two ops.
+    // Bounded acceptable risk: TTL ≥ 3×HB (ADR-0016) means HBs run well before expiry.
     const current = await this.opts.redis.get(this.opts.leaseKey);
     if (current !== this.opts.instanceId) return false;
     await this.opts.redis.pexpire(this.opts.leaseKey, this.opts.ttlMs);
