@@ -74,5 +74,22 @@ services:
       timeout: 2s
       retries: 10
 
+  asterisk:
+    build:
+      context: ./asterisk
+    volumes:
+      - ./asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./asterisk/ari.conf:/etc/asterisk/ari.conf:ro
+      - ./asterisk/http.conf:/etc/asterisk/http.conf:ro
+      - ./asterisk/modules.conf:/etc/asterisk/modules.conf:ro
+      - recordings:/var/spool/asterisk/recording
+    healthcheck:
+      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
 volumes:
   pg-data:
+  recordings:
