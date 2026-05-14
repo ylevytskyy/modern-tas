@@ -1,6 +1,6 @@
 # ADR-0013: Two-pass redaction pipeline (forced-align + NER + over-bleep)
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-05-12
 - **Deciders:** Backend lead, Compliance lead
 - **Consulted:** Telephony lead, Security eng
@@ -19,6 +19,10 @@ Adopt a two-pass redaction pipeline:
 1. **Pass 1 — ASR + forced alignment.** AssemblyAI Universal-3 Pro Medical (or equivalent medical-domain ASR) produces word-level timestamps. Microsoft Presidio's NER recognises PII spans. The intersection produces a high-confidence redaction mask.
 2. **Pass 2 — segment-boundary fallback over-bleep.** For any span where Presidio confidence < threshold or the ASR confidence on the boundary words < threshold, the system over-bleeps to the next silence boundary or 1.5 s, whichever is shorter. This trades intelligibility for safety.
 3. **Manual QA gate.** A 2% random sample of redacted recordings is queued for human review weekly. Findings feed the threshold-tuning loop.
+
+### Sub-decision (2026-05-14, G0 closure)
+
+Adopted **Option A — full two-pass pipeline**. AssemblyAI Universal-3 Pro Medical key acquisition is in progress (vendor sales cycle 1–4 weeks). MVP Sprint 1–3 builds the ML pipeline against the S4 fixture corpus assembled during Sprint-0. PoC tracer-bullet does NOT exercise this pipeline (PoC spec §5.2 cut).
 
 ## Consequences
 
