@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { AccountController } from './account.controller';
 import { DB_TOKEN } from '../database/database.module';
 import { makeDb } from '@ncall/db/client';
@@ -22,7 +21,6 @@ describe('AccountController', () => {
     await db.insert(account).values({ id: ACCOUNT_ID, tenantId: TENANT_ID, name: 'Demo Account' }).onConflictDoNothing();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: 'test-secret' })],
       controllers: [AccountController],
       providers: [{ provide: DB_TOKEN, useValue: db }],
     }).compile();

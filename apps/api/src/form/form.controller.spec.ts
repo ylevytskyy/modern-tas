@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { FormController } from './form.controller';
 import { DB_TOKEN } from '../database/database.module';
 import { makeDb } from '@ncall/db/client';
@@ -29,7 +28,6 @@ describe('FormController', () => {
     await db.insert(form).values({ id: FORM_ID, accountId: ACCOUNT_ID, name: 'Default', schema: FORM_SCHEMA }).onConflictDoNothing();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: 'test-secret' })],
       controllers: [FormController],
       providers: [{ provide: DB_TOKEN, useValue: db }],
     }).compile();

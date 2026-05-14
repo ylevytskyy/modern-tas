@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtModule } from '@nestjs/jwt';
 import { MessageController } from './message.controller';
 import { DB_TOKEN } from '../database/database.module';
 import { makeDb } from '@ncall/db/client';
@@ -34,7 +33,6 @@ describe('MessageController', () => {
     }).onConflictDoNothing();
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: 'test-secret' })],
       controllers: [MessageController],
       providers: [{ provide: DB_TOKEN, useValue: db }],
     }).compile();
