@@ -15,6 +15,13 @@
       "when": 1778744573454,
       "tag": "0001_safe_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1778744732711,
+      "tag": "0002_broad_odin",
+      "breakpoints": true
     }
   ]
 }

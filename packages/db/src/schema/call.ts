@@ -1,0 +1,31 @@
+import { pgTable, uuid, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { tenant, account, did } from "./tenancy";
+
+export const call = pgTable("call", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenant.id),
+  accountId: uuid("account_id").notNull().references(() => account.id),
+  didId: uuid("did_id").notNull().references(() => did.id),
+  fromE164: text("from_e164").notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  endedAt: timestamp("ended_at", { withTimezone: true }),
+  endedBy: text("ended_by", { enum: ["caller", "operator", "system"] }),
+  routedThrough: text("routed_through").array().notNull().default(sql`ARRAY[]::text[]`),
+});
+
+export const recording = pgTable("recording", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  callId: uuid("call_id").notNull().references(() => call.id),
+  path: text("path").notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  endedAt: timestamp("ended_at", { withTimezone: true }),
+});
+
+export const recordingRedactionInterval = pgTable("recording_redaction_interval", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  recordingId: uuid("recording_id").notNull().references(() => recording.id),
+  startMs: integer("start_ms").notNull(),
+  endMs: integer("end_ms").notNull(),
+  reason: text("reason", { enum: ["operator_pci_pause", "auto_pii_ml"] }).notNull(),
+});

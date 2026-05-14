@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { makeDb } from "../src/client";
 import { tenant, account, did, contact, form } from "../src/schema";
 import { user, queue, queueCall } from "../src/schema";
+import { call, recording, recordingRedactionInterval, message, dispatchAttempt } from "../src/schema";
 
 const URL = process.env.TEST_DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall_test";
 
@@ -37,5 +38,48 @@ describe("schema/0002 — operator + queue", () => {
     expect(u.role).toBe("operator");
     expect(q.strategy).toBe("fifo");
     expect(qc.queueId).toBe(q.id);
+  });
+});
+
+describe("schema/0003 — call+recording+message+dispatch", () => {
+  const db = makeDb(URL);
+
+  it("seeds a call, recording, redaction interval, message, dispatch round-trip", async () => {
+    const [t] = await db.insert(tenant).values({ name: "call-test" }).returning();
+    const [a] = await db.insert(account).values({ tenantId: t.id, name: "CT" }).returning();
+    const [d] = await db.insert(did).values({ accountId: a.id, e164: "+15559999" }).returning();
+    const [u] = await db.insert(user).values({ tenantId: t.id, email: "op@ct.test", role: "operator" }).returning();
+    const [cl] = await db.insert(call).values({
+      tenantId: t.id,
+      accountId: a.id,
+      didId: d.id,
+      fromE164: "+15551234",
+      startedAt: new Date(),
+    }).returning();
+    const [r] = await db.insert(recording).values({
+      callId: cl.id,
+      path: "rec/x.wav",
+      startedAt: new Date(),
+    }).returning();
+    const [ri] = await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 1000,
+      endMs: 2000,
+      reason: "operator_pci_pause",
+    }).returning();
+    const [m] = await db.insert(message).values({
+      callId: cl.id,
+      accountId: a.id,
+      operatorId: u.id,
+      body: "Caller wants a callback",
+    }).returning();
+    const [da] = await db.insert(dispatchAttempt).values({
+      messageId: m.id,
+      channel: "in_app",
+      deliveredAt: new Date(),
+    }).returning();
+    expect(cl.fromE164).toBe("+15551234");
+    expect(ri.reason).toBe("operator_pci_pause");
+    expect(da.channel).toBe("in_app");
   });
 });
