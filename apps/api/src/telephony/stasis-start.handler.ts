@@ -18,8 +18,8 @@ export class StasisStartHandler implements OnModuleInit {
   constructor(
     @Inject(DB_TOKEN) private readonly db: Db,
     @Inject(ARI_LEADER_TOKEN) private readonly ariLeader: AriLeaderClient,
-    private readonly nats: NatsClientService,
-    private readonly recordingService: RecordingService,
+    @Inject(NatsClientService) private readonly nats: NatsClientService,
+    @Inject(RecordingService) private readonly recordingService: RecordingService,
   ) {}
 
   onModuleInit(): void {

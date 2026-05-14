@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { NatsClientService } from '../nats/nats-client.service';
 import { WsGateway } from '../ws/ws.gateway';
 import { NatsSubjects } from '@ncall/shared-types';
@@ -10,8 +10,8 @@ const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 @Injectable()
 export class ArbiterService implements OnModuleInit {
   constructor(
-    private readonly nats: NatsClientService,
-    private readonly wsGateway: WsGateway,
+    @Inject(NatsClientService) private readonly nats: NatsClientService,
+    @Inject(WsGateway) private readonly wsGateway: WsGateway,
   ) {}
 
   onModuleInit(): void {

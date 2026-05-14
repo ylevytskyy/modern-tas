@@ -1,0 +1,1 @@
+export const NATS_CLIENT_TOKEN = 'NATS_CLIENT';

@@ -65,6 +65,10 @@ services:
   kamailio:
     build:
       context: ./kamailio
+    # init: true so tini owns PID 1 and reaps healthcheck children — kamailio's SIGCHLD
+    # handler terminates the process whenever any child exits non-zero (incl. healthcheck
+    # retries during startup); under tini those reaps never reach kamailio.
+    init: true
     volumes:
       - ./kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
       - ./kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro

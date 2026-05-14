@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { NatsConnection } from 'nats';
 import { StringCodec } from 'nats';
-import { NATS_CLIENT_TOKEN } from './nats.module';
+import { NATS_CLIENT_TOKEN } from './nats.tokens';
 
 const sc = StringCodec();
 

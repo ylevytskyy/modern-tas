@@ -2,8 +2,9 @@ import { Global, Module } from '@nestjs/common';
 import { connect } from 'nats';
 import type { NatsConnection } from 'nats';
 import { NatsClientService } from './nats-client.service';
+import { NATS_CLIENT_TOKEN } from './nats.tokens';
 
-export const NATS_CLIENT_TOKEN = 'NATS_CLIENT';
+export { NATS_CLIENT_TOKEN } from './nats.tokens';
 
 @Global()
 @Module({

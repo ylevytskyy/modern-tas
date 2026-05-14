@@ -130,8 +130,11 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
       // Fire SIPp asynchronously via spawn (D18: do NOT block with execSync).
       // --platform linux/amd64: drachtio/sipp is amd64-only; Rosetta handles on arm64 macOS.
       // host.docker.internal: resolves to macOS host IP from inside Docker Desktop container (D17).
+      // --entrypoint sipp: drachtio/sipp's default entrypoint is /entrypoint.sh which runs
+      //   `exec $@` — bash exec mis-parses SIPp's `-s` flag. Override to invoke sipp directly.
       const sippArgs = [
         'run', '--rm', '--platform', 'linux/amd64',
+        '--entrypoint', 'sipp',
         SIPP_IMAGE,
         '-sn', 'uac',
         '-d', '2000',
