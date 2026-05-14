@@ -1,0 +1,13 @@
+{
+  "name": "ncall-clone",
+  "private": true,
+  "packageManager": "pnpm@8.15.4",
+  "scripts": {
+    "typecheck": "pnpm -r --parallel run typecheck",
+    "lint": "pnpm -r --parallel run lint",
+    "test": "pnpm -r --parallel run test"
+  },
+  "devDependencies": {
+    "typescript": "5.4.2"
+  }
+}

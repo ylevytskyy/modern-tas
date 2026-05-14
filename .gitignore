@@ -390,3 +390,11 @@ contracts/fixtures/**/.local/
 seeds/local/
 seeds/*.local.sql
 seeds/*.local.json
+
+# ─────────────────────────────────────────────────────────────
+# pnpm workspace / monorepo (Chunk 1)
+# ─────────────────────────────────────────────────────────────
+.next/
+apps/*/dist/
+packages/*/dist/
+apps/e2e/results/
