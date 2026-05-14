@@ -83,7 +83,7 @@ Adopted **Option C — manual-QA-only redaction**. Recording stays on for all te
 
 - [ ] **Step 1.4: Verify the edit**
 
-Run: `grep -c 'Status: Accepted' docs/adr/0013-redaction-pipeline.md`
+Run: `grep -c '\*\*Status:\*\* Accepted' docs/adr/0013-redaction-pipeline.md`
 Expected: `1`
 
 Run: `grep -c 'Sub-decision (2026-05-14, G0 closure)' docs/adr/0013-redaction-pipeline.md`
@@ -110,7 +110,7 @@ Replace `<A/B/C>` in the message with the chosen letter.
 
 - [ ] **Step 2.1: Verify ADR-0015 is still Accepted (no regression since Sprint-0 ratification)**
 
-Run: `grep -c 'Status: Accepted' docs/adr/0015-temporal-cloud-tier.md`
+Run: `grep -c '\*\*Status:\*\* Accepted' docs/adr/0015-temporal-cloud-tier.md`
 Expected: `1`
 
 If `0`, stop — Sprint-0 baseline ratification has regressed and must be investigated before this task continues.
@@ -458,12 +458,12 @@ Expected: line matched, exit code 0.
 
 - [ ] **Step 7.2: ADR-0013 Accepted**
 
-Run: `grep 'Status: Accepted' docs/adr/0013-redaction-pipeline.md`
+Run: `grep '\*\*Status:\*\* Accepted' docs/adr/0013-redaction-pipeline.md`
 Expected: exit code 0.
 
 - [ ] **Step 7.3: ADR-0015 Accepted (regression check)**
 
-Run: `grep 'Status: Accepted' docs/adr/0015-temporal-cloud-tier.md`
+Run: `grep '\*\*Status:\*\* Accepted' docs/adr/0015-temporal-cloud-tier.md`
 Expected: exit code 0.
 
 - [ ] **Step 7.4: ADR-0015 Cloud-side disposition present**

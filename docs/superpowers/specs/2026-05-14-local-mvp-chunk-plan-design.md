@@ -33,8 +33,8 @@ This document is a **chunk-level execution plan** for the local-runnable MVP. It
 - **Deliverable:** `pot/g0-closed.md` committed on `main`; ADR-0015 Cloud-side disposition file present.
 - **Exit criteria:**
   - `grep 'G0 closed' pot/g0-closed.md` exits 0
-  - `grep 'Status: Accepted' docs/adr/0013-redaction-pipeline.md` exits 0
-  - `grep 'Status: Accepted' docs/adr/0015-temporal-cloud-tier.md` exits 0 (already true — verify it stayed)
+  - `grep '\*\*Status:\*\* Accepted' docs/adr/0013-redaction-pipeline.md` exits 0
+  - `grep '\*\*Status:\*\* Accepted' docs/adr/0015-temporal-cloud-tier.md` exits 0 (already true — verify it stayed)
   - One of: `docs/adr/0015-sdk-identity-evidence.md` shows Cloud run log OR `docs/adr/0015-cloud-sdk-deferred.md` present with written justification
   - S1 Layer-2 Linux readout file present in `pot/S1-telephony-happy-path/results/`
   - Slice-1 plan Task 0 checklist passes in full (steps 1–8)
