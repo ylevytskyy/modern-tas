@@ -19,9 +19,27 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { connect, StringCodec } from 'nats';
 import WebSocket from 'ws';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import * as pg from 'postgres';
 import * as Minio from 'minio';
+
+/**
+ * Look up Kamailio's IP on the compose default network.
+ * SIPp can't reliably reach `host.docker.internal:5060/udp` on Docker Desktop —
+ * UDP NAT is unreliable across container/host boundary, so put SIPp on the
+ * same compose network and target Kamailio by IP.
+ */
+function getKamailioComposeIp(): string {
+  try {
+    const out = execSync(
+      "docker inspect infra-kamailio-1 --format '{{range $k,$v := .NetworkSettings.Networks}}{{$v.IPAddress}}{{end}}'",
+    ).toString().trim();
+    if (!out || out === 'invalid IP') throw new Error(`Empty IP: ${out}`);
+    return out;
+  } catch (err) {
+    throw new Error(`Failed to resolve kamailio compose IP: ${(err as Error).message}`);
+  }
+}
 
 const SEEDED_TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
@@ -129,11 +147,17 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
 
       // Fire SIPp asynchronously via spawn (D18: do NOT block with execSync).
       // --platform linux/amd64: drachtio/sipp is amd64-only; Rosetta handles on arm64 macOS.
-      // host.docker.internal: resolves to macOS host IP from inside Docker Desktop container (D17).
+      // --network infra_default + IP target: Docker Desktop UDP NAT for `host.docker.internal:5060`
+      //   is unreliable on macOS (verified during Chunk 3 debug — INVITEs intermittently dropped).
+      //   Putting SIPp on the same compose network sidesteps the NAT entirely. The compose
+      //   project name is `infra` (network name `infra_default`); kamailio's IP is looked up
+      //   from `docker inspect` at runtime because compose IPs can shift across recreations.
       // --entrypoint sipp: drachtio/sipp's default entrypoint is /entrypoint.sh which runs
       //   `exec $@` — bash exec mis-parses SIPp's `-s` flag. Override to invoke sipp directly.
+      const kamailioIp = getKamailioComposeIp();
       const sippArgs = [
         'run', '--rm', '--platform', 'linux/amd64',
+        '--network', 'infra_default',
         '--entrypoint', 'sipp',
         SIPP_IMAGE,
         '-sn', 'uac',
@@ -142,7 +166,7 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
         '-r', '1',
         '-rp', '1000',
         '-s', '+15555550100',
-        `host.docker.internal:${KAMAILIO_SIP_PORT}`,
+        `${kamailioIp}:5060`,
       ];
       const sippProc = spawn('docker', sippArgs, { stdio: 'pipe' });
       sippProc.on('error', (err) => {
@@ -157,9 +181,6 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
       const t0 = Date.now();
       const wsPayload = await wsPromise;
       const elapsedNatsToWs = Date.now() - t0;
-
-      // Wait for SIPp to exit (cleanup — do not block assertions on this)
-      const sippExitPromise = new Promise<void>((resolve) => sippProc.on('close', () => resolve()));
 
       // WS payload assertions (spec exit criterion line 113)
       expect(wsPayload.type).toBe('incoming_call');
@@ -194,8 +215,10 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
         minio.statObject('ncall-recordings', `recordings/${callId}.wav`),
       ).resolves.toBeDefined();
 
-      // Cleanup: wait for SIPp to finish
-      await sippExitPromise;
+      // Cleanup: kill SIPp container if still running (the Stasis app doesn't
+      // auto-answer, so SIPp's INVITE never gets a 200 OK and the process
+      // would otherwise loop on retransmissions until its internal timeout).
+      sippProc.kill('SIGKILL');
     },
     30000,
   );
