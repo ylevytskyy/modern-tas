@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3
 
 COMPOSE_FILE := infra/docker-compose.yml
 
@@ -64,3 +64,13 @@ poc-jwt:
 	PAYLOAD=$$(printf '%s' '{"sub":"66666666-6666-6666-6666-666666666666","tenantId":"11111111-1111-1111-1111-111111111111","role":"operator","exp":4070908800}' | openssl base64 -A | tr '+/' '-_' | tr -d '='); \
 	SIG=$$(printf '%s' "$$HEADER.$$PAYLOAD" | openssl dgst -sha256 -hmac "poc-only-not-prod" -binary | openssl base64 -A | tr '+/' '-_' | tr -d '='); \
 	echo "$$HEADER.$$PAYLOAD.$$SIG"
+
+# Run Chunk 3 integration smoke test.
+# Requires: make poc-up + make poc-seed + make api-dev running in another terminal.
+# SIPp sends UDP to Kamailio on host port ${KAMAILIO_SIP_HOST_PORT:-5060}.
+# STOP-on-conflict: if port 5060 is in use, set KAMAILIO_SIP_HOST_PORT=5061 (or another free port).
+poc-test-chunk3:
+	DATABASE_URL=postgres://ncall.ncall:ncall@localhost:6543/ncall \
+	NATS_URL=nats://localhost:4222 \
+	APP_JWT_SECRET=poc-only-not-prod \
+	pnpm --filter @ncall/api exec vitest run --config vitest.integration.config.ts
