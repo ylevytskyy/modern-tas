@@ -37,6 +37,12 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@types/node@24.12.4)
 
+  packages/shared-types:
+    devDependencies:
+      typescript:
+        specifier: 5.4.2
+        version: 5.4.2
+
 packages:
 
   /@drizzle-team/studio@0.0.39:
