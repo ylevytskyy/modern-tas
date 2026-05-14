@@ -136,6 +136,40 @@ services:
       timeout: 2s
       retries: 8
 
+  temporal:
+    image: temporalio/auto-setup:1.22.4
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PWD: ncall
+      POSTGRES_SEEDS: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "7233:7233"
+    healthcheck:
+      test: ["CMD-SHELL", "temporal operator cluster health --address $(hostname -i):7233 2>&1 | grep -q SERVING || tctl --address $(hostname -i):7233 cluster health 2>&1 | grep -q SERVING"]
+      interval: 8s
+      timeout: 3s
+      retries: 15
+
+  temporal-ui:
+    image: temporalio/ui:2.21.3
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    depends_on:
+      temporal:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8080 > /dev/null 2>&1 && echo ok || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
 volumes:
   pg-data:
   recordings:
