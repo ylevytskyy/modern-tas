@@ -68,6 +68,8 @@ services:
     volumes:
       - ./kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
       - ./kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro
+    ports:
+      - "${KAMAILIO_SIP_HOST_PORT:-5060}:5060/udp"
     healthcheck:
       test: ["CMD", "kamcmd", "core.uptime"]
       interval: 5s
@@ -84,6 +86,8 @@ services:
       - ./asterisk/http.conf:/etc/asterisk/http.conf:ro
       - ./asterisk/modules.conf:/etc/asterisk/modules.conf:ro
       - recordings:/var/spool/asterisk/recording
+    ports:
+      - "${ASTERISK_ARI_HOST_PORT:-8088}:8088"
     healthcheck:
       test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
       interval: 5s
@@ -120,6 +124,9 @@ services:
   nats:
     image: nats:2.10-alpine
     command: ["-js", "-m", "8222"]
+    ports:
+      - "${NATS_HOST_PORT:-4222}:4222"
+      - "${NATS_MONITOR_HOST_PORT:-8222}:8222"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O- http://localhost:8222/healthz | grep -q ok"]
       interval: 3s
