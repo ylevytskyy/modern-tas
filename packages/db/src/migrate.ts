@@ -2,9 +2,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
   const url = process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall";
