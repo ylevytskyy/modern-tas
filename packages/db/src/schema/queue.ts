@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { account } from "./tenancy";
+import { tenant, account } from "./tenancy";
+import { call } from "./call";
 
 export const queue = pgTable("queue", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -13,8 +14,9 @@ export const queue = pgTable("queue", {
 
 export const queueCall = pgTable("queue_call", {
   id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenant.id),
   queueId: uuid("queue_id").notNull().references(() => queue.id),
-  callId: uuid("call_id").notNull(),
+  callId: uuid("call_id").notNull().references(() => call.id),
   enqueuedAt: timestamp("enqueued_at", { withTimezone: true }).notNull(),
   dequeuedAt: timestamp("dequeued_at", { withTimezone: true }),
   attempts: text("attempts").array().notNull().default(sql`ARRAY[]::text[]`),

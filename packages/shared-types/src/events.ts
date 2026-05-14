@@ -38,3 +38,12 @@ export interface NatsStasisStartPayload {
   tenantId: string;
   accountId: string;
 }
+
+/** WS payload shape for the `call.screenpop` event (sent to F03 operator UI). */
+export interface WsIncomingCallPayload {
+  /** Discriminator field. Spec exit criterion: event.type === 'incoming_call'. */
+  type: 'incoming_call';
+  callId: string;
+  tenantId: string;
+  callerE164: string;
+}

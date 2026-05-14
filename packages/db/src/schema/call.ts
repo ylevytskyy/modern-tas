@@ -16,6 +16,7 @@ export const call = pgTable("call", {
 
 export const recording = pgTable("recording", {
   id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenant.id),
   callId: uuid("call_id").notNull().references(() => call.id),
   path: text("path").notNull(),
   startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
