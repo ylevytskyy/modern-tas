@@ -1,0 +1,59 @@
+// RED: fails because ArbiterService does not exist.
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ArbiterService } from './arbiter.service';
+import { NatsClientService } from '../nats/nats-client.service';
+import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
+import { WsGateway } from '../ws/ws.gateway';
+import type { WsIncomingCallPayload } from '@ncall/shared-types';
+
+const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
+
+describe('ArbiterService', () => {
+  let arbiter: ArbiterService;
+  let module: TestingModule;
+
+  const mockWsGateway = { sendToOperator: vi.fn() };
+  const mockNc = {
+    publish: vi.fn(),
+    subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
+  };
+
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      providers: [
+        ArbiterService,
+        NatsClientService,
+        { provide: NATS_CLIENT_TOKEN, useValue: mockNc },
+        { provide: WsGateway, useValue: mockWsGateway },
+      ],
+    }).compile();
+    arbiter = module.get(ArbiterService);
+  });
+
+  afterAll(async () => { await module.close(); });
+
+  it('dispatch: picks seeded operator, sends WS event with type=incoming_call', async () => {
+    const stasisPayload = {
+      callId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      channel: 'test-channel',
+      tenantId: '11111111-1111-1111-1111-111111111111',
+      accountId: '22222222-2222-2222-2222-222222222222',
+    };
+
+    await arbiter.dispatch(stasisPayload);
+
+    expect(mockWsGateway.sendToOperator).toHaveBeenCalledWith(
+      SEEDED_OPERATOR_ID,
+      expect.objectContaining<Partial<WsIncomingCallPayload>>({
+        type: 'incoming_call',
+        callId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        tenantId: '11111111-1111-1111-1111-111111111111',
+      }),
+    );
+
+    const [, wsPayload] = mockWsGateway.sendToOperator.mock.calls[0] as [string, WsIncomingCallPayload];
+    expect(wsPayload.type).toBe('incoming_call');
+    expect(wsPayload.callId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+});
