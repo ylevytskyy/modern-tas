@@ -87,6 +87,9 @@ lib/
 .solid/
 *.local
 
+# Exception: Caddy local-dev config is not a Vite env override
+!infra/caddy/Caddyfile.local
+
 # Storybook
 storybook-static/
 .storybook-out/
