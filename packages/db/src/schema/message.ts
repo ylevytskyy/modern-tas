@@ -1,10 +1,11 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
-import { account } from "./tenancy";
+import { tenant, account } from "./tenancy";
 import { user } from "./operator";
 import { call } from "./call";
 
 export const message = pgTable("message", {
   id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").notNull().references(() => tenant.id),
   callId: uuid("call_id").notNull().references(() => call.id),
   accountId: uuid("account_id").notNull().references(() => account.id),
   operatorId: uuid("operator_id").notNull().references(() => user.id),

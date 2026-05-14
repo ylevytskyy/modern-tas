@@ -68,6 +68,7 @@ describe("schema/0003 — call+recording+message+dispatch", () => {
       reason: "operator_pci_pause",
     }).returning();
     const [m] = await db.insert(message).values({
+      tenantId: t.id,
       callId: cl.id,
       accountId: a.id,
       operatorId: u.id,
