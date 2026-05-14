@@ -62,5 +62,17 @@ services:
       timeout: 3s
       retries: 15
 
+  kamailio:
+    build:
+      context: ./kamailio
+    volumes:
+      - ./kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
+      - ./kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro
+    healthcheck:
+      test: ["CMD", "kamcmd", "core.uptime"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
 volumes:
   pg-data:
