@@ -90,6 +90,15 @@ services:
       timeout: 3s
       retries: 12
 
+  rtpengine:
+    build:
+      context: ./rtpengine
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep rtpengine || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 8
+
 volumes:
   pg-data:
   recordings:
