@@ -6,15 +6,29 @@ import { AccountModule } from './account/account.module';
 import { ContactModule } from './contact/contact.module';
 import { FormModule } from './form/form.module';
 import { MessageModule } from './message/message.module';
+import { NatsModule } from './nats/nats.module';
+import { RedisModule } from './redis/redis.module';
+import { AriModule } from './ari/ari.module';
+import { TelephonyModule } from './telephony/telephony.module';
+import { ArbiterModule } from './arbiter/arbiter.module';
+import { WsModule } from './ws/ws.module';
+import { RecordingModule } from './recording/recording.module';
 
 @Module({
   imports: [
     DatabaseModule,
     AuthModule,
+    NatsModule,
+    RedisModule,
+    AriModule,
     AccountModule,
     ContactModule,
     FormModule,
     MessageModule,
+    TelephonyModule,
+    ArbiterModule,
+    WsModule,
+    RecordingModule,
   ],
 })
 export class AppModule {}

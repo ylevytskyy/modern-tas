@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { DB_TOKEN } from '../database/database.module';
 import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
+import { RecordingService } from '../recording/recording.service';
 import { did, account, call, queueCall } from '@ncall/db';
 import { NatsSubjects } from '@ncall/shared-types';
 import type { NatsStasisStartPayload } from '@ncall/shared-types';
@@ -18,6 +19,7 @@ export class StasisStartHandler implements OnModuleInit {
     @Inject(DB_TOKEN) private readonly db: Db,
     @Inject(ARI_LEADER_TOKEN) private readonly ariLeader: AriLeaderClient,
     private readonly nats: NatsClientService,
+    private readonly recordingService: RecordingService,
   ) {}
 
   onModuleInit(): void {
@@ -80,6 +82,8 @@ export class StasisStartHandler implements OnModuleInit {
       callId,
       enqueuedAt: new Date(),
     });
+
+    await this.recordingService.startRecording({ callId, channelId, tenantId });
 
     const payload: NatsStasisStartPayload = {
       callId,

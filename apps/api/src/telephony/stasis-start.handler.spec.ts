@@ -6,6 +6,7 @@ import { DB_TOKEN } from '../database/database.module';
 import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
+import { RecordingService } from '../recording/recording.service';
 import { makeDb } from '@ncall/db/client';
 import { tenant, account, did, call, queue, queueCall } from '@ncall/db';
 import { NatsSubjects } from '@ncall/shared-types';
@@ -64,6 +65,7 @@ describe('StasisStartHandler', () => {
         { provide: NATS_CLIENT_TOKEN, useValue: mockNc },
         NatsClientService,
         { provide: ARI_LEADER_TOKEN, useValue: mockAriLeader },
+        { provide: RecordingService, useValue: { startRecording: vi.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
