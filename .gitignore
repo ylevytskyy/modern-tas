@@ -379,6 +379,9 @@ bundle-analyzer-report.html
 pot/scratch/
 .pot-local/
 
+# Subagent-loop intermediate artifacts (planner/verifier rounds)
+.scratch/
+
 # Generated golden fixtures we DO want tracked live under contracts/fixtures/.
 # Per-developer overrides do not.
 contracts/fixtures/**/.local/
