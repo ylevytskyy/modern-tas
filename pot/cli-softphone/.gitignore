@@ -1,0 +1,6 @@
+# Built pjsua binary and source tree
+bin/
+build/
+
+# Per-session SIP traces (regenerated on each launch)
+logs/
