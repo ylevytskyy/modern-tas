@@ -20,7 +20,15 @@ Adopt a two-pass redaction pipeline:
 2. **Pass 2 — segment-boundary fallback over-bleep.** For any span where Presidio confidence < threshold or the ASR confidence on the boundary words < threshold, the system over-bleeps to the next silence boundary or 1.5 s, whichever is shorter. This trades intelligibility for safety.
 3. **Manual QA gate.** A 2% random sample of redacted recordings is queued for human review weekly. Findings feed the threshold-tuning loop.
 
-### Sub-decision (2026-05-14, G0 closure)
+### Sub-decision (2026-05-15, G0 closure — supersedes 2026-05-14)
+
+Adopted **Option B — de-scope HIPAA-tier recording from MVP**. MVP tenants flagged `hipaa_tier=true` have `recording_enabled=false` by default; the ML redaction pipeline (Pass 1 + Pass 2) is removed from MVP scope. Non-HIPAA tenants record without redaction; operator-initiated PCI pause spans (PoC Slice 2) remain the only audio-level safeguard. Revisit post-MVP if HIPAA-tier demand justifies the AssemblyAI investment.
+
+Rationale for supersession: the 2026-05-14 sub-decision A assumed the AssemblyAI Universal-3 Pro Medical sales cycle was already engaged. On 2026-05-15 the founder confirmed it was not, and no HIPAA-tier customer is in the first 5 MVP tenant pipeline. Adopting B avoids a 1–4 week vendor-blocked calendar dependency and removes the ML-pipeline build from MVP Sprint 1–3 scope.
+
+### Sub-decision (2026-05-14, G0 closure) — SUPERSEDED 2026-05-15
+
+> **Superseded by the 2026-05-15 sub-decision above.** Retained for audit trail.
 
 Adopted **Option A — full two-pass pipeline**. AssemblyAI Universal-3 Pro Medical key acquisition is in progress (vendor sales cycle 1–4 weeks). MVP Sprint 1–3 builds the ML pipeline against the S4 fixture corpus assembled during Sprint-0. PoC tracer-bullet does NOT exercise this pipeline (PoC spec §5.2 cut).
 
