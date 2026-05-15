@@ -30,9 +30,18 @@ describe("schema/0002 — operator + queue", () => {
     const [a] = await db.insert(account).values({ tenantId: t.id, name: "QT" }).returning();
     const [u] = await db.insert(user).values({ tenantId: t.id, email: "op@qt.test", role: "operator" }).returning();
     const [q] = await db.insert(queue).values({ accountId: a.id, name: "main", strategy: "fifo" }).returning();
+    const [d] = await db.insert(did).values({ accountId: a.id, e164: "+15550100" }).returning();
+    const [cl] = await db.insert(call).values({
+      tenantId: t.id,
+      accountId: a.id,
+      didId: d.id,
+      fromE164: "+15551001",
+      startedAt: new Date(),
+    }).returning();
     const [qc] = await db.insert(queueCall).values({
+      tenantId: t.id,
       queueId: q.id,
-      callId: crypto.randomUUID(),
+      callId: cl.id,
       enqueuedAt: new Date(),
     }).returning();
     expect(u.role).toBe("operator");
@@ -57,6 +66,7 @@ describe("schema/0003 — call+recording+message+dispatch", () => {
       startedAt: new Date(),
     }).returning();
     const [r] = await db.insert(recording).values({
+      tenantId: t.id,
       callId: cl.id,
       path: "rec/x.wav",
       startedAt: new Date(),
