@@ -40,13 +40,18 @@ $(BUILD_DIR)/.git/config:
 # clones don't trigger a build against a broken tree.
 $(BIN): $(BUILD_DIR)/.git/config
 	cd $(BUILD_DIR) && CFLAGS="-fPIC -O2" ./configure \
-	  --prefix=$(PWD)/$(BUILD_DIR)/install \
+	  --prefix=$(CURDIR)/$(BUILD_DIR)/install \
 	  --disable-video \
 	  --disable-libwebrtc \
 	  --disable-opencore-amr
 	cd $(BUILD_DIR) && $(MAKE) dep
 	cd $(BUILD_DIR) && $(MAKE)
 	@mkdir -p bin
+	@count=$$(ls $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* 2>/dev/null | wc -l | tr -d ' '); \
+	  if [ "$$count" != "1" ]; then \
+	    echo "Error: expected exactly 1 pjsua-*-apple-darwin* binary in $(BUILD_DIR)/pjsip-apps/bin/, found $$count. Run 'make uninstall' and rebuild."; \
+	    exit 1; \
+	  fi
 	cp $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* $(BIN)
 	@echo ""
 	@echo "Built $(BIN). Verify with: $(BIN) --version"
