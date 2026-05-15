@@ -23,3 +23,9 @@ help:
 	@echo "  make tail-bob    Tail the most recent bob log"
 	@echo "  make clean       Remove $(LOGS)/"
 	@echo "  make uninstall   Remove bin/ and build/"
+
+# Shallow clone of pjproject pinned to the tag. Idempotent: presence of
+# the directory is enough to skip.
+$(BUILD_DIR):
+	@mkdir -p build
+	git clone --depth 1 --branch $(PJPROJECT_TAG) $(PJPROJECT_URL) $(BUILD_DIR)
