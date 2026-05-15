@@ -10,18 +10,20 @@ Design spec:
 
 ## Quick start
 
+All commands below run from `pot/cli-softphone/`.
+
 ```bash
 # 1. Build pjsua (one-time, ~5-10 min on Apple Silicon)
 make install
 
 # 2. Boot the S9 Asterisk stack in a separate terminal
-cd ../S9-audio-loopback && make up && cd -
+(cd ../S9-audio-loopback && make up)
 
 # 3. Launch alice (Terminal A)
 make alice
 
-# 4. Launch bob (Terminal B, new terminal)
-cd pot/cli-softphone && make bob
+# 4. Launch bob (Terminal B, new terminal — also from pot/cli-softphone/)
+make bob
 
 # 5. In alice's TUI: `m` then `sip:1002@127.0.0.1` to dial bob
 # 6. In bob's TUI: `a` to answer, `h` to hang up, `q` to quit
