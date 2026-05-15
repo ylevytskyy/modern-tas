@@ -24,8 +24,10 @@ help:
 	@echo "  make clean       Remove $(LOGS)/"
 	@echo "  make uninstall   Remove bin/ and build/"
 
-# Shallow clone of pjproject pinned to the tag. Idempotent: presence of
-# the directory is enough to skip.
-$(BUILD_DIR):
+# Shallow clone of pjproject pinned to the tag. We target .git/config
+# instead of the directory itself — git writes that file only on a
+# successful clone, so partial clones (network interruption mid-way)
+# trigger a retry instead of being silently skipped.
+$(BUILD_DIR)/.git/config:
 	@mkdir -p build
 	git clone --depth 1 --branch $(PJPROJECT_TAG) $(PJPROJECT_URL) $(BUILD_DIR)
