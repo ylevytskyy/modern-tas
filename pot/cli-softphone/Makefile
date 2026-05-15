@@ -31,3 +31,22 @@ help:
 $(BUILD_DIR)/.git/config:
 	@mkdir -p build
 	git clone --depth 1 --branch $(PJPROJECT_TAG) $(PJPROJECT_URL) $(BUILD_DIR)
+
+# Build pjsua from the cloned source. The configure flags strip features
+# we don't need (video, webrtc, OpenCore AMR) and keep the binary lean.
+# The built binary lands in pjsip-apps/bin/ with a triplet-suffixed name
+# (e.g. pjsua-aarch64-apple-darwin23.6.0). We glob and copy to bin/pjsua.
+# Depends on the .git/config sentinel from the clone target so partial
+# clones don't trigger a build against a broken tree.
+$(BIN): $(BUILD_DIR)/.git/config
+	cd $(BUILD_DIR) && CFLAGS="-fPIC -O2" ./configure \
+	  --prefix=$(PWD)/$(BUILD_DIR)/install \
+	  --disable-video \
+	  --disable-libwebrtc \
+	  --disable-opencore-amr
+	cd $(BUILD_DIR) && $(MAKE) dep
+	cd $(BUILD_DIR) && $(MAKE)
+	@mkdir -p bin
+	cp $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* $(BIN)
+	@echo ""
+	@echo "Built $(BIN). Verify with: $(BIN) --version"
