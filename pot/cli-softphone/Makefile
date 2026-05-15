@@ -60,3 +60,19 @@ $(BIN): $(BUILD_DIR)/.git/config
 # bin/pjsua already exists.
 install: $(BIN)
 	@echo "pjsua ready at $(BIN)"
+
+# Logs directory is created on demand. Gitignored — not committed.
+$(LOGS):
+	@mkdir -p $(LOGS)
+
+# Launch pjsua as alice. Drops into the interactive TUI. The log filename
+# is generated per invocation via shell ($$(date)) so each session is its
+# own artifact. CLI flags override config-file flags in pjsua, which is
+# why --log-file works even though it's not in accounts/alice.cfg.
+alice: $(BIN) $(LOGS)
+	$(BIN) --config-file=accounts/alice.cfg \
+	  --log-file=$(LOGS)/alice-$$(date -u +%FT%H-%M-%SZ).log
+
+bob: $(BIN) $(LOGS)
+	$(BIN) --config-file=accounts/bob.cfg \
+	  --log-file=$(LOGS)/bob-$$(date -u +%FT%H-%M-%SZ).log
