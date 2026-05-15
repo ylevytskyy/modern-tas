@@ -95,3 +95,12 @@ tail-bob:
 	  fi; \
 	  echo "Tailing $$latest"; \
 	  tail -f "$$latest"
+
+# Delete per-session logs only. Preserves the built binary and source tree.
+clean:
+	rm -rf $(LOGS)
+
+# Full reset: remove built binary and pjproject source. After this, the
+# next `make install` will re-clone and re-build (~5-10 min).
+uninstall:
+	rm -rf bin build
