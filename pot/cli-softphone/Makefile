@@ -55,3 +55,8 @@ $(BIN): $(BUILD_DIR)/.git/config
 	cp $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* $(BIN)
 	@echo ""
 	@echo "Built $(BIN). Verify with: $(BIN) --version"
+
+# Idempotent wrapper around the binary build. Re-runs are instant when
+# bin/pjsua already exists.
+install: $(BIN)
+	@echo "pjsua ready at $(BIN)"
