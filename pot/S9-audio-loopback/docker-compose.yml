@@ -17,3 +17,14 @@ services:
       timeout: 3s
       retries: 6
       start_period: 5s
+
+  sipp:
+    build: ./sipp-image
+    image: pot-s9/sipp:local
+    profiles: ["probe"]
+    depends_on:
+      asterisk:
+        condition: service_healthy
+    volumes:
+      - ./scenarios:/scenarios:ro
+    working_dir: /tmp

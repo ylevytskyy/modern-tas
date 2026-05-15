@@ -1,4 +1,4 @@
-.PHONY: image up down restart logs cli endpoints channels contacts dialplan
+.PHONY: image up down restart logs cli endpoints channels contacts dialplan sipp-image register-probe
 
 image:
 	docker compose build
@@ -39,3 +39,34 @@ contacts:
 
 dialplan:
 	docker exec s9-asterisk asterisk -rx "dialplan show tas-loopback"
+
+sipp-image:
+	docker compose --profile probe build sipp
+
+# Deterministic G1 check — runs REGISTER for alice + bob via SIPp from
+# inside the compose network. Reaches asterisk by service name on
+# 5060/udp (intra-network, no host port mapping involved → unlike the
+# softphone path on the Mac which goes through Docker Desktop's NAT).
+# Exit 0 = both REGISTER calls completed (401-challenge handled, 200 OK
+# received). Non-zero = at least one failed.
+register-probe:
+	@echo "=== Probe: REGISTER alice ==="
+	docker compose --profile probe run --rm sipp \
+	  -sf /scenarios/register.xml \
+	  -s alice -au alice -ap alice-s9-pot \
+	  -m 1 -r 1 -rp 1000 \
+	  -trace_err -trace_msg \
+	  -timeout 10s -recv_timeout 5000 \
+	  asterisk:5060
+	@echo ""
+	@echo "=== Probe: REGISTER bob ==="
+	docker compose --profile probe run --rm sipp \
+	  -sf /scenarios/register.xml \
+	  -s bob -au bob -ap bob-s9-pot \
+	  -m 1 -r 1 -rp 1000 \
+	  -trace_err -trace_msg \
+	  -timeout 10s -recv_timeout 5000 \
+	  asterisk:5060
+	@echo ""
+	@echo "=== Post-probe: pjsip contacts ==="
+	@docker exec s9-asterisk asterisk -rx "pjsip show contacts"
