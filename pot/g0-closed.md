@@ -15,7 +15,7 @@ Rationale: `pot/g0-signoff-proposal.md` §Path B documents that a solo-founder P
 
 ### S4 — Redaction accuracy
 
-- **Status:** De-scoped — HIPAA-tier recording disabled for MVP _(amended 2026-05-15, supersedes 2026-05-14)_
+- **Status:** De-scoped — HIPAA-tier recording disabled for MVP _(amended 2026-05-15, supersedes 2026-05-14)_; broader HIPAA-tier scope-out ratified per ADR-0026 (2026-05-15)
 - **ADR ratification:** ADR-0013 at Status: Accepted. Current sub-decision is **B — de-scope HIPAA-tier recording from MVP** (recorded 2026-05-15); see [`docs/adr/0013-redaction-pipeline.md` §Sub-decision (2026-05-15)](../docs/adr/0013-redaction-pipeline.md). The original 2026-05-14 ratification at commit `c0acf0e` adopted sub-decision A (full two-pass pipeline) and is retained in the ADR for audit trail. The 2026-05-15 supersession reflects confirmation that the AssemblyAI medical-tier sales cycle is not in progress and no HIPAA-tier tenant is in the first 5 MVP customers.
 - **PoC implication:** ML redaction pipeline is **not** in PoC tracer-bullet (PoC §5.2 cut) **and not in MVP**. MVP tenants flagged `hipaa_tier=true` have `recording_enabled=false` by default; non-HIPAA tenants record without ML redaction. Operator-initiated PCI pause spans (PoC Slice 2) remain the only audio-level safeguard. Revisit post-MVP if HIPAA-tier demand justifies AssemblyAI investment.
 
@@ -47,6 +47,7 @@ These ratifications are the durable architectural commitments for MVP build-out.
 - **Trigger:** Must be Green before Chunk 3 commit 1 of the MVP chunk-plan (Chunk 3 wires telephony and exercises media path via SIPp INVITE; without S1-Layer-2 evidence, Chunk 3 integration test cannot pass).
 - **Chunk 1 + Chunk 2 dependency:** None — those chunks do not exercise the media path; rtpengine container coming up is sufficient for compose healthchecks.
 - **Path to closure:** Run `pot/S1-telephony-happy-path/` smoke on a Linux host (local VM or CI). Commit the readout under `pot/S1-telephony-happy-path/results/<ISO>-linux-layer2.md` and update this section to "Green" with cite. Until that point, Chunk 3 is blocked.
+- **Edge-topology note (2026-05-15):** ADR-0025 adopts **Asterisk-direct telephony** as MVP-baseline, deferring the Kamailio-fronted SBC topology. The S1 PoT measurement evidence (573 ms TTFOK, 2 ms screen-pop p95) is preserved as migration evidence for the future production-scale topology. **Layer-2 rtpengine media smoke is moot for MVP** under Asterisk-direct topology (no rtpengine in the call path); Chunk 3 was Green at `a7c2dac` without Layer-2 evidence. The Layer-2 carry-over remains documented as evidence required when the Kamailio-fronted SBC topology is re-introduced — until that trigger, MVP work is not gated on it. See ADR-0025.
 
 ## Signatures
 

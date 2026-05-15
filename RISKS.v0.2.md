@@ -276,6 +276,21 @@ The v0.1 critical-risk delta is otherwise good: C1 (RLS) → ADR-01 likely holds
 
 ---
 
+## 8. MVP edge-topology risk (2026-05-15 amendment)
+
+**Context:** ADR-0025 (2026-05-15) adopts Asterisk-direct as MVP telephony topology, deferring the Kamailio-fronted SBC topology. This introduces a new risk class not present in the original S1 spike hypothesis (which assumed Kamailio in the path).
+
+### N8. Single-Asterisk crash = call drops during restart window
+
+- **Topology:** Asterisk-direct (no Kamailio dispatcher to drain calls before restart).
+- **Impact:** Single-Asterisk crash drops all in-flight calls on that node during the 5–20 s process restart window. With Kamailio-fronted SBC topology, failing calls would have been drained to a warm standby by the Kamailio dispatcher (~573 ms TTFOK per S1 PoT).
+- **MVP mitigation:** Carrier-side DNS SRV pointing at a **warm standby** Asterisk instance (~30 s failover). Scheduled maintenance via planned drain (announce ahead, operator console shows pending-maintenance banner). Kubernetes / systemd auto-restart ensures 5–20 s MTTR.
+- **Re-introduction trigger:** If failover SLA requirement drops below 30 s (e.g. HIPAA-tier BAA requirement for sub-second failover, or volume >300 concurrent), upgrade to Kamailio-fronted SBC topology per ADR-0025 re-introduction trigger.
+- **Severity:** **Medium × Medium** (rare for a well-operated single node; acceptable at pre-revenue MVP scale with stated MTTR).
+- **ADR:** ADR-0025. See also `pot/g0-closed.md` §S1 edge-topology amendment.
+
+---
+
 ## Sources
 
 - [Temporal Cloud HIPAA announcement (Feb 5, 2024)](https://temporal.io/blog/temporal-cloud-is-now-hipaa-compliant)

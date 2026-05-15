@@ -49,3 +49,7 @@ Pending PoT spike S4 — see [`pot/S4-redaction-accuracy/results/`](../../pot/S4
 - **Single-pass ASR-bleep only.** Documented to miss digit-by-digit numbers and accented speakers. Rejected: insufficient for HIPAA medical workloads.
 - **Delegated capture via Telnyx Pay / Stripe terminal for the entire call.** Works for PCI but not HIPAA — PHI conversation can't be routed to a third-party IVR. Adopted as the PCI-only path for the card-entry segment (see compliance-posture memory); not a general redaction substitute.
 - **Disable recording for HIPAA tenants.** Removes the operator-quality and dispute-resolution use cases entirely. Rejected: would close off the medical answering service vertical, the largest target market.
+
+## Broader scope (2026-05-15)
+
+ADR-0013 sub-decision B (this file, commit `aac9aeb`) disabled HIPAA-tier recording, removing the *consequence* (ML redaction pipeline) from MVP scope. **ADR-0026** (created 2026-05-15) generalises the scope-out: the entire HIPAA-tier compliance posture (column encryption, 7-year retention, SRTP-mandatory per-HIPAA-tenant enforcement, BAA vendor cycles for medical SKUs) is deferred from MVP scope. See [`docs/adr/0026-hipaa-tier-deferred.md`](./0026-hipaa-tier-deferred.md) for the full decision, re-introduction trigger, and consequences.

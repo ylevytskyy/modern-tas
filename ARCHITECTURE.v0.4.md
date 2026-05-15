@@ -404,3 +404,13 @@ Three things make v0.4 work, building on v0.3's compliance and telephony spine:
 3. **Honest timeline rebaselined to PRD §10.1**: PoT 4–6 weeks → MVP 9–11 months → v1.x +3–6 months → v2 +6–12 months. Total runway PoT → v2 = **22–30 months** ±25%. v0.3's implied 7.5-month MVP is retired.
 
 The build is ready to start from PoT next sprint. **PoT executed 2026-05-13** (see §2.5, pending G0 sign-off ratification): **Green** — S1 Layer 1 signalling (S1 Layer 2 media deferred to Sprint 0), S2 queue dequeue, S3 ARI leader hard-stop, S5 Supavisor `SET LOCAL`, S8 Caddy permission + LE; **Deferred-with-fallback-plan** (per §2.4 amendment) — S4 redaction (vendor + fixtures absent — close-out gated on a Sprint-0 compliance review), S6 nCall fixtures (vendor + inventory absent — CRM-HAR scraper adopted as MVP baseline), S7 Temporal BAA (2–6 wk sales/legal cycle — self-host Temporal adopted as MVP baseline; Cloud Enterprise stays a Sprint-N upgrade). The architecture commits to the adopted fallbacks pending G0 sign-off; the bundle (this §2.5 + the §2.4 amendment + the §3 G1 swap + ADR-0015 rewrite + forensic notes in `pot/pot-readout.md` + `tools/crm-har-to-fixtures/scrape.mjs`) ratifies as one unit at the G0 meeting.
+
+### MVP edge topology (2026-05-15 amendment)
+
+**Decision (ADR-0025):** MVP telephony runs **Asterisk-direct** — carrier SIP trunk connects directly to Asterisk; no Kamailio SBC tier; no rtpengine in the normal call path. The Kamailio-fronted SBC topology (Kamailio + rtpengine) documented in §2.3 S1 spike hypothesis and §6.3 AC #9 is **deferred** to the production-scale path, with a named re-introduction trigger (see ADR-0025).
+
+**Why:** Solo-founder MVP scale (~50–300 concurrent peak) is ~5% of single-Asterisk capacity measured in S1. Kamailio-fronted SBC topology's advantages (sub-second failover, kernel-mode RTP forwarding, topology hiding) do not justify ~2 extra containers + ~200 MB RAM + two config surfaces at this scale.
+
+**Physical rewire:** `infra/kamailio/`, `infra/rtpengine/`, and compose services are **not removed** in this amendment — Chunk 4 scope. `chunk3-smoke` integration test stays Green at commit `a7c2dac` (unchanged topology until Chunk 4).
+
+See ADR-0025 for full decision, consequences, and re-introduction trigger. See ADR-0026 for the companion HIPAA-tier deferral.
