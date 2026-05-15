@@ -1,0 +1,9 @@
+# S4 — STUB. External dependency: AssemblyAI API key + audio fixtures.
+# This compose file is intentionally minimal — Presidio runs locally; ASR is HTTPS to vendor.
+# When prereqs land, expand with the actual harness container.
+
+services:
+  presidio-analyzer:
+    image: mcr.microsoft.com/presidio-analyzer:latest
+    ports:
+      - "5001:5001"

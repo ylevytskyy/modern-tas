@@ -1,0 +1,8 @@
+# S6 — STUB. No infra; capture is a curl loop run from the host or a one-shot container.
+# This compose file exists only so `docker compose config` validates.
+
+services:
+  curl:
+    image: curlimages/curl:8.10.1
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["manual"]

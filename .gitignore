@@ -87,6 +87,9 @@ lib/
 .solid/
 *.local
 
+# Exception: Caddy local-dev config is not a Vite env override
+!infra/caddy/Caddyfile.local
+
 # Storybook
 storybook-static/
 .storybook-out/
@@ -379,6 +382,9 @@ bundle-analyzer-report.html
 pot/scratch/
 .pot-local/
 
+# Subagent-loop intermediate artifacts (planner/verifier rounds)
+.scratch/
+
 # Generated golden fixtures we DO want tracked live under contracts/fixtures/.
 # Per-developer overrides do not.
 contracts/fixtures/**/.local/
@@ -387,3 +393,11 @@ contracts/fixtures/**/.local/
 seeds/local/
 seeds/*.local.sql
 seeds/*.local.json
+
+# ─────────────────────────────────────────────────────────────
+# pnpm workspace / monorepo (Chunk 1)
+# ─────────────────────────────────────────────────────────────
+.next/
+apps/*/dist/
+packages/*/dist/
+apps/e2e/results/

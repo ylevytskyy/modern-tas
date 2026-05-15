@@ -1,0 +1,27 @@
+# Local dev only — production uses the ADR-0019 HAProxy+Caddy chain (on_demand_tls.ask + HAProxy rate-limit).
+# This file uses Caddy's built-in CA (tls internal) for localhost and *.localhost.
+# No Let's Encrypt interaction; no ACME requests will be fired.
+{
+    local_certs
+}
+
+localhost {
+    tls internal
+
+    handle /v1/* {
+        reverse_proxy api:3000
+    }
+    handle /ws {
+        reverse_proxy api:3000
+    }
+    handle {
+        reverse_proxy web:3001
+    }
+}
+
+*.localhost {
+    tls internal
+    # Wildcard subdomains for future per-tenant routing (Chunks 2+).
+    # In Chunk 1 this block simply responds 200 to confirm TLS works.
+    respond "ncall-clone: {host}" 200
+}

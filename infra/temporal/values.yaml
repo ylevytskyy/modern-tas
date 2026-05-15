@@ -1,0 +1,84 @@
+# Production-target Helm values for Temporal self-host on EU-residency K8s.
+# AUTHORED but UNRUN. Local execution uses values.local.yaml.
+#
+# This file documents the production deltas for the Sprint-N platform-eng task
+# that adapts it to the chosen K8s distribution + external PG/ES providers.
+#
+# Key deltas vs values.local.yaml:
+#   - replicaCount: 3 (HA) vs 1 (local)
+#   - podDisruptionBudget enabled
+#   - createDatabase/manageSchema: false (DBA + Temporal admin tooling pre-creates)
+#   - External managed PG + ES (RDS/Hetzner/Scaleway EU regions) instead of in-cluster bitnami
+#   - mTLS internode + frontend (Open Risk #4 — not exercised in local baseline)
+#   - HTTPS ES endpoint
+#   - Web UI behind ingress with TLS termination
+
+server:
+  # HA: 3 replicas per Temporal service (frontend/matching/history/worker-system).
+  replicaCount: 3
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  config:
+    persistence:
+      defaultStore: default
+      visibilityStore: visibility
+      numHistoryShards: 512
+      datastores:
+        default:
+          sql:
+            # External managed PG (RDS eu-central-1 / Hetzner managed PG EU /
+            # Scaleway DB eu-west). Secret created out-of-band by platform-eng.
+            createDatabase: false  # DBA pre-creates; no app-side schema mgmt
+            manageSchema: false    # schemas managed via temporal admin tooling
+            pluginName: postgres12
+            driverName: postgres12
+            databaseName: temporal
+            connectAddr: "<EU-PG-HOST>:5432"
+            connectProtocol: tcp
+            user: temporal
+            existingSecret: temporal-prod-pg-secret
+            secretKey: password
+        visibility:
+          elasticsearch:
+            # External managed ES (Elastic Cloud EU / self-hosted ECK on EU K8s).
+            # Replicated, DR-ready. ES 8.x (version: v8).
+            version: v8
+            url:
+              scheme: https
+              host: "<EU-ES-HOST>:9200"
+            username: temporal
+            existingSecret: temporal-prod-es-secret
+            secretKey: password
+            logLevel: error
+            indices:
+              visibility: temporal_visibility_v1
+
+    # mTLS between client and frontend, between cluster nodes.
+    # Cert chain managed via cert-manager + internal CA.
+    # This is the auth path that local baseline does NOT exercise (Open Risk #4).
+    tls:
+      internode:
+        client:
+          serverName: temporal-internode
+        server:
+          requireClientAuth: true
+      frontend:
+        client:
+          serverName: temporal-frontend
+        server:
+          requireClientAuth: true
+
+# Web UI: HA, behind ingress with TLS termination.
+web:
+  replicaCount: 2
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    # host + tls populated at deploy time by platform-eng
+
+# Observability: Prometheus + Grafana out of cluster (shared platform).
+# ServiceMonitor authored separately by platform-eng via server.metrics.serviceMonitor.
+# NOTE: prometheus/grafana/cassandra/elasticsearch/mysql top-level keys are all rejected
+# by temporal/temporal chart v1.0.0+. Those subcharts were removed in v1.0.0-rc.2.

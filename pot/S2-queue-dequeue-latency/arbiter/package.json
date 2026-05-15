@@ -1,0 +1,16 @@
+{
+  "name": "pot-s2-arbiter",
+  "version": "0.0.1",
+  "private": true,
+  "description": "PoT-only NestJS-arbiter stub. Throwaway. Do not carry into Sprint 1.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ari-client": "^2.2.0",
+    "ioredis": "^5.4.1",
+    "nats": "^2.28.0",
+    "ws": "^8.18.0"
+  }
+}

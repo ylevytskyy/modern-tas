@@ -1,0 +1,64 @@
+# S5 — Supavisor SET LOCAL parity. Smallest, fastest spike.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: pot
+      POSTGRES_DB: pot
+      POSTGRES_USER: postgres
+    volumes:
+      - ./fixtures/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 2s
+      retries: 5
+
+  supavisor-migrate:
+    image: supabase/supavisor:1.1.66
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:pot@postgres:5432/_supavisor
+      SECRET_KEY_BASE: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      VAULT_ENC_KEY: 0123456789abcdef0123456789abcdef
+      API_JWT_SECRET: dev
+      METRICS_JWT_SECRET: dev
+      REGION: pot
+      ERL_AFLAGS: "-proto_dist inet_tcp"
+      RELEASE_COOKIE: cookie
+      RELEASE_NODE: supavisor-migrate@127.0.0.1
+    entrypoint: ["/app/bin/supavisor", "eval", "Supavisor.Release.migrate"]
+    restart: "no"
+
+  supavisor:
+    image: supabase/supavisor:1.1.66
+    depends_on:
+      postgres:
+        condition: service_healthy
+      supavisor-migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://postgres:pot@postgres:5432/_supavisor
+      SECRET_KEY_BASE: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      VAULT_ENC_KEY: 0123456789abcdef0123456789abcdef
+      API_JWT_SECRET: dev
+      METRICS_JWT_SECRET: dev
+      REGION: pot
+      ERL_AFLAGS: "-proto_dist inet_tcp"
+      RELEASE_COOKIE: cookie
+      RELEASE_NODE: supavisor@127.0.0.1
+    ports:
+      - "5432:5432"  # transaction mode
+      - "4000:4000"  # admin API
+
+  runner:
+    image: postgres:17-alpine  # reuse for psql
+    depends_on:
+      - supavisor
+    volumes:
+      - ./fixtures:/fixtures:ro
+      - ./results:/results
+    entrypoint: ["sleep", "infinity"]  # keep alive; tests invoke psql exec

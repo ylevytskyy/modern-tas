@@ -1,0 +1,4 @@
+caddy admin reachable:
+200
+haproxy stats reachable:
+200

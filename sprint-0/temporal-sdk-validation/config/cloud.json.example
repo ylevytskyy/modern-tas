@@ -1,0 +1,11 @@
+{
+  "_comment": "Cloud-side validation NOT exercised in Sprint-0 baseline. ADR-0015 §Evidence item 1 ratifies on partial check (self-host runs; Cloud claim accepted on Temporal portability docs). If a Temporal Cloud sandbox is signed up later, copy this file to cloud.json and fill in:",
+  "address": "<your-namespace>.tmprl.cloud:7233",
+  "namespace": "<your-namespace>",
+  "tls": {
+    "clientCertPair": {
+      "crt": "<path-to-client.crt>",
+      "key": "<path-to-client.key>"
+    }
+  }
+}

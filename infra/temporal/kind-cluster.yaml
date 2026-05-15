@@ -1,0 +1,14 @@
+# 1-node kind cluster for Temporal self-host baseline (ADR-0015 §Evidence item 2).
+# Local-only; not representative of production EU K8s topology.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: temporal-baseline
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30733
+        hostPort: 7233
+        protocol: TCP
+      - containerPort: 30808
+        hostPort: 8080
+        protocol: TCP

@@ -1,0 +1,19 @@
+# Pinned chart versions for the Temporal local baseline stack.
+# ADR-0015 §Decision said "v1.0.0 Helm chart"; current latest stable is 1.2.0 (app 1.31.0).
+# If this differs from what ADR-0015 documented, see docs/adr/0015-selfhost-baseline-log.md (Slice D).
+#
+# NOTE on ES chart: Using elastic/elasticsearch 8.5.1 (official Elastic Helm chart, ES 8.5.1)
+# from https://helm.elastic.co — NOT bitnami/elasticsearch.
+# bitnami/elasticsearch charts (v21.x and v22.x) are behind the Bitnami paid-image gate
+# (effective August 2025); docker.elastic.co images (official Elastic chart) remain free.
+# Temporal 1.20+ supports ES v8; version: v8 in values.local.yaml.
+dependencies:
+  - name: temporal
+    repository: https://go.temporal.io/helm-charts
+    version: "1.2.0"        # app version: 1.31.0
+  - name: postgresql
+    repository: https://charts.bitnami.com/bitnami
+    version: "18.6.5"       # app version: 18.3.0 (PostgreSQL); bitnami/postgresql images still free
+  - name: elasticsearch
+    repository: https://helm.elastic.co
+    version: "8.5.1"        # app version: 8.5.1 (ES v8); official Elastic chart, docker.elastic.co image

@@ -1,0 +1,2 @@
+subscriber-1  | {"t_ms":1778652608677,"event":"subscriber_starting","ari_app":"s1-test","out_file":"/work/subscriber.jsonl"}
+subscriber-1  | {"t_ms":1778652608714,"event":"ws_open"}

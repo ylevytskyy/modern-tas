@@ -1,0 +1,1030 @@
+----------------------------------------------- 2026-05-13 06:14:38.706631
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-0
+From: "S1-1" <sip:1@172.19.0.6:5060>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 1-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:1@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:38.706965
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-0
+From: "S1-1" <sip:1@172.19.0.6:5060>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 1-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:38.709376
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-0
+Call-ID: 1-1@172.19.0.6
+From: "S1-1" <sip:1@172.19.0.6>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5>;tag=c4be7fe7-76c3-4456-890f-6913b7df60a7
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10528 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:38.709651
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-5
+From: "S1-1" <sip:1@172.19.0.6:5060>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5:5060>;tag=c4be7fe7-76c3-4456-890f-6913b7df60a7
+Call-ID: 1-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:1@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:38.906607
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-0
+From: "S1-2" <sip:2@172.19.0.6:5060>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 2-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:2@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:38.906836
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-0
+From: "S1-2" <sip:2@172.19.0.6:5060>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 2-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:38.909006
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-0
+Call-ID: 2-1@172.19.0.6
+From: "S1-2" <sip:2@172.19.0.6>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5>;tag=fc973710-18d0-4a6e-8bbf-9c488cddcabf
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10818 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:38.909138
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-5
+From: "S1-2" <sip:2@172.19.0.6:5060>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5:5060>;tag=fc973710-18d0-4a6e-8bbf-9c488cddcabf
+Call-ID: 2-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:2@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.010550
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-7
+From: "S1-1" <sip:1@172.19.0.6:5060>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5:5060>;tag=c4be7fe7-76c3-4456-890f-6913b7df60a7
+Call-ID: 1-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.011339
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-1-7
+Call-ID: 1-1@172.19.0.6
+From: "S1-1" <sip:1@172.19.0.6>;tag=1SIPpTag001
+To: <sip:9999@172.19.0.5>;tag=c4be7fe7-76c3-4456-890f-6913b7df60a7
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.106559
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-0
+From: "S1-3" <sip:3@172.19.0.6:5060>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 3-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:3@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:39.106776
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-0
+From: "S1-3" <sip:3@172.19.0.6:5060>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 3-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.108838
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-0
+Call-ID: 3-1@172.19.0.6
+From: "S1-3" <sip:3@172.19.0.6>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5>;tag=c51e432b-8712-4549-aaba-828a40265eef
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10712 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:39.108961
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-5
+From: "S1-3" <sip:3@172.19.0.6:5060>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5:5060>;tag=c51e432b-8712-4549-aaba-828a40265eef
+Call-ID: 3-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:3@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.210544
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-7
+From: "S1-2" <sip:2@172.19.0.6:5060>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5:5060>;tag=fc973710-18d0-4a6e-8bbf-9c488cddcabf
+Call-ID: 2-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.211134
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-2-7
+Call-ID: 2-1@172.19.0.6
+From: "S1-2" <sip:2@172.19.0.6>;tag=1SIPpTag002
+To: <sip:9999@172.19.0.5>;tag=fc973710-18d0-4a6e-8bbf-9c488cddcabf
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.306575
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-0
+From: "S1-4" <sip:4@172.19.0.6:5060>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 4-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:4@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:39.306797
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-0
+From: "S1-4" <sip:4@172.19.0.6:5060>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 4-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.308693
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-0
+Call-ID: 4-1@172.19.0.6
+From: "S1-4" <sip:4@172.19.0.6>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5>;tag=da9c418e-458e-48b8-b893-6c278b1874c3
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10922 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:39.308846
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-5
+From: "S1-4" <sip:4@172.19.0.6:5060>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5:5060>;tag=da9c418e-458e-48b8-b893-6c278b1874c3
+Call-ID: 4-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:4@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.410553
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-7
+From: "S1-3" <sip:3@172.19.0.6:5060>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5:5060>;tag=c51e432b-8712-4549-aaba-828a40265eef
+Call-ID: 3-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.411313
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-3-7
+Call-ID: 3-1@172.19.0.6
+From: "S1-3" <sip:3@172.19.0.6>;tag=1SIPpTag003
+To: <sip:9999@172.19.0.5>;tag=c51e432b-8712-4549-aaba-828a40265eef
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.506566
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-0
+From: "S1-5" <sip:5@172.19.0.6:5060>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 5-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:5@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:39.506804
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-0
+From: "S1-5" <sip:5@172.19.0.6:5060>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 5-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.508849
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-0
+Call-ID: 5-1@172.19.0.6
+From: "S1-5" <sip:5@172.19.0.6>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5>;tag=be5a590f-610e-4709-a370-bcfc14758060
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10374 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:39.509009
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-5
+From: "S1-5" <sip:5@172.19.0.6:5060>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5:5060>;tag=be5a590f-610e-4709-a370-bcfc14758060
+Call-ID: 5-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:5@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.610543
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-7
+From: "S1-4" <sip:4@172.19.0.6:5060>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5:5060>;tag=da9c418e-458e-48b8-b893-6c278b1874c3
+Call-ID: 4-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.611210
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-4-7
+Call-ID: 4-1@172.19.0.6
+From: "S1-4" <sip:4@172.19.0.6>;tag=1SIPpTag004
+To: <sip:9999@172.19.0.5>;tag=da9c418e-458e-48b8-b893-6c278b1874c3
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.706565
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-0
+From: "S1-6" <sip:6@172.19.0.6:5060>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 6-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:6@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:39.706760
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-0
+From: "S1-6" <sip:6@172.19.0.6:5060>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 6-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.709039
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-0
+Call-ID: 6-1@172.19.0.6
+From: "S1-6" <sip:6@172.19.0.6>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5>;tag=2b2e01e4-89e5-4989-9457-2eba7a9e70bf
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10772 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:39.709276
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-5
+From: "S1-6" <sip:6@172.19.0.6:5060>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5:5060>;tag=2b2e01e4-89e5-4989-9457-2eba7a9e70bf
+Call-ID: 6-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:6@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.810534
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-7
+From: "S1-5" <sip:5@172.19.0.6:5060>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5:5060>;tag=be5a590f-610e-4709-a370-bcfc14758060
+Call-ID: 5-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.811125
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-5-7
+Call-ID: 5-1@172.19.0.6
+From: "S1-5" <sip:5@172.19.0.6>;tag=1SIPpTag005
+To: <sip:9999@172.19.0.5>;tag=be5a590f-610e-4709-a370-bcfc14758060
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.906658
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-0
+From: "S1-7" <sip:7@172.19.0.6:5060>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 7-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:7@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:39.906896
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-0
+From: "S1-7" <sip:7@172.19.0.6:5060>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 7-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:39.909074
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-0
+Call-ID: 7-1@172.19.0.6
+From: "S1-7" <sip:7@172.19.0.6>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5>;tag=d7e22d8c-58ec-42c3-8088-50d65e8dfb12
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10858 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:39.909216
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-5
+From: "S1-7" <sip:7@172.19.0.6:5060>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5:5060>;tag=d7e22d8c-58ec-42c3-8088-50d65e8dfb12
+Call-ID: 7-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:7@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.010553
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-7
+From: "S1-6" <sip:6@172.19.0.6:5060>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5:5060>;tag=2b2e01e4-89e5-4989-9457-2eba7a9e70bf
+Call-ID: 6-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.011214
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-6-7
+Call-ID: 6-1@172.19.0.6
+From: "S1-6" <sip:6@172.19.0.6>;tag=1SIPpTag006
+To: <sip:9999@172.19.0.5>;tag=2b2e01e4-89e5-4989-9457-2eba7a9e70bf
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.106595
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-0
+From: "S1-8" <sip:8@172.19.0.6:5060>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 8-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:8@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:40.106752
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-0
+From: "S1-8" <sip:8@172.19.0.6:5060>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 8-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.108952
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-0
+Call-ID: 8-1@172.19.0.6
+From: "S1-8" <sip:8@172.19.0.6>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5>;tag=b9c86d20-4bc1-4a31-bc1f-4ca06f79de84
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10558 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:40.109104
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-5
+From: "S1-8" <sip:8@172.19.0.6:5060>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5:5060>;tag=b9c86d20-4bc1-4a31-bc1f-4ca06f79de84
+Call-ID: 8-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:8@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.210530
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-7
+From: "S1-7" <sip:7@172.19.0.6:5060>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5:5060>;tag=d7e22d8c-58ec-42c3-8088-50d65e8dfb12
+Call-ID: 7-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.211249
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-7-7
+Call-ID: 7-1@172.19.0.6
+From: "S1-7" <sip:7@172.19.0.6>;tag=1SIPpTag007
+To: <sip:9999@172.19.0.5>;tag=d7e22d8c-58ec-42c3-8088-50d65e8dfb12
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.306571
+UDP message sent (479 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-0
+From: "S1-9" <sip:9@172.19.0.6:5060>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 9-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:9@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:40.306758
+UDP message received [297] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-0
+From: "S1-9" <sip:9@172.19.0.6:5060>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 9-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.308616
+UDP message received [716] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-0
+Call-ID: 9-1@172.19.0.6
+From: "S1-9" <sip:9@172.19.0.6>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5>;tag=0491af29-dda1-45a1-b821-e7bb5a78ac0a
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10362 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:40.308765
+UDP message sent (329 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-5
+From: "S1-9" <sip:9@172.19.0.6:5060>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5:5060>;tag=0491af29-dda1-45a1-b821-e7bb5a78ac0a
+Call-ID: 9-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:9@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.410539
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-7
+From: "S1-8" <sip:8@172.19.0.6:5060>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5:5060>;tag=b9c86d20-4bc1-4a31-bc1f-4ca06f79de84
+Call-ID: 8-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.411170
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-8-7
+Call-ID: 8-1@172.19.0.6
+From: "S1-8" <sip:8@172.19.0.6>;tag=1SIPpTag008
+To: <sip:9999@172.19.0.5>;tag=b9c86d20-4bc1-4a31-bc1f-4ca06f79de84
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.506590
+UDP message sent (485 bytes):
+
+INVITE sip:9999@172.19.0.5:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-0
+From: "S1-10" <sip:10@172.19.0.6:5060>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 10-1@172.19.0.6
+CSeq: 1 INVITE
+Contact: <sip:10@172.19.0.6:5060>
+Max-Forwards: 70
+User-Agent: SIPp/S1
+Content-Type: application/sdp
+Content-Length:   127
+
+v=0
+o=- 53655765 2353687637 IN IP4 172.19.0.6
+s=-
+c=IN IP4 172.19.0.6
+t=0 0
+m=audio 6000 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+
+----------------------------------------------- 2026-05-13 06:14:40.506783
+UDP message received [302] bytes :
+
+SIP/2.0 100 trying -- your call is important to us
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-0
+From: "S1-10" <sip:10@172.19.0.6:5060>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5:5060>
+Call-ID: 10-1@172.19.0.6
+CSeq: 1 INVITE
+Server: kamailio (5.7.4 (aarch64/linux))
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.508982
+UDP message received [721] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-0
+Call-ID: 10-1@172.19.0.6
+From: "S1-10" <sip:10@172.19.0.6>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5>;tag=44cc9b37-46d2-4966-a9b3-dadc4cfe4e96
+CSeq: 1 INVITE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Contact: <sip:172.19.0.2:5060>
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, INFO, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub
+Content-Type: application/sdp
+Content-Length:   175
+
+v=0
+o=- 53655765 2353687639 IN IP4 172.19.0.2
+s=Asterisk
+c=IN IP4 172.19.0.2
+t=0 0
+m=audio 10364 RTP/AVP 0
+a=rtpmap:0 PCMU/8000
+a=ptime:20
+a=maxptime:140
+a=sendrecv
+
+----------------------------------------------- 2026-05-13 06:14:40.509231
+UDP message sent (335 bytes):
+
+ACK sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-5
+From: "S1-10" <sip:10@172.19.0.6:5060>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5:5060>;tag=44cc9b37-46d2-4966-a9b3-dadc4cfe4e96
+Call-ID: 10-1@172.19.0.6
+CSeq: 1 ACK
+Contact: <sip:10@172.19.0.6:5060>
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.610559
+UDP message sent (295 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-7
+From: "S1-9" <sip:9@172.19.0.6:5060>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5:5060>;tag=0491af29-dda1-45a1-b821-e7bb5a78ac0a
+Call-ID: 9-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.611154
+UDP message received [307] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-9-7
+Call-ID: 9-1@172.19.0.6
+From: "S1-9" <sip:9@172.19.0.6>;tag=1SIPpTag009
+To: <sip:9999@172.19.0.5>;tag=0491af29-dda1-45a1-b821-e7bb5a78ac0a
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.810551
+UDP message sent (300 bytes):
+
+BYE sip:9999@asterisk:5060 SIP/2.0
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-7
+From: "S1-10" <sip:10@172.19.0.6:5060>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5:5060>;tag=44cc9b37-46d2-4966-a9b3-dadc4cfe4e96
+Call-ID: 10-1@172.19.0.6
+CSeq: 2 BYE
+Max-Forwards: 70
+Content-Length: 0
+
+
+----------------------------------------------- 2026-05-13 06:14:40.811199
+UDP message received [312] bytes :
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 172.19.0.6:5060;branch=z9hG4bK-1-10-7
+Call-ID: 10-1@172.19.0.6
+From: "S1-10" <sip:10@172.19.0.6>;tag=1SIPpTag0010
+To: <sip:9999@172.19.0.5>;tag=44cc9b37-46d2-4966-a9b3-dadc4cfe4e96
+CSeq: 2 BYE
+Server: Asterisk PBX 20.6.0~dfsg+~cs6.13.40431414-2build5
+Content-Length:  0
+
+

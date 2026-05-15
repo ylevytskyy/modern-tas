@@ -1,0 +1,16 @@
+# bitnami/postgresql values for Temporal local-baseline backing store.
+# No persistence (faster boot, no PVC needed in kind).
+# Secret created by bitnami chart: <release>-postgresql, key: postgres-password
+auth:
+  postgresPassword: temporal-pg-pass
+  database: temporal
+primary:
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m

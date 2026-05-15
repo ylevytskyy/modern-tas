@@ -1,0 +1,4 @@
+arbiter-1  | [
+arbiter-1  |   'This API is using a deprecated version of Swagger!  Please see http://github.com/wordnik/swagger-core/wiki for more info'
+arbiter-1  | ]
+arbiter-1  | [arbiter] up. instance=c00f4c5c48ff queue=pot-queue ari_app=pot-queue

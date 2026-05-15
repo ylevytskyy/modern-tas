@@ -1,0 +1,58 @@
+# S3 — ARI leader 100 ms hard-stop. Boots Asterisk + Redis + 2 leader stubs.
+
+services:
+  asterisk:
+    build: ./asterisk-image
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./fixtures/asterisk:/etc/asterisk:ro
+    ports:
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD-SHELL", "asterisk -rx 'core show uptime' 2>/dev/null | grep -q 'System uptime'"]
+      interval: 10s
+      timeout: 3s
+      retries: 18
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  leader-a:
+    build: ./leader
+    depends_on:
+      asterisk:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      INSTANCE_ID: leader-a
+      REDIS_URL: redis://redis:6379
+      ARI_URL: http://asterisk:8088/ari
+      ARI_USER: pot
+      ARI_PASS: pot
+      ARI_APP: pot-leader-test
+      LEASE_KEY: pot:ari-leader:asterisk-1
+
+  leader-b:
+    build: ./leader
+    depends_on:
+      asterisk:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      INSTANCE_ID: leader-b
+      REDIS_URL: redis://redis:6379
+      ARI_URL: http://asterisk:8088/ari
+      ARI_USER: pot
+      ARI_PASS: pot
+      ARI_APP: pot-leader-test
+      LEASE_KEY: pot:ari-leader:asterisk-1

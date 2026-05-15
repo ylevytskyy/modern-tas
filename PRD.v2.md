@@ -505,6 +505,8 @@ Modern answering services receive SMS inbound. nCall does not natively model thi
 
 (Unchanged from v1.1.) Docker containers, PJSIP via realtime against PostgreSQL, ARI exposed on internal :8088, AMI on :5038, `res_prometheus` `/metrics`, CDR/CEL to Postgres direct, recordings to per-tenant `/recordings` volume. **Model B** multi-tenancy (N tenants per Asterisk with per-tenant context + PJSIP auth/aor/endpoint via realtime); escalate to Model A for HIPAA-strict tenants. **Note (v2)**: queue logic is in NestJS, not Asterisk `Queue()`; Asterisk holds calls in MOH-playing Stasis bridges while NestJS dequeues.
 
+> **Amendment 2026-05-15 (ADR-0025):** MVP edge topology is **Asterisk-direct** — carrier SIP trunk connects directly to Asterisk; the Kamailio SBC tier and rtpengine described in §7.2.1–7.2.2 are **deferred** to the production-scale Kamailio-fronted SBC topology path. `infra/kamailio/` and `infra/rtpengine/` configs are preserved but not active in MVP (Chunk 4 scope). Re-introduction trigger: concurrent volume >300, HIPAA-tier BAA sub-second failover requirement, or compliance-audit SIP/media N+1 posture block. See ADR-0025.
+
 #### 7.2.4 TURN (deferred — not in MVP)
 
 (Unchanged from v1.1.) Not deployed in MVP. rtpengine acts as the public media relay with `ICE=force` server-reflexive candidates; v1.x adds coturn when measurable WebRTC connectivity failures emerge. Design hooks: SIP.js `iceServers` config endpoint returns empty array in MVP; UDP port range 49152–65535 reserved on future TURN host; credential provisioning code path sketched but not implemented.
@@ -774,6 +776,8 @@ This complements the tenant-side anti-fraud monitor (§6.3) — that one protect
 ## 8. Compliance Plan
 
 (Unchanged from v1.1.) HIPAA: BAAs everywhere, encryption in transit + at rest, RLS + column encryption, 7-year retention, append-only audit, no PHI in non-secure SMS. **v2 addition**: PHI not in URL query strings (§5.14.1). GDPR: EU residency for EU-domiciled tenants, DPA template, right to erasure workflow, DPIA per tenant. PCI: delegated capture (Telnyx Pay) preferred, pause+redact fallback, network segmentation, quarterly ASV scans. Baseline: TLS 1.2+, MFA for admins, audit log, quarterly subprocessor review.
+
+> **Amendment 2026-05-15 (ADR-0026):** **HIPAA-tier support is deferred from MVP.** MVP compliance scope is **GDPR + PCI + general security baseline only**. Items not in MVP scope: `hipaa_tier` tenant flag; column-level encryption for caller_name/caller_number/message body; 7-year retention (default 90 days applies to all MVP tenants); BAA signing for medical-tier vendor SKUs (AssemblyAI Pro Medical, Temporal Cloud Enterprise HIPAA); SRTP-mandatory enforcement per HIPAA tenant; `pseudonymise_until_retention_expires` saga path. GDPR + PCI obligations are unchanged. Re-introduction trigger: first HIPAA-tier prospect with signed BAA intent, >20% healthcare pipeline, or regulatory shift. See ADR-0026 and ADR-0013 §Broader scope (2026-05-15). See also ADR-0025 (Asterisk-direct edge topology).
 
 ---
 

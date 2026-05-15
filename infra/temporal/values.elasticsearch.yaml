@@ -1,0 +1,54 @@
+# Official Elastic Helm chart values for Temporal local-baseline visibility store.
+# Chart: elastic/elasticsearch v8.5.1 (ES 8.5.1)
+# Image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1 (free, no paywall)
+#
+# NOTE: bitnami/elasticsearch charts (v21.x and v22.x) are behind the Bitnami paid-image
+# gate (effective August 2025). We use the official Elastic Helm chart instead.
+# The Makefile targets elastic/elasticsearch (repo: https://helm.elastic.co).
+#
+# Service created by this chart: elasticsearch-master (port 9200)
+# NOTE: the official Elastic chart names the service from `clusterName` (default
+# "elasticsearch"), NOT from the Helm release name. So the in-cluster DNS is
+# elasticsearch-master.<namespace>.svc.cluster.local:9200 regardless of release name.
+# For namespace "temporal": elasticsearch-master.temporal.svc.cluster.local:9200
+#
+# Security: disabled for local baseline (no TLS, no x-pack auth).
+# Protocol: http (not https — createCert: false + xpack.security.enabled: false).
+#
+# NOTE on discovery.type: Do NOT set discovery.type=single-node here. The official
+# chart injects cluster.initial_master_nodes via env var; ES 8.x rejects that setting
+# when discovery.type=single-node is present (they are mutually exclusive). Instead,
+# replicas=1 + minimumMasterNodes=1 achieves single-node behaviour via the chart's own
+# discovery bootstrap (cluster.initial_master_nodes=[master-0]).
+
+replicas: 1
+minimumMasterNodes: 1
+
+# Disable certificate creation and x-pack security for local baseline.
+createCert: false
+
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: false
+    xpack.security.http.ssl.enabled: false
+    xpack.security.transport.ssl.enabled: false
+
+# The chart defaults to protocol: https; switch to http since security is off.
+protocol: http
+
+# No persistence needed for local baseline (faster boot, no PVC).
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    memory: 768Mi
+    cpu: 200m
+  limits:
+    memory: 1Gi
+    cpu: 1000m
+
+esJvmOptions:
+  jvm.options: |
+    -Xms384m
+    -Xmx384m

@@ -1,0 +1,6 @@
+# S1 PoT — dispatcher target list. Set ID 1 contains the single
+# Asterisk downstream; both kamailios proxy to the same Asterisk so
+# failover at the kamailio tier is transparent to Asterisk-side state.
+#
+# Format: setid uri flags
+1 sip:asterisk:5060 0
