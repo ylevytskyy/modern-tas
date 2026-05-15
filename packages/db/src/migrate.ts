@@ -4,7 +4,7 @@ import postgres from "postgres";
 import path from "path";
 
 async function main() {
-  const url = process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall";
+  const url = process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas";
   const sql = postgres(url, { max: 1 });
   const db = drizzle(sql);
   await migrate(db, { migrationsFolder: path.join(__dirname, "../drizzle") });

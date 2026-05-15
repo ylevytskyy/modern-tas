@@ -40,7 +40,7 @@
 
 ### D6 — MinIO SDK choice
 
-**Decision:** Use `minio@^8.0.7`. Credentials from env: `MINIO_ENDPOINT` (default `localhost`), `MINIO_PORT` (default `9000`), `MINIO_ACCESS_KEY` (default `ncall`), `MINIO_SECRET_KEY` (default `ncall1234`). Bucket: `ncall-recordings`.
+**Decision:** Use `minio@^8.0.7`. Credentials from env: `MINIO_ENDPOINT` (default `localhost`), `MINIO_PORT` (default `9000`), `MINIO_ACCESS_KEY` (default `tas`), `MINIO_SECRET_KEY` (default `tas1234`). Bucket: `tas-recordings`.
 
 ### D7 — JwtModule cleanup placement
 
@@ -60,11 +60,11 @@
 
 ### D11 — `packages/ari-client` workspace package design
 
-**Decision:** `packages/ari-client` as `@ncall/ari-client`. Contains `AriLeaderClient` class with Redis lease loop (TTL=1500ms, HB=500ms). Hard-stop callback fires via `process.nextTick` on lease loss. In-flight handler guard (`if (!this.isLeader) return`) prevents split-brain events from deposed leader (ADR-0016 §3 + Consequences).
+**Decision:** `packages/ari-client` as `@tas/ari-client`. Contains `AriLeaderClient` class with Redis lease loop (TTL=1500ms, HB=500ms). Hard-stop callback fires via `process.nextTick` on lease loss. In-flight handler guard (`if (!this.isLeader) return`) prevents split-brain events from deposed leader (ADR-0016 §3 + Consequences).
 
 ### D12 — Migration 0004 scope and FK on `queue_call.callId`
 
-**Decision:** Migration 0004 adds `tenant_id uuid NOT NULL` to `recording` and `queue_call`, plus FK on `queue_call.callId`. Drizzle schema changes in `call.ts` and `queue.ts`. Generate with `pnpm --filter @ncall/db migrate:gen` (drizzle-kit 0.20.x `generate:pg` subcommand).
+**Decision:** Migration 0004 adds `tenant_id uuid NOT NULL` to `recording` and `queue_call`, plus FK on `queue_call.callId`. Drizzle schema changes in `call.ts` and `queue.ts`. Generate with `pnpm --filter @tas/db migrate:gen` (drizzle-kit 0.20.x `generate:pg` subcommand).
 
 ### D13 — Single-operator routing strategy
 
@@ -76,7 +76,7 @@
 
 ### D15 — Asterisk Stasis app name
 
-**Decision:** Stasis app name is `ncall` (from `infra/asterisk/ari.conf` `[ncall]` user + `extensions.conf` `Stasis(ncall)`). `ARI_APP` env var defaults to `ncall`.
+**Decision:** Stasis app name is `tas` (from `infra/asterisk/ari.conf` `[tas]` user + `extensions.conf` `Stasis(tas)`). `ARI_APP` env var defaults to `tas`.
 
 ### D16 — Tenant ID resolution on StasisStart
 
@@ -114,7 +114,7 @@ docker run --rm --platform linux/amd64 \
 
 **Rationale:** Matches Chunk 2's T15b pattern which handled `tenant_id` addition on `message`. Avoids requiring users to `make poc-down -v && make poc-up` which destroys all dev state. A `NOT NULL` without DEFAULT aborts on non-empty tables (drizzle-kit 0.20.x generates bare `ADD COLUMN ... NOT NULL` with no DEFAULT — verified in Chunk 2).
 
-**Implementation:** After `pnpm --filter @ncall/db migrate:gen` generates the SQL, manually edit `0004_<name>.sql` to add DEFAULT and DROP DEFAULT clauses as shown in T21m Step 5.
+**Implementation:** After `pnpm --filter @tas/db migrate:gen` generates the SQL, manually edit `0004_<name>.sql` to add DEFAULT and DROP DEFAULT clauses as shown in T21m Step 5.
 
 ### D20 — Hard-stop unit test latency assertion (M4 fix)
 
@@ -143,7 +143,7 @@ docker run --rm --platform linux/amd64 \
 | `packages/ari-client/src/leader.ts` | Create | T22 |
 | `packages/ari-client/test/leader-hardstop.spec.ts` | Create | T22 |
 | `packages/ari-client/vitest.config.ts` | Create | T22 |
-| `apps/api/package.json` | Modify (add nats, @ncall/ari-client, ioredis, minio to deps; ws to deps; postgres + @types/ws to devDeps; remove @types/ioredis; no @nestjs/platform-ws or @nestjs/websockets) | T23 |
+| `apps/api/package.json` | Modify (add nats, @tas/ari-client, ioredis, minio to deps; ws to deps; postgres + @types/ws to devDeps; remove @types/ioredis; no @nestjs/platform-ws or @nestjs/websockets) | T23 |
 | `apps/api/src/nats/nats.module.ts` | Create | T23 |
 | `apps/api/src/nats/nats-client.service.ts` | Create | T23 |
 | `apps/api/src/nats/nats.module.spec.ts` | Create | T23 |
@@ -183,7 +183,7 @@ docker run --rm --platform linux/amd64 \
   ```
   and the corresponding `import { JwtModule } from '@nestjs/jwt';` if it becomes unused.
 
-- [ ] Step 2: Run `pnpm --filter @ncall/api test` → all 11 specs GREEN.
+- [ ] Step 2: Run `pnpm --filter @tas/api test` → all 11 specs GREEN.
 
 - [ ] Step 3: Commit:
   ```bash
@@ -282,7 +282,7 @@ export interface WsIncomingCallPayload {
 
 - [ ] Step 4: Generate migration:
   ```bash
-  pnpm --filter @ncall/db migrate:gen
+  pnpm --filter @tas/db migrate:gen
   ```
   (drizzle-kit 0.20.x `generate:pg` subcommand — per Chunk 1/2 deviation notes). Produces `packages/db/drizzle/0004_<name>.sql`.
 
@@ -315,7 +315,7 @@ export interface WsIncomingCallPayload {
   - `tenant_id` on `queue_call` with DEFAULT + DROP DEFAULT
   - FK on `queue_call.call_id` → `call.id`
 
-- [ ] Step 7: Run `pnpm --filter @ncall/db typecheck` → exits 0.
+- [ ] Step 7: Run `pnpm --filter @tas/db typecheck` → exits 0.
 
 - [ ] Step 8: Commit:
   ```bash
@@ -528,7 +528,7 @@ describe('AriLeaderClient — hard-stop callback path (mock Redis/ARI, no real i
     (leader as any).isLeader = false;
 
     // Fire a StasisStart event while isLeader === false
-    capturedHandler!({ channel: { id: 'ch-1', dialplan: {}, caller: {} }, application: 'ncall' });
+    capturedHandler!({ channel: { id: 'ch-1', dialplan: {}, caller: {} }, application: 'tas' });
 
     // onStasisStart must NOT be called — guard drops it
     expect(onStasisStart).not.toHaveBeenCalled();
@@ -540,7 +540,7 @@ describe('AriLeaderClient — hard-stop callback path (mock Redis/ARI, no real i
 
 ```json
 {
-  "name": "@ncall/ari-client",
+  "name": "@tas/ari-client",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -593,7 +593,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] Step 5: Run `pnpm --filter @ncall/ari-client test` → confirm RED (module not found for `../src/leader.js`).
+- [ ] Step 5: Run `pnpm --filter @tas/ari-client test` → confirm RED (module not found for `../src/leader.js`).
 
 - [ ] Step 6: Create `packages/ari-client/src/leader.ts` (GREEN implementation):
 
@@ -653,7 +653,7 @@ export class AriLeaderClient {
   private isLeader = false;
   private ariHandle: AriClientHandle | null = null;
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
-  private readonly ARI_APP = process.env.ARI_APP ?? 'ncall';
+  private readonly ARI_APP = process.env.ARI_APP ?? 'tas';
 
   constructor(opts: AriLeaderClientOptions) {
     this.opts = opts;
@@ -774,9 +774,9 @@ export { AriLeaderClient } from './leader.js';
 export type { AriLeaderClientOptions, AriClientHandle, StasisStartEvent } from './leader.js';
 ```
 
-- [ ] Step 8: Run `pnpm --filter @ncall/ari-client test` → confirm GREEN (3/3).
+- [ ] Step 8: Run `pnpm --filter @tas/ari-client test` → confirm GREEN (3/3).
 
-- [ ] Step 9: Run `pnpm --filter @ncall/ari-client typecheck` → exits 0.
+- [ ] Step 9: Run `pnpm --filter @tas/ari-client typecheck` → exits 0.
 
 - [ ] Step 10: Commit:
   ```bash
@@ -824,9 +824,9 @@ describe('NatsClientService', () => {
 
   it('publish() calls nc.publish with subject and encoded payload', () => {
     const payload = { callId: 'abc', tenantId: 'tenant-1', channel: 'ch-1', accountId: 'acct-1' };
-    service.publish('ncall.stasis.start', payload);
+    service.publish('tas.stasis.start', payload);
     expect(mockNc.publish).toHaveBeenCalledWith(
-      'ncall.stasis.start',
+      'tas.stasis.start',
       expect.any(Uint8Array),
     );
     const encoded = mockNc.publish.mock.calls[0][1] as Uint8Array;
@@ -836,22 +836,22 @@ describe('NatsClientService', () => {
 
   it('subscribe() calls nc.subscribe and registers callback', () => {
     const handler = vi.fn();
-    service.subscribe('ncall.stasis.start', handler);
+    service.subscribe('tas.stasis.start', handler);
     expect(mockNc.subscribe).toHaveBeenCalledWith(
-      'ncall.stasis.start',
+      'tas.stasis.start',
       expect.objectContaining({ callback: expect.any(Function) }),
     );
   });
 });
 ```
 
-- [ ] Step 2: Run `pnpm --filter @ncall/api test` → RED (NatsClientService / NATS_CLIENT_TOKEN not found).
+- [ ] Step 2: Run `pnpm --filter @tas/api test` → RED (NatsClientService / NATS_CLIENT_TOKEN not found).
 
 - [ ] Step 3: Modify `apps/api/package.json` — add/move dependencies:
 
 **Add to `dependencies`:**
 ```json
-"@ncall/ari-client": "workspace:*",
+"@tas/ari-client": "workspace:*",
 "ioredis": "^5.4.1",
 "minio": "^8.0.7",
 "nats": "^2.29.3",
@@ -968,7 +968,7 @@ export class RedisModule {}
 
 ```ts
 import { Global, Module } from '@nestjs/common';
-import { AriLeaderClient } from '@ncall/ari-client';
+import { AriLeaderClient } from '@tas/ari-client';
 import Redis from 'ioredis';
 
 export const ARI_LEADER_TOKEN = 'ARI_LEADER';
@@ -984,12 +984,12 @@ export const ARI_LEADER_TOKEN = 'ARI_LEADER';
           connect: (url: string, user: string, pass: string) => Promise<any>;
         };
         const ariUrl = process.env.ARI_URL ?? 'http://localhost:8088';
-        const ariUser = process.env.ARI_USER ?? 'ncall';
-        const ariPass = process.env.ARI_PASS ?? 'ncall';
+        const ariUser = process.env.ARI_USER ?? 'tas';
+        const ariPass = process.env.ARI_PASS ?? 'tas';
 
         const leader = new AriLeaderClient({
           instanceId: process.env.INSTANCE_ID ?? `api-${process.pid}`,
-          leaseKey: `ncall:ari-leader:${process.env.ASTERISK_ID ?? 'asterisk-1'}`,
+          leaseKey: `tas:ari-leader:${process.env.ASTERISK_ID ?? 'asterisk-1'}`,
           ttlMs: Number(process.env.ARI_LEASE_TTL_MS ?? 1500),
           heartbeatMs: Number(process.env.ARI_HEARTBEAT_MS ?? 500),
           redis,
@@ -1016,7 +1016,7 @@ export const ARI_LEADER_TOKEN = 'ARI_LEADER';
 export class AriModule {}
 ```
 
-- [ ] Step 8: Run `pnpm --filter @ncall/api test` → NATS spec GREEN; all other existing specs GREEN.
+- [ ] Step 8: Run `pnpm --filter @tas/api test` → NATS spec GREEN; all other existing specs GREEN.
 
 - [ ] Step 9: Commit:
   ```bash
@@ -1043,9 +1043,9 @@ import { DB_TOKEN } from '../database/database.module';
 import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
-import { makeDb } from '@ncall/db/client';
-import { tenant, account, did, call, queue, queueCall } from '@ncall/db';
-import { NatsSubjects } from '@ncall/shared-types';
+import { makeDb } from '@tas/db/client';
+import { tenant, account, did, call, queue, queueCall } from '@tas/db';
+import { NatsSubjects } from '@tas/shared-types';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -1056,10 +1056,10 @@ const QUEUE_ID = '77777777-7777-7777-7777-777777777777';
 const makeStasisStartEvent = (channelId = 'test-channel-id') => ({
   channel: {
     id: channelId,
-    dialplan: { context: 'ncall-inbound', exten: '+15555550100' },
+    dialplan: { context: 'tas-inbound', exten: '+15555550100' },
     caller: { number: '+15555550200' },
   },
-  application: 'ncall',
+  application: 'tas',
 });
 
 describe('StasisStartHandler', () => {
@@ -1140,7 +1140,7 @@ describe('StasisStartHandler', () => {
 });
 ```
 
-- [ ] Step 3: Run `pnpm --filter @ncall/api test` → RED (StasisStartHandler not found).
+- [ ] Step 3: Run `pnpm --filter @tas/api test` → RED (StasisStartHandler not found).
 
 - [ ] Step 4: Create `apps/api/src/telephony/stasis-start.handler.ts`:
 
@@ -1150,11 +1150,11 @@ import { eq } from 'drizzle-orm';
 import { DB_TOKEN } from '../database/database.module';
 import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
-import { did, account, call, queueCall } from '@ncall/db';
-import { NatsSubjects } from '@ncall/shared-types';
-import type { NatsStasisStartPayload } from '@ncall/shared-types';
-import type { Db } from '@ncall/db/client';
-import type { AriLeaderClient, StasisStartEvent } from '@ncall/ari-client';
+import { did, account, call, queueCall } from '@tas/db';
+import { NatsSubjects } from '@tas/shared-types';
+import type { NatsStasisStartPayload } from '@tas/shared-types';
+import type { Db } from '@tas/db/client';
+import type { AriLeaderClient, StasisStartEvent } from '@tas/ari-client';
 
 // Seeded queue ID — single-queue strategy for PoC (Chunk 6 adds dynamic routing)
 const SEEDED_QUEUE_ID = '77777777-7777-7777-7777-777777777777';
@@ -1255,7 +1255,7 @@ import { AriModule } from '../ari/ari.module';
 export class TelephonyModule {}
 ```
 
-- [ ] Step 6: Run `pnpm --filter @ncall/api test` → StasisStartHandler spec GREEN; all prior GREEN.
+- [ ] Step 6: Run `pnpm --filter @tas/api test` → StasisStartHandler spec GREEN; all prior GREEN.
 
 - [ ] Step 7: Commit:
   ```bash
@@ -1279,7 +1279,7 @@ import { ArbiterService } from './arbiter.service';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
 import { WsGateway } from '../ws/ws.gateway';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 
@@ -1340,8 +1340,8 @@ describe('ArbiterService', () => {
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WsGateway } from './ws.gateway';
-import { WsEvents } from '@ncall/shared-types';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import { WsEvents } from '@tas/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 describe('WsGateway', () => {
   let gateway: WsGateway;
@@ -1385,7 +1385,7 @@ describe('WsGateway', () => {
 });
 ```
 
-- [ ] Step 3: Run `pnpm --filter @ncall/api test` → RED for both new specs.
+- [ ] Step 3: Run `pnpm --filter @tas/api test` → RED for both new specs.
 
 - [ ] Step 4: Create `apps/api/src/ws/ws.gateway.ts`:
 
@@ -1393,8 +1393,8 @@ describe('WsGateway', () => {
 import { Injectable } from '@nestjs/common';
 import * as jsonwebtoken from 'jsonwebtoken';
 import type { WebSocket } from 'ws';
-import { WsEvents } from '@ncall/shared-types';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import { WsEvents } from '@tas/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 @Injectable()
 export class WsGateway {
@@ -1442,8 +1442,8 @@ export class WsModule {}
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { NatsClientService } from '../nats/nats-client.service';
 import { WsGateway } from '../ws/ws.gateway';
-import { NatsSubjects } from '@ncall/shared-types';
-import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@ncall/shared-types';
+import { NatsSubjects } from '@tas/shared-types';
+import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@tas/shared-types';
 
 /** Single seeded operator for Chunk 3 PoC. Chunk 6 replaces with FIFO heap + skill matching. */
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
@@ -1490,7 +1490,7 @@ import { WsModule } from '../ws/ws.module';
 export class ArbiterModule {}
 ```
 
-- [ ] Step 8: Run `pnpm --filter @ncall/api test` → ArbiterService + WsGateway specs GREEN; all prior GREEN.
+- [ ] Step 8: Run `pnpm --filter @tas/api test` → ArbiterService + WsGateway specs GREEN; all prior GREEN.
 
 - [ ] Step 9: Commit:
   ```bash
@@ -1510,8 +1510,8 @@ import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecordingService } from './recording.service';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { tenant, account, did, call, recording } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { tenant, account, did, call, recording } from '@tas/db';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -1566,7 +1566,7 @@ describe('RecordingService', () => {
     expect(rec.startedAt).toBeInstanceOf(Date);
 
     expect(mockMinioClient.putObject).toHaveBeenCalledWith(
-      'ncall-recordings',
+      'tas-recordings',
       `recordings/${CALL_ID}.wav`,
       expect.any(Buffer),
     );
@@ -1574,18 +1574,18 @@ describe('RecordingService', () => {
 });
 ```
 
-- [ ] Step 2: Run `pnpm --filter @ncall/api test` → RED (RecordingService not found).
+- [ ] Step 2: Run `pnpm --filter @tas/api test` → RED (RecordingService not found).
 
 - [ ] Step 3: Create `apps/api/src/recording/recording.service.ts`:
 
 ```ts
 import { Injectable, Inject } from '@nestjs/common';
 import { DB_TOKEN } from '../database/database.module';
-import { recording } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
+import { recording } from '@tas/db';
+import type { Db } from '@tas/db/client';
 import type { Client as MinioClient } from 'minio';
 
-const MINIO_BUCKET = 'ncall-recordings';
+const MINIO_BUCKET = 'tas-recordings';
 
 export interface StartRecordingParams {
   callId: string;
@@ -1640,8 +1640,8 @@ import { Client as MinioClient } from 'minio';
           endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
           port: Number(process.env.MINIO_PORT ?? 9000),
           useSSL: false,
-          accessKey: process.env.MINIO_ACCESS_KEY ?? 'ncall',
-          secretKey: process.env.MINIO_SECRET_KEY ?? 'ncall1234',
+          accessKey: process.env.MINIO_ACCESS_KEY ?? 'tas',
+          secretKey: process.env.MINIO_SECRET_KEY ?? 'tas1234',
         }),
     },
   ],
@@ -1738,9 +1738,9 @@ async function bootstrap() {
 bootstrap();
 ```
 
-- [ ] Step 8: Run `pnpm --filter @ncall/api test` → RecordingService spec GREEN; full suite GREEN.
+- [ ] Step 8: Run `pnpm --filter @tas/api test` → RecordingService spec GREEN; full suite GREEN.
 
-- [ ] Step 9: Run `pnpm --filter @ncall/api typecheck` → exits 0.
+- [ ] Step 9: Run `pnpm --filter @tas/api typecheck` → exits 0.
 
 - [ ] Step 10: Commit:
   ```bash
@@ -1756,11 +1756,11 @@ bootstrap();
 **C1 fix:** Replace `cdreis/sipp:latest` with `drachtio/sipp@sha256:a47d473...` (pinned digest).
 **C2/D17 fix:** Use `host.docker.internal:5060` (published port from D17) with `--platform linux/amd64`.
 **C3/D18 fix:** Use `spawn` (not `execSync`); measure NATS→WS latency only.
-**C4 fix:** Do NOT replace `apps/api/vitest.config.ts`. Only ADD the `@ncall/ari-client` alias to the existing file.
+**C4 fix:** Do NOT replace `apps/api/vitest.config.ts`. Only ADD the `@tas/ari-client` alias to the existing file.
 
 > **STOP-on-port-conflict guidance:** The integration test sends UDP SIP traffic to port 5060 (published from Kamailio per D17). If port 5060 is already in use on the host, STOP and report BLOCKED. Do NOT kill the conflicting process.
 
-- [ ] Step 1: **ADD alias only** to existing `apps/api/vitest.config.ts`. The existing file has the `unplugin-swc` plugin block with `decoratorMetadata: true` — this MUST be preserved. Only add the `@ncall/ari-client` alias entry.
+- [ ] Step 1: **ADD alias only** to existing `apps/api/vitest.config.ts`. The existing file has the `unplugin-swc` plugin block with `decoratorMetadata: true` — this MUST be preserved. Only add the `@tas/ari-client` alias entry.
 
   **Old content** (current file — verified by live probe):
   ```ts
@@ -1789,9 +1789,9 @@ bootstrap();
       globalSetup: './test/vitest.globalSetup.ts',
       include: ['src/**/*.spec.ts'],
       alias: {
-        '@ncall/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
-        '@ncall/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
-        '@ncall/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
+        '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
+        '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
+        '@tas/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
       },
     },
   });
@@ -1824,16 +1824,16 @@ bootstrap();
       globalSetup: './test/vitest.globalSetup.ts',
       include: ['src/**/*.spec.ts'],
       alias: {
-        '@ncall/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
-        '@ncall/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
-        '@ncall/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
-        '@ncall/ari-client': resolve(__dirname, '../../packages/ari-client/src/index.ts'),
+        '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
+        '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
+        '@tas/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
+        '@tas/ari-client': resolve(__dirname, '../../packages/ari-client/src/index.ts'),
       },
     },
   });
   ```
 
-  Use the Edit tool (`old_string` / `new_string`) on `apps/api/vitest.config.ts` — do NOT use Write (which would overwrite the file). The only change is adding the `@ncall/ari-client` alias line.
+  Use the Edit tool (`old_string` / `new_string`) on `apps/api/vitest.config.ts` — do NOT use Write (which would overwrite the file). The only change is adding the `@tas/ari-client` alias line.
 
 - [ ] Step 2: Create `apps/api/vitest.integration.config.ts` (separate config for integration tests — does NOT need the swc plugin since integration tests don't use NestJS decorators directly):
 
@@ -1847,9 +1847,9 @@ export default defineConfig({
     include: ['test/integration/**/*.spec.ts'],
     testTimeout: 30000,
     alias: {
-      '@ncall/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
-      '@ncall/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
-      '@ncall/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
+      '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
+      '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
+      '@tas/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
     },
   },
 });
@@ -1887,7 +1887,7 @@ const SEEDED_TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 
 const NATS_URL = process.env.NATS_URL ?? 'nats://localhost:4222';
-const DB_URL = process.env.DATABASE_URL ?? 'postgres://ncall.ncall:ncall@localhost:6543/ncall';
+const DB_URL = process.env.DATABASE_URL ?? 'postgres://tas.tas:tas@localhost:6543/tas';
 const API_WS_URL = 'ws://localhost:3000/ws';
 const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT ?? 'localhost';
 const MINIO_PORT = Number(process.env.MINIO_PORT ?? 9000);
@@ -1965,8 +1965,8 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
       endPoint: MINIO_ENDPOINT,
       port: MINIO_PORT,
       useSSL: false,
-      accessKey: process.env.MINIO_ACCESS_KEY ?? 'ncall',
-      secretKey: process.env.MINIO_SECRET_KEY ?? 'ncall1234',
+      accessKey: process.env.MINIO_ACCESS_KEY ?? 'tas',
+      secretKey: process.env.MINIO_SECRET_KEY ?? 'tas1234',
     });
   });
 
@@ -1980,7 +1980,7 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
     'SIPp INVITE fires: NATS stasis_start + WS incoming_call; NATS→WS latency < 800ms; DB rows tenant_id; MinIO object exists',
     async () => {
       // Set up listeners BEFORE firing SIPp (so no events are missed)
-      const natsPromise = waitForNatsMessage(nc, 'ncall.stasis.start', 15000);
+      const natsPromise = waitForNatsMessage(nc, 'tas.stasis.start', 15000);
       const wsPromise = waitForWsEvent(
         ws,
         (parsed) => parsed.event === 'call.screenpop' && parsed.data?.type === 'incoming_call',
@@ -2048,7 +2048,7 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
 
       // MinIO: recording placeholder object exists (spec exit criterion line 114)
       await expect(
-        minio.statObject('ncall-recordings', `recordings/${callId}.wav`),
+        minio.statObject('tas-recordings', `recordings/${callId}.wav`),
       ).resolves.toBeDefined();
 
       // Cleanup: wait for SIPp to finish
@@ -2067,10 +2067,10 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
 # SIPp sends UDP to Kamailio on host port ${KAMAILIO_SIP_HOST_PORT:-5060}.
 # STOP-on-conflict: if port 5060 is in use, set KAMAILIO_SIP_HOST_PORT=5061 (or another free port).
 poc-test-chunk3:
-	DATABASE_URL=postgres://ncall.ncall:ncall@localhost:6543/ncall \
+	DATABASE_URL=postgres://tas.tas:tas@localhost:6543/tas \
 	NATS_URL=nats://localhost:4222 \
 	APP_JWT_SECRET=poc-only-not-prod \
-	pnpm --filter @ncall/api exec vitest run --config vitest.integration.config.ts
+	pnpm --filter @tas/api exec vitest run --config vitest.integration.config.ts
 ```
 
 - [ ] Step 5: Verify RED before full wiring:
@@ -2179,7 +2179,7 @@ Assert:
 
 ```bash
 # Run BEFORE the INVITE to observe:
-nats sub ncall.stasis.start --server nats://localhost:4222
+nats sub tas.stasis.start --server nats://localhost:4222
 ```
 
 Expected: JSON payload with `callId`, `tenantId`, `channel`, `accountId`.
@@ -2189,11 +2189,11 @@ Expected: JSON payload with `callId`, `tenantId`, `channel`, `accountId`.
 ```bash
 CALL_ID=<paste-callId-here>
 
-psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
+psql postgres://tas.tas:tas@localhost:6543/tas -c \
   "SELECT id, tenant_id, call_id, enqueued_at FROM queue_call WHERE call_id = '$CALL_ID';"
 # Expected: 1 row, tenant_id = '11111111-1111-1111-1111-111111111111'
 
-psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
+psql postgres://tas.tas:tas@localhost:6543/tas -c \
   "SELECT id, tenant_id, path, started_at FROM recording WHERE call_id = '$CALL_ID';"
 # Expected: 1 row, tenant_id = '11111111-1111-1111-1111-111111111111', path = 'recordings/<callId>.wav'
 ```
@@ -2201,8 +2201,8 @@ psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
 ## Step 7: Verify MinIO object
 
 ```bash
-mc alias set local http://localhost:9000 ncall ncall1234
-mc stat local/ncall-recordings/recordings/$CALL_ID.wav
+mc alias set local http://localhost:9000 tas tas1234
+mc stat local/tas-recordings/recordings/$CALL_ID.wav
 ```
 
 Expected: object exists (size 0 — placeholder; actual WAV populated by Chunk 7).
@@ -2211,7 +2211,7 @@ Expected: object exists (size 0 — placeholder; actual WAV populated by Chunk 7
 
 - VS Code "Attach to API" (port 9229): set breakpoint in `stasis-start.handler.ts:handleStasisStart`. Fire another INVITE. Breakpoint should hit.
 - NATS visible: `nats server check connection --server nats://localhost:4222` → OK
-- Redis visible: `redis-cli -p 6379 keys 'ncall:ari-leader:*'` → lease key present
+- Redis visible: `redis-cli -p 6379 keys 'tas:ari-leader:*'` → lease key present
 
 ## Success criteria
 
@@ -2234,10 +2234,10 @@ Expected: object exists (size 0 — placeholder; actual WAV populated by Chunk 7
 
 ## Exit criteria checklist
 
-- [ ] `packages/ari-client` unit test: 3/3 GREEN — callback path verified, split-brain guard verified (`pnpm --filter @ncall/ari-client test`)
-- [ ] `pnpm --filter @ncall/api test` GREEN (all unit specs, no compose needed)
-- [ ] `pnpm --filter @ncall/db typecheck` GREEN after migration 0004 schema changes
-- [ ] `pnpm --filter @ncall/api typecheck` GREEN
+- [ ] `packages/ari-client` unit test: 3/3 GREEN — callback path verified, split-brain guard verified (`pnpm --filter @tas/ari-client test`)
+- [ ] `pnpm --filter @tas/api test` GREEN (all unit specs, no compose needed)
+- [ ] `pnpm --filter @tas/db typecheck` GREEN after migration 0004 schema changes
+- [ ] `pnpm --filter @tas/api typecheck` GREEN
 - [ ] Migration 0004 SQL: `tenant_id` on `recording` + `queue_call` with backfill DEFAULT + DROP DEFAULT; FK on `queue_call.call_id`
 - [ ] `make poc-test-chunk3` GREEN: SIPp INVITE → NATS `stasis_start` + WS `incoming_call`; NATS→WS latency < 800 ms; `event.type === 'incoming_call'`; `event.callId` UUID v4; `event.tenantId === seeded-tenant-id`
 - [ ] `queue_call` row has `tenant_id = '11111111-...'` (integration test asserts)

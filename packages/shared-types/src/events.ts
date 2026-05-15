@@ -4,13 +4,13 @@
 
 /** NATS subjects */
 export const NatsSubjects = {
-  MESSAGE_CREATED: 'ncall.message.created',
-  CALL_STARTED: 'ncall.call.started',
-  CALL_ENDED: 'ncall.call.ended',
+  MESSAGE_CREATED: 'tas.message.created',
+  CALL_STARTED: 'tas.call.started',
+  CALL_ENDED: 'tas.call.ended',
   /** Published by Asterisk ARI StasisStart handler (Chunk 3). */
-  STASIS_START: 'ncall.stasis.start',
+  STASIS_START: 'tas.stasis.start',
   /** Published by Asterisk ARI StasisEnd handler (Chunk 3). */
-  STASIS_END: 'ncall.stasis.end',
+  STASIS_END: 'tas.stasis.end',
 } as const;
 
 /** WS event names (sent to F03 operator UI) */

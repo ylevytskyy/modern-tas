@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { ContactController } from './contact.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, contact, tenant } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, contact, tenant } from '@tas/db';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const ACCOUNT_ID = '22222222-2222-2222-2222-222222222222';

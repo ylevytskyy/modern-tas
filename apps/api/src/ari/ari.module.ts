@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { AriLeaderClient } from '@ncall/ari-client';
+import { AriLeaderClient } from '@tas/ari-client';
 import Redis from 'ioredis';
 
 export const ARI_LEADER_TOKEN = 'ARI_LEADER';
@@ -15,12 +15,12 @@ export const ARI_LEADER_TOKEN = 'ARI_LEADER';
           connect: (url: string, user: string, pass: string) => Promise<any>;
         };
         const ariUrl = process.env.ARI_URL ?? 'http://localhost:8088';
-        const ariUser = process.env.ARI_USER ?? 'ncall';
-        const ariPass = process.env.ARI_PASS ?? 'ncall';
+        const ariUser = process.env.ARI_USER ?? 'tas';
+        const ariPass = process.env.ARI_PASS ?? 'tas';
 
         const leader = new AriLeaderClient({
           instanceId: process.env.INSTANCE_ID ?? `api-${process.pid}`,
-          leaseKey: `ncall:ari-leader:${process.env.ASTERISK_ID ?? 'asterisk-1'}`,
+          leaseKey: `tas:ari-leader:${process.env.ASTERISK_ID ?? 'asterisk-1'}`,
           ttlMs: Number(process.env.ARI_LEASE_TTL_MS ?? 1500),
           heartbeatMs: Number(process.env.ARI_HEARTBEAT_MS ?? 500),
           redis,

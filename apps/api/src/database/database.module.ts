@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { makeDb } from '@ncall/db/client';
-import type { Db } from '@ncall/db/client';
+import { makeDb } from '@tas/db/client';
+import type { Db } from '@tas/db/client';
 
 export const DB_TOKEN = 'DB';
 
@@ -12,7 +12,7 @@ export const DB_TOKEN = 'DB';
       useFactory: (): Db =>
         makeDb(
           process.env.DATABASE_URL ??
-            'postgres://ncall.ncall:ncall@localhost:6543/ncall',
+            'postgres://tas.tas:tas@localhost:6543/tas',
         ),
     },
   ],

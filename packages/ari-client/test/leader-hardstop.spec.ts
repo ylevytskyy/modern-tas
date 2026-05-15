@@ -147,7 +147,7 @@ describe('AriLeaderClient — hard-stop callback path (mock Redis/ARI, no real i
     (leader as any).isLeader = false;
 
     // Fire a StasisStart event while isLeader === false
-    capturedHandler!({ channel: { id: 'ch-1', dialplan: {}, caller: {} }, application: 'ncall' });
+    capturedHandler!({ channel: { id: 'ch-1', dialplan: {}, caller: {} }, application: 'tas' });
 
     // onStasisStart must NOT be called — guard drops it
     expect(onStasisStart).not.toHaveBeenCalled();

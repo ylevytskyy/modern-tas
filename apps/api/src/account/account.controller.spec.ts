@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { AccountController } from './account.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, tenant } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, tenant } from '@tas/db';
 
 // DATABASE_URL is set by vitest.globalSetup.ts (testcontainers)
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';

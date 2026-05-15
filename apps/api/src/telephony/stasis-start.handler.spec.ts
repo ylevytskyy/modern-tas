@@ -7,9 +7,9 @@ import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
 import { RecordingService } from '../recording/recording.service';
-import { makeDb } from '@ncall/db/client';
-import { tenant, account, did, call, queue, queueCall } from '@ncall/db';
-import { NatsSubjects } from '@ncall/shared-types';
+import { makeDb } from '@tas/db/client';
+import { tenant, account, did, call, queue, queueCall } from '@tas/db';
+import { NatsSubjects } from '@tas/shared-types';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -20,10 +20,10 @@ const QUEUE_ID = '77777777-7777-7777-7777-777777777777';
 const makeStasisStartEvent = (channelId = 'test-channel-id') => ({
   channel: {
     id: channelId,
-    dialplan: { context: 'ncall-inbound', exten: '+15555550100' },
+    dialplan: { context: 'tas-inbound', exten: '+15555550100' },
     caller: { number: '+15555550200' },
   },
-  application: 'ncall',
+  application: 'tas',
 });
 
 describe('StasisStartHandler', () => {

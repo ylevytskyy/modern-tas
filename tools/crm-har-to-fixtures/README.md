@@ -4,15 +4,15 @@ Extract `/v1` XML responses from a CRM-captured HAR file into the
 `contracts/fixtures/v1-xml/` layout used by M25 (the `/v1` compatibility
 module) round-trip tests.
 
-Sprint-0 carry-over from [S6 — `/v1` byte-for-byte fixture capture](../../pot/S6-ncall-fixture-capture/README.md),
+Sprint-0 carry-over from [S6 — `/v1` byte-for-byte fixture capture](../../pot/S6-tas-fixture-capture/README.md),
 adopting the **Yellow fallback path** signed off in
 [pot/g0-signoff-proposal.md §S6](../../pot/g0-signoff-proposal.md): capture
-the CRM's actual nCall traffic from a browser HAR export rather than
-scraping a live nCall instance directly.
+the CRM's actual TAS traffic from a browser HAR export rather than
+scraping a live TAS instance directly.
 
 ## Why HAR
 
-S6's primary path (live nCall instance + curl-loop capture) is blocked
+S6's primary path (live TAS instance + curl-loop capture) is blocked
 on vendor access. The Phase-0 fallback adopts whatever the existing
 CRM uses today — which is exactly what M25 must match for the
 drop-in-compatibility constraint ([[crm-api-compat]] memory). A HAR
@@ -26,7 +26,7 @@ authoritative inventory of M25's surface area.
 2. Open DevTools → Network tab.
 3. Make sure "Preserve log" is enabled.
 4. Make sure "Record" is on (red circle).
-5. Drive the CRM through every screen / workflow that calls nCall —
+5. Drive the CRM through every screen / workflow that calls TAS —
    call lists, contact lookups, KPI dashboards, message threads,
    billing exports, anything backed by a `/v1/...` request.
 6. When done: right-click the Network grid → "Save all as HAR with
@@ -55,7 +55,7 @@ Sample output:
 ```
 Read 247 HAR entries
 Matched 89 /v1/...{.xml,.json} entries
-Wrote 89 fixtures to /Users/lion/Documents/Projects/mine/ncall-clone/contracts/fixtures/v1-xml
+Wrote 89 fixtures to /Users/lion/Documents/Projects/mine/tas/contracts/fixtures/v1-xml
 Resources seen: Calls, Clients, Contacts, KPI, Messages, Users, me, time
 ```
 
@@ -94,7 +94,7 @@ Fingerprint conventions:
 
 ## Quirks documentation
 
-The scraper does not author or update `docs/ncall-compat/quirks.md` —
+The scraper does not author or update `docs/tas-compat/quirks.md` —
 that doc captures *deviations from PRD §7.5*, which requires manual
 diffing of the captured fixtures against the PRD spec. The scraper
 gives you the raw material; M25 module construction (or a separate
@@ -112,10 +112,10 @@ synthetic input.
 
 ## Cross-references
 
-- [pot/S6-ncall-fixture-capture/README.md](../../pot/S6-ncall-fixture-capture/README.md)
+- [pot/S6-tas-fixture-capture/README.md](../../pot/S6-tas-fixture-capture/README.md)
   — the original spike spec.
 - [pot/g0-signoff-proposal.md §S6](../../pot/g0-signoff-proposal.md)
   — Sprint-0 close-out path that this tool implements.
-- [docs/ncall-compat/quirks.md](../../docs/ncall-compat/quirks.md)
+- [docs/tas-compat/quirks.md](../../docs/tas-compat/quirks.md)
   — downstream quirks inventory (not authored by this tool).
 - [PRD §7.5](../../PRD.md) — `/v1` compatibility contract.

@@ -4,7 +4,7 @@ import { tenant, account, did, contact, form } from "../src/schema";
 import { user, queue, queueCall } from "../src/schema";
 import { call, recording, recordingRedactionInterval, message, dispatchAttempt } from "../src/schema";
 
-const URL = process.env.TEST_DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall_test";
+const URL = process.env.TEST_DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas_test";
 
 describe("schema/0001 — tenancy + CRM", () => {
   const db = makeDb(URL);

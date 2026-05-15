@@ -10,9 +10,9 @@ import {
 import { eq, and } from 'drizzle-orm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { contact, account } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { ContactDto } from '@ncall/shared-types';
+import { contact, account } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { ContactDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 

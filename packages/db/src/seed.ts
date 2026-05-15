@@ -20,7 +20,7 @@ const FORM_SCHEMA = {
 };
 
 async function main() {
-  const db = makeDb(process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall");
+  const db = makeDb(process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas");
 
   await db.insert(tenant).values({ id: FIXED_IDS.tenant, name: "demo-tenant" }).onConflictDoNothing();
   await db.insert(account).values({ id: FIXED_IDS.account, tenantId: FIXED_IDS.tenant, name: "Demo Account" }).onConflictDoNothing();

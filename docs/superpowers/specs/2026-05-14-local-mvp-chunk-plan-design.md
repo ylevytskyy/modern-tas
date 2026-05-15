@@ -65,7 +65,7 @@ This document is a **chunk-level execution plan** for the local-runnable MVP. It
   - Temporal `temporal workflow list` returns empty (not error)
   - MinIO bucket accessible at `localhost:9000`
   - `Caddyfile.local` present; `curl -k https://localhost` returns Caddy response (no LE request fired)
-  - Debuggable on host: `pnpm --filter @ncall/db run seed` connects to compose Postgres
+  - Debuggable on host: `pnpm --filter @tas/db run seed` connects to compose Postgres
 - **Effort:** 4–5 days.
 - **Dependencies:** Chunk 0.
 - **Risks:**
@@ -82,10 +82,10 @@ This document is a **chunk-level execution plan** for the local-runnable MVP. It
   - `packages/shared-types` (REST DTOs, NATS event types, WS event types)
   - Unit tests (vitest): use **testcontainers** (`@testcontainers/postgresql`) to spin up an ephemeral Postgres per test run — no live compose required in CI `pnpm test`. Testcontainers images pulled once; cached in CI by layer cache. **`apps/api/test/vitest.globalSetup.ts`** runs `drizzle-kit migrate` against the testcontainers Postgres connection string before any test suite; without this step, tests fail with "relation does not exist".
   - Integration tests (hitting compose Postgres) live under `test/integration/` and are gated by `make poc-up` — run in Chunk 5's CI step, not in plain `pnpm test`.
-  - `pnpm --filter @ncall/api run dev` with `--inspect` on port 9229
+  - `pnpm --filter @tas/api run dev` with `--inspect` on port 9229
   - **S6 trigger rule:** If `/v1/Account/:id` controller in Chunk 2 requires a recorded CRM fixture response to pass its unit tests, assign S6 cache-scraper stub work to Chunk 2 scope at that point. Otherwise S6 stays unowned for the PoC.
 - **Out of scope:** NATS wiring, ARI client, WebSocket gateway, Temporal worker, F03 UI.
-- **Deliverable:** `pnpm --filter @ncall/api run test` green in CI (no compose required); API reachable at `localhost:3000/v1/Account/1` with seeded data on dev.
+- **Deliverable:** `pnpm --filter @tas/api run test` green in CI (no compose required); API reachable at `localhost:3000/v1/Account/1` with seeded data on dev.
 - **Exit criteria:**
   - Unit tests red → green (TDD slices) via testcontainers — confirmed in `pnpm test` CI step without `make poc-up`; `vitest.globalSetup.ts` runs `drizzle-kit migrate` before suite
   - VS Code "Attach to API" launch config works (port 9229, breakpoint in AccountController hits)
@@ -139,7 +139,7 @@ This document is a **chunk-level execution plan** for the local-runnable MVP. It
   - Browser screen-pop renders within 800 ms of INVITE (observe via DevTools Network)
   - Temporal Web UI (`localhost:8080`) shows `DispatchMessage` workflow Completed
   - `dispatch_attempt.delivered_at` non-null in Postgres
-  - `pnpm --filter @ncall/web run dev` + `pnpm --filter @ncall/temporal-worker run dev` both debuggable on host
+  - `pnpm --filter @tas/web run dev` + `pnpm --filter @tas/temporal-worker run dev` both debuggable on host
 - **Effort:** 4–5 days.
 - **Dependencies:** Chunk 3 (NATS + WS + ARI wiring), Chunk 1 (Temporal in compose).
 - **Risks:** SDK identity open risk (ADR-0015 Open Risk #4) surfaces here if Cloud-side deferral was chosen. Bounded: divergence caught by exit criterion grep; fix is connection-string change, not workflow code change.
@@ -154,7 +154,7 @@ This document is a **chunk-level execution plan** for the local-runnable MVP. It
   - SIPp Docker image + `happy-path.xml` scenario (Task 34)
   - Assertion helpers: DB queries (with `tenant_id` check), ARI channel check, recording file check (Task 35)
   - `poc-e2e-s1-happy-path.spec.ts` — includes explicit `tenant_id` assertion: every DB row (call, recording, dispatch_attempt) and every NATS/WS event carries `tenant_id = seeded-tenant-id` (spec §4 exit criterion 3)
-  - GitHub Actions `poc-e2e.yml` — Linux Ubuntu runner: `make poc-up && pnpm --filter @ncall/api run test && make poc-e2e` (unit tests with testcontainers + integration harness)
+  - GitHub Actions `poc-e2e.yml` — Linux Ubuntu runner: `make poc-up && pnpm --filter @tas/api run test && make poc-e2e` (unit tests with testcontainers + integration harness)
   - **`make poc-up-all-docker`** task: Dockerfiles for `apps/api`, `apps/web`, `apps/temporal-worker` + `docker-compose.all-in.yml` override file. Three Dockerfiles required before this target can exit 0. Named deliverable, not absorbed text.
   - `poc/readout-slice1.md` scaffolded (Task 39)
 - **Out of scope:** S-2 through S-5 scenarios.

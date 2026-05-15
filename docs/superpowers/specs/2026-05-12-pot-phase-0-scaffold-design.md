@@ -17,7 +17,7 @@ Lay down a reproducible workspace for the eight Phase 0 Proof-of-Technology spik
 - **No spike execution.** No `make S5-test` runs, no measurements taken, no go/no-go signals produced in this branch. Each spike is staged for execution but not triggered.
 - **No broader monorepo skeleton.** No `apps/`, `packages/`, `contracts/`, root `README.md`, `CONTRIBUTING.md`, or CI. Those wait for Sprint 1 after PoT exits — the PoT is throwaway by design (ARCH §2.1) and shouldn't dictate Sprint-1 layout.
 - **No ratification of ADRs.** The six seeded ADRs land as `Status: Proposed` with `Evidence: pending PoT S<N>`. Sprint 0 (Phase 1) is responsible for moving them to `Accepted`.
-- **No external-dependency unblocking.** S4 (AssemblyAI key + audio fixtures), S6 (live nCall vendor instance), S7 (Temporal sales letter) remain blocked on user-side action — their dirs are documented stubs, not runnable compose stacks.
+- **No external-dependency unblocking.** S4 (AssemblyAI key + audio fixtures), S6 (live TAS vendor instance), S7 (Temporal sales letter) remain blocked on user-side action — their dirs are documented stubs, not runnable compose stacks.
 - **No top-level project docs.** The repo has zero contributor orientation today; this branch does not add it. Pure PoT scope.
 
 ## 3. Branch strategy
@@ -68,7 +68,7 @@ Spike-to-slug mapping (drives directory names and Makefile target stems):
 | S3 | `ari-leader-hard-stop` | Telephony eng | runnable |
 | S4 | `redaction-accuracy` | Backend + compliance | stub (needs AssemblyAI key + audio) |
 | S5 | `supavisor-set-local` | SRE | runnable |
-| S6 | `ncall-fixture-capture` | Compliance + backend | stub (needs vendor live instance) |
+| S6 | `tas-fixture-capture` | Compliance + backend | stub (needs vendor live instance) |
 | S7 | `temporal-baa` | Compliance | stub (sales/legal, no infra) |
 | S8 | `caddy-le-posture` | SRE | runnable (LE form is org-side, k6 storage-flood runs local) |
 

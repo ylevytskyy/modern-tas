@@ -35,7 +35,7 @@ pot/
   S3-ari-leader-hard-stop/                # task 5 (runnable)
   S4-redaction-accuracy/                  # task 6 (stub)
   S5-supavisor-set-local/                 # task 7 (runnable)
-  S6-ncall-fixture-capture/               # task 8 (stub)
+  S6-tas-fixture-capture/               # task 8 (stub)
   S7-temporal-baa/                        # task 9 (stub)
   S8-caddy-le-posture/                    # task 10 (runnable)
 ```
@@ -456,7 +456,7 @@ PHASE 2 — MVP BUILD                    9–11 months
 | [S3](./S3-ari-leader-hard-stop/) | ARI leader 100 ms hard-stop | Telephony eng | runnable | Not started |
 | [S4](./S4-redaction-accuracy/) | Two-pass redaction accuracy on 8 kHz μ-law | Backend + compliance | stub | Not started |
 | [S5](./S5-supavisor-set-local/) | Supavisor `SET LOCAL` parity | SRE | runnable | Not started |
-| [S6](./S6-ncall-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
+| [S6](./S6-tas-fixture-capture/) | `/v1` byte-for-byte fixture capture | Compliance + backend | stub | Not started |
 | [S7](./S7-temporal-baa/) | Temporal Cloud BAA + EU namespace | Compliance | stub | Not started |
 | [S8](./S8-caddy-le-posture/) | Caddy 2.10+ permission + LE rate-limit | SRE | runnable | Not started |
 
@@ -508,7 +508,7 @@ SPIKES := S1-telephony-happy-path \
           S3-ari-leader-hard-stop \
           S4-redaction-accuracy \
           S5-supavisor-set-local \
-          S6-ncall-fixture-capture \
+          S6-tas-fixture-capture \
           S7-temporal-baa \
           S8-caddy-le-posture
 
@@ -620,7 +620,7 @@ Status legend: **Not started** · **In progress** · **Green** (signal met) · *
 - **Run dates:** —
 - **Owner:** —
 - **Result:** —
-- **Evidence:** `pot/S6-ncall-fixture-capture/results/`
+- **Evidence:** `pot/S6-tas-fixture-capture/results/`
 - **ADR(s) updated:** —
 
 ## S7 — Temporal Cloud BAA + EU namespace
@@ -2181,31 +2181,31 @@ EOF
 
 ---
 
-## Task 8: S6 — nCall fixture capture (stub)
+## Task 8: S6 — TAS fixture capture (stub)
 
 **Files:**
-- Create: `pot/S6-ncall-fixture-capture/README.md`
-- Create: `pot/S6-ncall-fixture-capture/runbook.md`
-- Create: `pot/S6-ncall-fixture-capture/docker-compose.yml`
-- Create: `pot/S6-ncall-fixture-capture/Makefile`
-- Create: `pot/S6-ncall-fixture-capture/.gitignore`
-- Create: `pot/S6-ncall-fixture-capture/fixtures/.gitkeep`
-- Create: `pot/S6-ncall-fixture-capture/results/.gitkeep`
+- Create: `pot/S6-tas-fixture-capture/README.md`
+- Create: `pot/S6-tas-fixture-capture/runbook.md`
+- Create: `pot/S6-tas-fixture-capture/docker-compose.yml`
+- Create: `pot/S6-tas-fixture-capture/Makefile`
+- Create: `pot/S6-tas-fixture-capture/.gitignore`
+- Create: `pot/S6-tas-fixture-capture/fixtures/.gitkeep`
+- Create: `pot/S6-tas-fixture-capture/results/.gitkeep`
 
-- [ ] **Step 1: Write `pot/S6-ncall-fixture-capture/README.md`**
+- [ ] **Step 1: Write `pot/S6-tas-fixture-capture/README.md`**
 
 ```markdown
-# S6 — `/v1` byte-for-byte fixture capture from live nCall
+# S6 — `/v1` byte-for-byte fixture capture from live TAS
 
 > **Status: STUB — needs vendor live-instance access before this spike runs.**
 
 ## Hypothesis
 
-A read-only test tenant on a real nCall instance can be cloned into golden fixtures sufficient for M25 (the `/v1` compatibility module) to pass round-trip tests.
+A read-only test tenant on a real TAS instance can be cloned into golden fixtures sufficient for M25 (the `/v1` compatibility module) to pass round-trip tests.
 
 ## Go/no-go signal
 
-- **Green:** 200 captured XML responses (every consumed resource, every consumed query shape) committed to `/contracts/fixtures/v1-xml/`. Unknown-quirk inventory committed to `docs/ncall-compat/quirks.md`.
+- **Green:** 200 captured XML responses (every consumed resource, every consumed query shape) committed to `/contracts/fixtures/v1-xml/`. Unknown-quirk inventory committed to `docs/tas-compat/quirks.md`.
 - **Yellow:** 100–200 fixtures captured; remaining endpoints documented for later capture during Sprint 1.
 - **Red:** Vendor blocks the test tenant. Fall back to scraping the existing CRM's response cache (lower fidelity but extractable).
 
@@ -2215,7 +2215,7 @@ Compliance lead + backend engineer.
 
 ## Prereqs (BLOCKED — needs user-side action)
 
-- **Live nCall instance access.** Either an existing tenant where a read-only user can be created, or a vendor-provided sandbox.
+- **Live TAS instance access.** Either an existing tenant where a read-only user can be created, or a vendor-provided sandbox.
 - **HTTP Basic Auth credentials** for the test tenant.
 - **List of endpoints currently consumed by the existing CRM.** Source: CRM source code, access logs, or developer interview.
 - No infra prereqs — the capture is a curl loop.
@@ -2239,7 +2239,7 @@ Per ARCH §2.3: scrape the existing CRM's response cache. Fidelity is lower (no 
 No ADR — this spike feeds the M25 module spec directly. Carries forward as `/contracts/fixtures/v1-xml/`.
 ```
 
-- [ ] **Step 2: Write `pot/S6-ncall-fixture-capture/runbook.md`**
+- [ ] **Step 2: Write `pot/S6-tas-fixture-capture/runbook.md`**
 
 ```markdown
 # S6 Runbook (DRAFT)
@@ -2250,7 +2250,7 @@ No ADR — this spike feeds the M25 module spec directly. Carries forward as `/c
 make check-prereqs
 ```
 
-Verifies: NCALL_BASE_URL, NCALL_USER, NCALL_PASS env vars set.
+Verifies: TAS_BASE_URL, TAS_USER, TAS_PASS env vars set.
 
 ## Capture loop
 
@@ -2275,7 +2275,7 @@ make snapshot-results
 Nothing to tear down — pure curl loop.
 ```
 
-- [ ] **Step 3: Write `pot/S6-ncall-fixture-capture/docker-compose.yml`**
+- [ ] **Step 3: Write `pot/S6-tas-fixture-capture/docker-compose.yml`**
 
 ```yaml
 # S6 — STUB. No infra; capture is a curl loop run from the host or a one-shot container.
@@ -2288,16 +2288,16 @@ services:
     profiles: ["manual"]
 ```
 
-- [ ] **Step 4: Write `pot/S6-ncall-fixture-capture/Makefile`**
+- [ ] **Step 4: Write `pot/S6-tas-fixture-capture/Makefile`**
 
 ```make
 .PHONY: up test teardown snapshot-results status check-prereqs
 TIMESTAMP := $(shell date -u +%Y%m%dT%H%M%SZ)
 
 check-prereqs:
-	@test -n "$$NCALL_BASE_URL" || { echo "MISSING: NCALL_BASE_URL env var (e.g., https://acme.ncall.com)"; exit 1; }
-	@test -n "$$NCALL_USER" || { echo "MISSING: NCALL_USER env var"; exit 1; }
-	@test -n "$$NCALL_PASS" || { echo "MISSING: NCALL_PASS env var"; exit 1; }
+	@test -n "$$TAS_BASE_URL" || { echo "MISSING: TAS_BASE_URL env var (e.g., https://acme.tas.com)"; exit 1; }
+	@test -n "$$TAS_USER" || { echo "MISSING: TAS_USER env var"; exit 1; }
+	@test -n "$$TAS_PASS" || { echo "MISSING: TAS_PASS env var"; exit 1; }
 	@echo "Prereqs OK"
 
 up:
@@ -2305,7 +2305,7 @@ up:
 
 test:
 	@echo "S6 is BLOCKED on external prereqs:"
-	@echo "  - live nCall instance access (NCALL_BASE_URL, NCALL_USER, NCALL_PASS)"
+	@echo "  - live TAS instance access (TAS_BASE_URL, TAS_USER, TAS_PASS)"
 	@echo "  - list of CRM-consumed endpoints"
 	@echo "Capture script template will land in fixtures/capture.sh.template at spike-execution time."
 	@exit 1
@@ -2322,7 +2322,7 @@ status:
 	@ls -1 fixtures/v1-xml/ 2>/dev/null | head -10 || echo "no fixtures yet"
 ```
 
-- [ ] **Step 5: Write `pot/S6-ncall-fixture-capture/.gitignore`**
+- [ ] **Step 5: Write `pot/S6-tas-fixture-capture/.gitignore`**
 
 ```gitignore
 results/*
@@ -2336,26 +2336,26 @@ fixtures/capture.sh
 
 Run:
 ```bash
-mkdir -p pot/S6-ncall-fixture-capture/fixtures pot/S6-ncall-fixture-capture/results
-touch pot/S6-ncall-fixture-capture/fixtures/.gitkeep pot/S6-ncall-fixture-capture/results/.gitkeep
+mkdir -p pot/S6-tas-fixture-capture/fixtures pot/S6-tas-fixture-capture/results
+touch pot/S6-tas-fixture-capture/fixtures/.gitkeep pot/S6-tas-fixture-capture/results/.gitkeep
 ```
 
 - [ ] **Step 7: Validate compose**
 
 Run:
 ```bash
-docker compose -f pot/S6-ncall-fixture-capture/docker-compose.yml config -q
+docker compose -f pot/S6-tas-fixture-capture/docker-compose.yml config -q
 ```
 Expected: exits 0.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add pot/S6-ncall-fixture-capture/
+git add pot/S6-tas-fixture-capture/
 git commit -m "$(cat <<'EOF'
-chore(pot): scaffold S6 nCall fixture capture stub
+chore(pot): scaffold S6 TAS fixture capture stub
 
-Stub: needs live nCall vendor access. Capture is a curl loop;
+Stub: needs live TAS vendor access. Capture is a curl loop;
 no boot infra. make test exits 1 with checklist until creds land.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
@@ -2796,7 +2796,7 @@ test -f pot/README.md && \
 test -f pot/Makefile && \
 test -f pot/pot-readout.md && \
 for s in S1-telephony-happy-path S2-queue-dequeue-latency S3-ari-leader-hard-stop \
-         S4-redaction-accuracy S5-supavisor-set-local S6-ncall-fixture-capture \
+         S4-redaction-accuracy S5-supavisor-set-local S6-tas-fixture-capture \
          S7-temporal-baa S8-caddy-le-posture; do \
   test -f pot/$s/README.md && \
   test -f pot/$s/runbook.md && \

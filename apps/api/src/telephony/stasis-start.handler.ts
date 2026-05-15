@@ -4,11 +4,11 @@ import { DB_TOKEN } from '../database/database.module';
 import { ARI_LEADER_TOKEN } from '../ari/ari.module';
 import { NatsClientService } from '../nats/nats-client.service';
 import { RecordingService } from '../recording/recording.service';
-import { did, account, call, queueCall } from '@ncall/db';
-import { NatsSubjects } from '@ncall/shared-types';
-import type { NatsStasisStartPayload } from '@ncall/shared-types';
-import type { Db } from '@ncall/db/client';
-import type { AriLeaderClient, StasisStartEvent } from '@ncall/ari-client';
+import { did, account, call, queueCall } from '@tas/db';
+import { NatsSubjects } from '@tas/shared-types';
+import type { NatsStasisStartPayload } from '@tas/shared-types';
+import type { Db } from '@tas/db/client';
+import type { AriLeaderClient, StasisStartEvent } from '@tas/ari-client';
 
 // Seeded queue ID — single-queue strategy for PoC (Chunk 6 adds dynamic routing)
 const SEEDED_QUEUE_ID = '77777777-7777-7777-7777-777777777777';

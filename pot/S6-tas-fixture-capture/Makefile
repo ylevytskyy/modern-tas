@@ -2,9 +2,9 @@
 TIMESTAMP := $(shell date -u +%Y%m%dT%H%M%SZ)
 
 check-prereqs:
-	@test -n "$$NCALL_BASE_URL" || { echo "MISSING: NCALL_BASE_URL env var (e.g., https://acme.ncall.com)"; exit 1; }
-	@test -n "$$NCALL_USER" || { echo "MISSING: NCALL_USER env var"; exit 1; }
-	@test -n "$$NCALL_PASS" || { echo "MISSING: NCALL_PASS env var"; exit 1; }
+	@test -n "$$TAS_BASE_URL" || { echo "MISSING: TAS_BASE_URL env var (e.g., https://acme.tas.com)"; exit 1; }
+	@test -n "$$TAS_USER" || { echo "MISSING: TAS_USER env var"; exit 1; }
+	@test -n "$$TAS_PASS" || { echo "MISSING: TAS_PASS env var"; exit 1; }
 	@echo "Prereqs OK"
 
 up:
@@ -12,7 +12,7 @@ up:
 
 test:
 	@echo "S6 is BLOCKED on external prereqs:"
-	@echo "  - live nCall instance access (NCALL_BASE_URL, NCALL_USER, NCALL_PASS)"
+	@echo "  - live TAS instance access (TAS_BASE_URL, TAS_USER, TAS_PASS)"
 	@echo "  - list of CRM-consumed endpoints"
 	@echo "Capture script template will land in fixtures/capture.sh.template at spike-execution time."
 	@exit 1

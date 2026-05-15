@@ -234,7 +234,7 @@ packages:
 
 ```json
 {
-  "name": "ncall-clone",
+  "name": "tas",
   "private": true,
   "packageManager": "pnpm@8.15.4",
   "scripts": {
@@ -302,13 +302,13 @@ git commit -m "chore(repo): pnpm workspace + root tooling baseline"
 - Create: `packages/db/src/client.ts`
 - Create: `packages/db/src/schema/index.ts` (empty re-exports for now)
 
-No TDD — scaffold only. Verified by `pnpm --filter @ncall/db typecheck` passing.
+No TDD — scaffold only. Verified by `pnpm --filter @tas/db typecheck` passing.
 
 - [ ] **Step 1: Create `packages/db/package.json`**
 
 ```json
 {
-  "name": "@ncall/db",
+  "name": "@tas/db",
   "version": "0.0.0",
   "private": true,
   "main": "dist/index.js",
@@ -360,7 +360,7 @@ export default {
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall",
+    url: process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas",
   },
 } satisfies Config;
 ```
@@ -389,7 +389,7 @@ export {};
 
 - [ ] **Step 6: Install + verify**
 
-Run: `pnpm install && pnpm --filter @ncall/db typecheck`
+Run: `pnpm install && pnpm --filter @tas/db typecheck`
 Expected: install succeeds; typecheck passes.
 
 - [ ] **Step 7: Commit**
@@ -418,7 +418,7 @@ import { describe, it, expect } from "vitest";
 import { makeDb } from "../src/client";
 import { tenant, account, did, contact, form } from "../src/schema";
 
-const URL = process.env.TEST_DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall_test";
+const URL = process.env.TEST_DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas_test";
 
 describe("schema/0001 — tenancy + CRM", () => {
   const db = makeDb(URL);
@@ -441,7 +441,7 @@ Also add to `packages/db/package.json` devDependencies: `"vitest": "1.4.0"`, and
 
 - [ ] **Step 2: Run the test — confirm RED for the expected reason**
 
-Run: `pnpm --filter @ncall/db test`
+Run: `pnpm --filter @tas/db test`
 Expected: FAIL — cannot import `tenant`, `account`, etc. from `../src/schema`.
 
 - [ ] **Step 3: Implement the schema**
@@ -501,18 +501,18 @@ export * from "./crm";
 
 - [ ] **Step 4: Generate migration**
 
-Run: `pnpm --filter @ncall/db migrate:gen`
+Run: `pnpm --filter @tas/db migrate:gen`
 Expected: creates `packages/db/drizzle/0001_*.sql` + meta files.
 
 - [ ] **Step 5: Apply against a throwaway test DB + run the test**
 
 Run:
 ```bash
-docker run --rm -d --name ncall-test-pg -e POSTGRES_USER=ncall -e POSTGRES_PASSWORD=ncall -e POSTGRES_DB=ncall_test -p 5433:5432 postgres:15
+docker run --rm -d --name tas-test-pg -e POSTGRES_USER=tas -e POSTGRES_PASSWORD=tas -e POSTGRES_DB=tas_test -p 5433:5432 postgres:15
 sleep 3
-DATABASE_URL=postgres://ncall:ncall@localhost:5433/ncall_test pnpm --filter @ncall/db migrate:apply
-TEST_DATABASE_URL=postgres://ncall:ncall@localhost:5433/ncall_test pnpm --filter @ncall/db test
-docker rm -f ncall-test-pg
+DATABASE_URL=postgres://tas:tas@localhost:5433/tas_test pnpm --filter @tas/db migrate:apply
+TEST_DATABASE_URL=postgres://tas:tas@localhost:5433/tas_test pnpm --filter @tas/db test
+docker rm -f tas-test-pg
 ```
 Expected: migration applies; test PASSES.
 
@@ -558,7 +558,7 @@ describe("schema/0002 — operator + queue", () => {
 
 - [ ] **Step 2: Run — confirm RED**
 
-Run: `pnpm --filter @ncall/db test`
+Run: `pnpm --filter @tas/db test`
 Expected: FAIL — cannot import `user`, `queue`, `queueCall`.
 
 - [ ] **Step 3: Implement**
@@ -611,12 +611,12 @@ export * from "./queue";
 
 Run:
 ```bash
-pnpm --filter @ncall/db migrate:gen
-docker run --rm -d --name ncall-test-pg -e POSTGRES_USER=ncall -e POSTGRES_PASSWORD=ncall -e POSTGRES_DB=ncall_test -p 5433:5432 postgres:15
+pnpm --filter @tas/db migrate:gen
+docker run --rm -d --name tas-test-pg -e POSTGRES_USER=tas -e POSTGRES_PASSWORD=tas -e POSTGRES_DB=tas_test -p 5433:5432 postgres:15
 sleep 3
-DATABASE_URL=postgres://ncall:ncall@localhost:5433/ncall_test pnpm --filter @ncall/db migrate:apply
-TEST_DATABASE_URL=postgres://ncall:ncall@localhost:5433/ncall_test pnpm --filter @ncall/db test
-docker rm -f ncall-test-pg
+DATABASE_URL=postgres://tas:tas@localhost:5433/tas_test pnpm --filter @tas/db migrate:apply
+TEST_DATABASE_URL=postgres://tas:tas@localhost:5433/tas_test pnpm --filter @tas/db test
+docker rm -f tas-test-pg
 ```
 Expected: both tests PASS.
 
@@ -665,7 +665,7 @@ describe("schema/0003 — call+recording+message+dispatch", () => {
 
 - [ ] **Step 2: Run — confirm RED**
 
-Run: `pnpm --filter @ncall/db test`
+Run: `pnpm --filter @tas/db test`
 Expected: FAIL — cannot import `call`, `recording`, etc.
 
 - [ ] **Step 3: Implement**
@@ -762,7 +762,7 @@ git commit -m "feat(db): migration 0003 — call+recording+redaction_interval+me
 **Files:**
 - Create: `packages/db/src/seed.ts`
 
-No TDD — deterministic seed; verification = `pnpm --filter @ncall/db seed` against a fresh DB and inspecting rows.
+No TDD — deterministic seed; verification = `pnpm --filter @tas/db seed` against a fresh DB and inspecting rows.
 
 - [ ] **Step 1: Create `packages/db/src/seed.ts`**
 
@@ -789,7 +789,7 @@ const FORM_SCHEMA = {
 };
 
 async function main() {
-  const db = makeDb(process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:5432/ncall");
+  const db = makeDb(process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas");
 
   await db.insert(tenant).values({ id: FIXED_IDS.tenant, name: "demo-tenant" }).onConflictDoNothing();
   await db.insert(account).values({ id: FIXED_IDS.account, tenantId: FIXED_IDS.tenant, name: "Demo Account" }).onConflictDoNothing();
@@ -810,12 +810,12 @@ main().catch((e) => { console.error(e); process.exit(1); });
 
 Run:
 ```bash
-docker run --rm -d --name ncall-seed-pg -e POSTGRES_USER=ncall -e POSTGRES_PASSWORD=ncall -e POSTGRES_DB=ncall -p 5434:5432 postgres:15
+docker run --rm -d --name tas-seed-pg -e POSTGRES_USER=tas -e POSTGRES_PASSWORD=tas -e POSTGRES_DB=tas -p 5434:5432 postgres:15
 sleep 3
-DATABASE_URL=postgres://ncall:ncall@localhost:5434/ncall pnpm --filter @ncall/db migrate:apply
-DATABASE_URL=postgres://ncall:ncall@localhost:5434/ncall pnpm --filter @ncall/db seed
-docker exec ncall-seed-pg psql -U ncall -d ncall -c "select id, e164 from did;"
-docker rm -f ncall-seed-pg
+DATABASE_URL=postgres://tas:tas@localhost:5434/tas pnpm --filter @tas/db migrate:apply
+DATABASE_URL=postgres://tas:tas@localhost:5434/tas pnpm --filter @tas/db seed
+docker exec tas-seed-pg psql -U tas -d tas -c "select id, e164 from did;"
+docker rm -f tas-seed-pg
 ```
 Expected: seed prints `seed: ok`; psql shows DID `+15555550100`.
 
@@ -844,13 +844,13 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: ncall
-      POSTGRES_PASSWORD: ncall
-      POSTGRES_DB: ncall
+      POSTGRES_USER: tas
+      POSTGRES_PASSWORD: tas
+      POSTGRES_DB: tas
     volumes:
       - pg-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ncall"]
+      test: ["CMD-SHELL", "pg_isready -U tas"]
       interval: 3s
       timeout: 2s
       retries: 10
@@ -861,7 +861,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: ecto://ncall:ncall@postgres:5432/ncall
+      DATABASE_URL: ecto://tas:tas@postgres:5432/tas
       SECRET_KEY_BASE: "01234567890123456789012345678901234567890123456789012345678901234567890123456789"
       VAULT_ENC_KEY: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       API_JWT_SECRET: "poc-only-not-prod"
@@ -896,7 +896,7 @@ poc-down:
 	docker compose -f infra/docker-compose.yml down -v
 
 poc-e2e:
-	pnpm --filter @ncall/e2e test
+	pnpm --filter @tas/e2e test
 ```
 
 (The `wait-for-healthy.sh` helper lands in Task 15.)
@@ -908,7 +908,7 @@ Run:
 docker compose -f infra/docker-compose.yml up -d postgres supavisor
 sleep 8
 docker compose -f infra/docker-compose.yml ps
-docker run --rm --network host postgres:15 psql postgres://ncall:ncall@localhost:6543/ncall -c "select 1;"
+docker run --rm --network host postgres:15 psql postgres://tas:tas@localhost:6543/tas -c "select 1;"
 docker compose -f infra/docker-compose.yml down -v
 ```
 Expected: ps shows both healthy; psql via supavisor returns `1`.
@@ -991,13 +991,13 @@ git commit -m "feat(infra): kamailio service (inherits pot/S1 patterns; single A
 
 ---
 
-## Task 9: Asterisk service (inherits pot/S1 patterns + Stasis app `ncall`)
+## Task 9: Asterisk service (inherits pot/S1 patterns + Stasis app `tas`)
 
 **Files:**
 - Create: `infra/asterisk/Dockerfile` (copy from `pot/S1-telephony-happy-path/asterisk-image/Dockerfile`)
-- Create: `infra/asterisk/extensions.conf` (one context: route DID +15555550100 → Stasis(ncall))
+- Create: `infra/asterisk/extensions.conf` (one context: route DID +15555550100 → Stasis(tas))
 - Create: `infra/asterisk/pjsip.conf` (one transport, one trunk endpoint accepting INVITE from kamailio)
-- Create: `infra/asterisk/ari.conf` (one user `ncall`/`ncall`)
+- Create: `infra/asterisk/ari.conf` (one user `tas`/`tas`)
 - Create: `infra/asterisk/http.conf` (enable HTTP server on 8088 for ARI)
 - Create: `infra/asterisk/modules.conf` (load `res_ari*`, `res_pjsip*`, `app_stasis`, `app_mixmonitor`)
 - Modify: `infra/docker-compose.yml` (add `asterisk` service)
@@ -1011,13 +1011,13 @@ cp pot/S1-telephony-happy-path/asterisk-image/Dockerfile infra/asterisk/Dockerfi
 - [ ] **Step 2: Create `infra/asterisk/extensions.conf`**
 
 ```ini
-[ncall-inbound]
+[tas-inbound]
 exten => +15555550100,1,NoOp(PoC inbound)
- same => n,Stasis(ncall)
+ same => n,Stasis(tas)
  same => n,Hangup()
 
 [default]
-exten => _X.,1,Goto(ncall-inbound,${EXTEN},1)
+exten => _X.,1,Goto(tas-inbound,${EXTEN},1)
 ```
 
 - [ ] **Step 3: Create `infra/asterisk/pjsip.conf`**
@@ -1057,10 +1057,10 @@ enabled=yes
 pretty=yes
 allowed_origins=*
 
-[ncall]
+[tas]
 type=user
 read_only=no
-password=ncall
+password=tas
 ```
 
 - [ ] **Step 5: Create `infra/asterisk/http.conf`**
@@ -1109,7 +1109,7 @@ Run:
 ```bash
 docker compose -f infra/docker-compose.yml up -d --build asterisk kamailio
 sleep 15
-curl -u ncall:ncall http://localhost:8088/ari/asterisk/info
+curl -u tas:tas http://localhost:8088/ari/asterisk/info
 docker compose -f infra/docker-compose.yml down
 ```
 The `curl` against ARI requires exposing port 8088 — add `ports: ["8088:8088"]` to the asterisk service in compose for the smoke test, then remove it before commit (the API will reach Asterisk over the compose network by service name).
@@ -1119,7 +1119,7 @@ Expected: ARI returns a JSON blob with `system`/`status` fields.
 
 ```bash
 git add infra/asterisk infra/docker-compose.yml
-git commit -m "feat(infra): asterisk service — Stasis(ncall) on DID +15555550100, ARI user ncall"
+git commit -m "feat(infra): asterisk service — Stasis(tas) on DID +15555550100, ARI user tas"
 ```
 
 ---
@@ -1191,8 +1191,8 @@ git commit -m "feat(infra): rtpengine service + kamailio rtpengine module hook"
     image: minio/minio:RELEASE.2024-03-15T01-07-19Z
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ncall
-      MINIO_ROOT_PASSWORD: ncall1234
+      MINIO_ROOT_USER: tas
+      MINIO_ROOT_PASSWORD: tas1234
     volumes:
       - minio-data:/data
     healthcheck:
@@ -1213,7 +1213,7 @@ Run:
 ```bash
 docker compose -f infra/docker-compose.yml up -d minio
 sleep 5
-docker compose -f infra/docker-compose.yml exec minio mc alias set local http://localhost:9000 ncall ncall1234
+docker compose -f infra/docker-compose.yml exec minio mc alias set local http://localhost:9000 tas tas1234
 docker compose -f infra/docker-compose.yml exec minio mc mb local/recordings
 docker compose -f infra/docker-compose.yml exec minio mc ls local/
 docker compose -f infra/docker-compose.yml down
@@ -1253,7 +1253,7 @@ Run:
 ```bash
 docker compose -f infra/docker-compose.yml up -d nats
 sleep 4
-docker run --rm --network ncall-clone_default natsio/nats-box:latest nats --server nats://nats:4222 server check connection
+docker run --rm --network tas_default natsio/nats-box:latest nats --server nats://nats:4222 server check connection
 docker compose -f infra/docker-compose.yml down
 ```
 Expected: `nats server check` prints `OK`.
@@ -1281,8 +1281,8 @@ git commit -m "feat(infra): nats jetstream service"
     environment:
       DB: postgres12
       DB_PORT: "5432"
-      POSTGRES_USER: ncall
-      POSTGRES_PWD: ncall
+      POSTGRES_USER: tas
+      POSTGRES_PWD: tas
       POSTGRES_SEEDS: postgres
     depends_on:
       postgres:
@@ -1428,8 +1428,8 @@ Make it executable: `chmod +x scripts/wait-for-healthy.sh`
 
 ```makefile
 poc-up-fresh: poc-down poc-up
-	pnpm --filter @ncall/db migrate:apply
-	pnpm --filter @ncall/db seed
+	pnpm --filter @tas/db migrate:apply
+	pnpm --filter @tas/db seed
 
 poc-status:
 	docker compose -f infra/docker-compose.yml ps
@@ -1472,7 +1472,7 @@ git commit -m "chore(make): poc-up-fresh runs full stack + migrations + seed; wa
 
 ```json
 {
-  "name": "@ncall/api",
+  "name": "@tas/api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -1492,8 +1492,8 @@ git commit -m "chore(make): poc-up-fresh runs full stack + migrations + seed; wa
     "rxjs": "7.8.1",
     "ws": "8.16.0",
     "nats": "2.19.0",
-    "@ncall/db": "workspace:*",
-    "@ncall/shared-types": "workspace:*"
+    "@tas/db": "workspace:*",
+    "@tas/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/cli": "10.3.2",
@@ -1539,7 +1539,7 @@ git commit -m "chore(make): poc-up-fresh runs full stack + migrations + seed; wa
 
 ```json
 {
-  "name": "@ncall/shared-types",
+  "name": "@tas/shared-types",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
@@ -1643,7 +1643,7 @@ describe("api smoke", () => {
 
 - [ ] **Step 8: Install + run test**
 
-Run: `pnpm install && pnpm --filter @ncall/api test`
+Run: `pnpm install && pnpm --filter @tas/api test`
 Expected: smoke test PASSES.
 
 - [ ] **Step 9: Commit**
@@ -1715,9 +1715,9 @@ export * from "./api";
 
 - [ ] **Step 2: Run — confirm RED**
 
-Pre-req: run `pnpm --filter @ncall/db migrate:apply && pnpm --filter @ncall/db seed` against the running Postgres in compose.
+Pre-req: run `pnpm --filter @tas/db migrate:apply && pnpm --filter @tas/db seed` against the running Postgres in compose.
 
-Run: `DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall pnpm --filter @ncall/api test test/v1/account.e2e-spec.ts`
+Run: `DATABASE_URL=postgres://tas:tas@localhost:6543/tas pnpm --filter @tas/api test test/v1/account.e2e-spec.ts`
 Expected: FAIL — 404 on `/v1/Account/:id` (route doesn't exist).
 
 - [ ] **Step 3: Implement**
@@ -1725,11 +1725,11 @@ Expected: FAIL — 404 on `/v1/Account/:id` (route doesn't exist).
 Create `apps/api/src/v1/account.controller.ts`:
 ```ts
 import { Controller, Get, Param, NotFoundException, UseGuards } from "@nestjs/common";
-import { makeDb } from "@ncall/db/client";
-import { account } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { account } from "@tas/db";
 import { eq } from "drizzle-orm";
 import { JwtGuard } from "../auth/jwt.guard";
-import type { AccountDto } from "@ncall/shared-types";
+import type { AccountDto } from "@tas/shared-types";
 
 @UseGuards(JwtGuard)
 @Controller("v1/Account")
@@ -1770,7 +1770,7 @@ export class AppModule {}
 
 - [ ] **Step 4: Run — confirm GREEN**
 
-Run: `DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall pnpm --filter @ncall/api test`
+Run: `DATABASE_URL=postgres://tas:tas@localhost:6543/tas pnpm --filter @tas/api test`
 Expected: all 3 tests PASS (smoke + 401 + 200).
 
 - [ ] **Step 5: Commit**
@@ -1822,7 +1822,7 @@ describe("/v1/Contact/:id", () => {
 
 - [ ] **Step 2: Run — confirm RED**
 
-Run: `DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall pnpm --filter @ncall/api test test/v1/contact.e2e-spec.ts`
+Run: `DATABASE_URL=postgres://tas:tas@localhost:6543/tas pnpm --filter @tas/api test test/v1/contact.e2e-spec.ts`
 Expected: 404.
 
 - [ ] **Step 3: Implement**
@@ -1830,11 +1830,11 @@ Expected: 404.
 Create `apps/api/src/v1/contact.controller.ts`:
 ```ts
 import { Controller, Get, Param, NotFoundException, UseGuards } from "@nestjs/common";
-import { makeDb } from "@ncall/db/client";
-import { contact } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { contact } from "@tas/db";
 import { eq } from "drizzle-orm";
 import { JwtGuard } from "../auth/jwt.guard";
-import type { ContactDto } from "@ncall/shared-types";
+import type { ContactDto } from "@tas/shared-types";
 
 @UseGuards(JwtGuard)
 @Controller("v1/Contact")
@@ -1897,8 +1897,8 @@ import { Test } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { AppModule } from "../../src/app.module";
-import { makeDb } from "@ncall/db/client";
-import { call, did, account } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { call, did, account } from "@tas/db";
 import { eq } from "drizzle-orm";
 
 const ACCOUNT_ID = "22222222-2222-2222-2222-222222222222";
@@ -1942,10 +1942,10 @@ describe("POST /v1/Message", () => {
 Create `apps/api/src/v1/message.controller.ts`:
 ```ts
 import { Controller, Post, Body, UseGuards, Req, HttpCode } from "@nestjs/common";
-import { makeDb } from "@ncall/db/client";
-import { message } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { message } from "@tas/db";
 import { JwtGuard } from "../auth/jwt.guard";
-import type { MessageCreateRequest, MessageDto } from "@ncall/shared-types";
+import type { MessageCreateRequest, MessageDto } from "@tas/shared-types";
 
 @UseGuards(JwtGuard)
 @Controller("v1/Message")
@@ -2075,8 +2075,8 @@ export class AppModule {}
 Run:
 ```bash
 make poc-up
-pnpm --filter @ncall/api build
-NATS_URL=nats://localhost:4222 DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall node apps/api/dist/main.js &
+pnpm --filter @tas/api build
+NATS_URL=nats://localhost:4222 DATABASE_URL=postgres://tas:tas@localhost:6543/tas node apps/api/dist/main.js &
 APP_PID=$!
 sleep 3
 kill $APP_PID
@@ -2099,7 +2099,7 @@ git commit -m "feat(api): nats client wiring (Global EventsModule)"
 - Create: `packages/ari-client/package.json`
 - Create: `packages/ari-client/tsconfig.json`
 - Create: `packages/ari-client/src/index.ts`
-- Modify: `apps/api/package.json` (add `@ncall/ari-client` dep)
+- Modify: `apps/api/package.json` (add `@tas/ari-client` dep)
 - Create: `apps/api/src/telephony/ari.client.ts`
 - Create: `apps/api/src/telephony/telephony.module.ts`
 - Modify: `apps/api/src/app.module.ts`
@@ -2110,7 +2110,7 @@ No TDD against real Asterisk in unit test — verified by Task 23 integration. W
 
 ```json
 {
-  "name": "@ncall/ari-client",
+  "name": "@tas/ari-client",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
@@ -2195,13 +2195,13 @@ export class AriClient {
 }
 ```
 
-- [ ] **Step 3: Add `@ncall/ari-client` to apps/api package.json dependencies (`"@ncall/ari-client": "workspace:*"`)**
+- [ ] **Step 3: Add `@tas/ari-client` to apps/api package.json dependencies (`"@tas/ari-client": "workspace:*"`)**
 
 - [ ] **Step 4: Create `apps/api/src/telephony/ari.client.ts`**
 
 ```ts
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from "@nestjs/common";
-import { AriClient } from "@ncall/ari-client";
+import { AriClient } from "@tas/ari-client";
 
 @Injectable()
 export class AriService implements OnModuleInit, OnModuleDestroy {
@@ -2212,9 +2212,9 @@ export class AriService implements OnModuleInit, OnModuleDestroy {
     this.client = new AriClient({
       host: process.env.ARI_HOST ?? "asterisk",
       port: Number(process.env.ARI_PORT ?? 8088),
-      user: process.env.ARI_USER ?? "ncall",
-      pass: process.env.ARI_PASS ?? "ncall",
-      app: process.env.ARI_APP ?? "ncall",
+      user: process.env.ARI_USER ?? "tas",
+      pass: process.env.ARI_PASS ?? "tas",
+      app: process.env.ARI_APP ?? "tas",
     });
     await this.client.connect();
     this.logger.log("ari connected");
@@ -2240,8 +2240,8 @@ Add to `app.module.ts` imports.
 Run:
 ```bash
 make poc-up
-pnpm --filter @ncall/api build
-ARI_HOST=localhost DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall NATS_URL=nats://localhost:4222 node apps/api/dist/main.js &
+pnpm --filter @tas/api build
+ARI_HOST=localhost DATABASE_URL=postgres://tas:tas@localhost:6543/tas NATS_URL=nats://localhost:4222 node apps/api/dist/main.js &
 APP_PID=$!
 sleep 5
 kill $APP_PID
@@ -2325,10 +2325,10 @@ Create `apps/api/src/telephony/stasis.handler.ts`:
 import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
 import { AriService } from "./ari.client";
 import { NatsClient } from "../events/nats.client";
-import { makeDb } from "@ncall/db/client";
-import { did, account, call } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { did, account, call } from "@tas/db";
 import { eq } from "drizzle-orm";
-import type { StasisStartEvent } from "@ncall/shared-types";
+import type { StasisStartEvent } from "@tas/shared-types";
 
 @Injectable()
 export class StasisHandler implements OnModuleInit {
@@ -2376,7 +2376,7 @@ Register `StasisHandler` as a provider in `telephony.module.ts` and re-export it
 - [ ] **Step 4: Run — confirm GREEN**
 
 Pre-req: compose stack up; seed applied.
-Run: `DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall NATS_URL=nats://localhost:4222 pnpm --filter @ncall/api test test/telephony/stasis.e2e-spec.ts`
+Run: `DATABASE_URL=postgres://tas:tas@localhost:6543/tas NATS_URL=nats://localhost:4222 pnpm --filter @tas/api test test/telephony/stasis.e2e-spec.ts`
 Expected: PASSES.
 
 - [ ] **Step 5: Commit**
@@ -2403,8 +2403,8 @@ import { Test } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import { AppModule } from "../../src/app.module";
 import { connect, JSONCodec } from "nats";
-import { makeDb } from "@ncall/db/client";
-import { queueCall, queue } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { queueCall, queue } from "@tas/db";
 
 describe("arbiter dequeue + ARI bridge", () => {
   let app: INestApplication;
@@ -2448,10 +2448,10 @@ Create `apps/api/src/telephony/arbiter.service.ts`:
 import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
 import { AriService } from "./ari.client";
 import { NatsClient } from "../events/nats.client";
-import { makeDb } from "@ncall/db/client";
-import { queueCall, queue, user } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { queueCall, queue, user } from "@tas/db";
 import { eq, and, isNull, asc } from "drizzle-orm";
-import type { StasisStartEvent } from "@ncall/shared-types";
+import type { StasisStartEvent } from "@tas/shared-types";
 
 @Injectable()
 export class ArbiterService implements OnModuleInit {
@@ -2667,7 +2667,7 @@ await this.db.insert(recording).values({
 });
 ```
 
-(Add `recording` import from `@ncall/db`.)
+(Add `recording` import from `@tas/db`.)
 
 - [ ] **Step 4: Run — GREEN**
 
@@ -2693,7 +2693,7 @@ git commit -m "feat(recording): MixMonitor start + recording row on bridge creat
 
 ```json
 {
-  "name": "@ncall/web",
+  "name": "@tas/web",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -2708,7 +2708,7 @@ git commit -m "feat(recording): MixMonitor start + recording row on bridge creat
     "next": "14.1.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "@ncall/shared-types": "workspace:*"
+    "@tas/shared-types": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "20.11.30",
@@ -2747,7 +2747,7 @@ module.exports = { reactStrictMode: true };
 - [ ] **Step 4: `app/layout.tsx`**
 
 ```tsx
-export const metadata = { title: "nCall PoC Operator" };
+export const metadata = { title: "TAS PoC Operator" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="en"><body>{children}</body></html>;
 }
@@ -2758,7 +2758,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```tsx
 "use client";
 import { useEffect, useState } from "react";
-import type { IncomingCallWsEvent } from "@ncall/shared-types";
+import type { IncomingCallWsEvent } from "@tas/shared-types";
 
 export default function OperatorPage() {
   const [call, setCall] = useState<IncomingCallWsEvent | null>(null);
@@ -2781,7 +2781,7 @@ export default function OperatorPage() {
 
 - [ ] **Step 6: Smoke**
 
-Run: `pnpm install && pnpm --filter @ncall/web dev`
+Run: `pnpm install && pnpm --filter @tas/web dev`
 Expected: Next.js starts on :3001; visiting http://localhost:3001/operator renders "Waiting for call…".
 
 - [ ] **Step 7: Commit**
@@ -2862,7 +2862,7 @@ export function ScreenPop({ accountId }: { accountId: string }) {
 ```tsx
 "use client";
 import { useEffect, useState } from "react";
-import type { IncomingCallWsEvent } from "@ncall/shared-types";
+import type { IncomingCallWsEvent } from "@tas/shared-types";
 import { ScreenPop } from "../../components/ScreenPop";
 
 export default function OperatorPage() {
@@ -2934,7 +2934,7 @@ export function MessageForm({ callId, accountId, onSaved }: { callId: string; ac
 ```tsx
 "use client";
 import { useEffect, useState } from "react";
-import type { IncomingCallWsEvent } from "@ncall/shared-types";
+import type { IncomingCallWsEvent } from "@tas/shared-types";
 import { ScreenPop } from "../../components/ScreenPop";
 import { MessageForm } from "../../components/MessageForm";
 
@@ -3002,7 +3002,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN corepack enable && pnpm --filter @ncall/api build
+RUN corepack enable && pnpm --filter @tas/api build
 
 FROM node:20-alpine
 WORKDIR /app
@@ -3026,14 +3026,14 @@ FROM node:20-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN corepack enable && pnpm --filter @ncall/web build
+RUN corepack enable && pnpm --filter @tas/web build
 
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=build /app /app
 RUN corepack enable
 EXPOSE 3001
-CMD ["pnpm", "--filter", "@ncall/web", "start"]
+CMD ["pnpm", "--filter", "@tas/web", "start"]
 ```
 
 - [ ] **Step 3: Extend `infra/docker-compose.yml`**
@@ -3044,13 +3044,13 @@ CMD ["pnpm", "--filter", "@ncall/web", "start"]
       context: ..
       dockerfile: apps/api/Dockerfile
     environment:
-      DATABASE_URL: postgres://ncall:ncall@supavisor:6543/ncall
+      DATABASE_URL: postgres://tas:tas@supavisor:6543/tas
       NATS_URL: nats://nats:4222
       ARI_HOST: asterisk
       ARI_PORT: "8088"
-      ARI_USER: ncall
-      ARI_PASS: ncall
-      ARI_APP: ncall
+      ARI_USER: tas
+      ARI_PASS: tas
+      ARI_APP: tas
     depends_on:
       supavisor: { condition: service_healthy }
       nats: { condition: service_healthy }
@@ -3099,7 +3099,7 @@ git commit -m "feat(infra): api + web Dockerfiles + compose entries; full stack 
 
 ```json
 {
-  "name": "@ncall/temporal-worker",
+  "name": "@tas/temporal-worker",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -3115,8 +3115,8 @@ git commit -m "feat(infra): api + web Dockerfiles + compose entries; full stack 
     "@temporalio/activity": "1.10.1",
     "@temporalio/client": "1.10.1",
     "ws": "8.16.0",
-    "@ncall/db": "workspace:*",
-    "@ncall/shared-types": "workspace:*"
+    "@tas/db": "workspace:*",
+    "@tas/shared-types": "workspace:*"
   },
   "devDependencies": { "typescript": "5.4.2", "vitest": "1.4.0", "@types/ws": "8.5.10" }
 }
@@ -3151,7 +3151,7 @@ main().catch((e) => { console.error(e); process.exit(1); });
 
 - [ ] **Step 4: Smoke (boots even with empty workflow file — fails loudly if not)**
 
-Run: `pnpm install && pnpm --filter @ncall/temporal-worker build`
+Run: `pnpm install && pnpm --filter @tas/temporal-worker build`
 Expected: TS error pointing to missing workflow/activity files. Good — task 32 lands them.
 
 - [ ] **Step 5: Commit**
@@ -3207,7 +3207,7 @@ Add `"@temporalio/testing": "1.10.1"` to devDeps.
 
 - [ ] **Step 2: Run — RED**
 
-Run: `pnpm --filter @ncall/temporal-worker test`
+Run: `pnpm --filter @tas/temporal-worker test`
 Expected: import errors (workflow doesn't exist).
 
 - [ ] **Step 3: Implement workflow + activity**
@@ -3229,8 +3229,8 @@ export async function dispatchMessage(arg: { messageId: string; accountId: strin
 `apps/temporal-worker/src/activities/in-app-delivery.activity.ts`:
 ```ts
 import WebSocket from "ws";
-import { makeDb } from "@ncall/db/client";
-import { dispatchAttempt } from "@ncall/db";
+import { makeDb } from "@tas/db/client";
+import { dispatchAttempt } from "@tas/db";
 
 export async function deliverInApp(arg: { messageId: string; accountId: string }): Promise<{ deliveredAt: string }> {
   // Push a delivery notice to the api's "Sent Messages" WS channel and persist the attempt.
@@ -3287,7 +3287,7 @@ git commit -m "feat(dispatch): DispatchMessage workflow + InAppDelivery activity
 
 ```json
 {
-  "name": "@ncall/e2e",
+  "name": "@tas/e2e",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -3296,7 +3296,7 @@ git commit -m "feat(dispatch): DispatchMessage workflow + InAppDelivery activity
     "typecheck": "tsc --noEmit",
     "lint": "echo ok"
   },
-  "dependencies": { "@ncall/db": "workspace:*", "@ncall/shared-types": "workspace:*" },
+  "dependencies": { "@tas/db": "workspace:*", "@tas/shared-types": "workspace:*" },
   "devDependencies": {
     "@playwright/test": "1.42.1",
     "typescript": "5.4.2",
@@ -3334,7 +3334,7 @@ export {};
 
 - [ ] **Step 5: Install browsers**
 
-Run: `pnpm install && pnpm --filter @ncall/e2e exec playwright install --with-deps chromium`
+Run: `pnpm install && pnpm --filter @tas/e2e exec playwright install --with-deps chromium`
 Expected: Chromium installs.
 
 - [ ] **Step 6: Commit**
@@ -3455,8 +3455,8 @@ git commit -m "feat(e2e): SIPp image + happy-path scenario (INVITE → 20s talk 
 - [ ] **Step 1: `lib/db.ts`**
 
 ```ts
-import { makeDb } from "@ncall/db/client";
-export function db() { return makeDb(process.env.DATABASE_URL ?? "postgres://ncall:ncall@localhost:6543/ncall"); }
+import { makeDb } from "@tas/db/client";
+export function db() { return makeDb(process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:6543/tas"); }
 ```
 
 - [ ] **Step 2: `lib/ari.ts`**
@@ -3464,7 +3464,7 @@ export function db() { return makeDb(process.env.DATABASE_URL ?? "postgres://nca
 ```ts
 export async function ariChannels(): Promise<any[]> {
   const r = await fetch("http://localhost:8088/ari/channels", {
-    headers: { Authorization: "Basic " + Buffer.from("ncall:ncall").toString("base64") },
+    headers: { Authorization: "Basic " + Buffer.from("tas:tas").toString("base64") },
   });
   return r.json();
 }
@@ -3519,7 +3519,7 @@ import { test, expect } from "@playwright/test";
 import { execSync } from "child_process";
 import { db } from "../lib/db";
 import { ariChannels } from "../lib/ari";
-import { message, dispatchAttempt, recording } from "@ncall/db";
+import { message, dispatchAttempt, recording } from "@tas/db";
 import { eq, desc } from "drizzle-orm";
 
 test("S1 happy path: SIPp call -> operator screen-pop -> message saved -> dispatch delivered", async ({ page }) => {
@@ -3565,7 +3565,7 @@ test("S1 happy path: SIPp call -> operator screen-pop -> message saved -> dispat
 Run:
 ```bash
 make poc-up-fresh
-pnpm --filter @ncall/e2e test:s1
+pnpm --filter @tas/e2e test:s1
 ```
 Expected: test fails at some integration boundary. The exact failure reveals which composition glue is missing.
 
@@ -3596,7 +3596,7 @@ This task has **no pre-written code** because the failures will reveal whatever 
 - [ ] **Step 2: Inspect logs**: `make poc-logs | grep -i error`, ARI events, NATS subjects.
 - [ ] **Step 3: Form a hypothesis**: which component received the wrong data, or didn't receive at all?
 - [ ] **Step 4: Write the smallest fix**.
-- [ ] **Step 5: Re-run `pnpm --filter @ncall/e2e test:s1`**.
+- [ ] **Step 5: Re-run `pnpm --filter @tas/e2e test:s1`**.
 - [ ] **Step 6: When green, commit with `fix(<component>): <one-line>`**.
 
 When the scenario is green end-to-end:
@@ -3639,7 +3639,7 @@ jobs:
       - run: make poc-up-fresh
         env:
           TIMEOUT_SECONDS: "180"
-      - run: pnpm --filter @ncall/e2e exec playwright install --with-deps chromium
+      - run: pnpm --filter @tas/e2e exec playwright install --with-deps chromium
       - run: make poc-e2e
       - if: failure()
         uses: actions/upload-artifact@v4

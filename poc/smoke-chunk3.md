@@ -34,13 +34,13 @@ The Swagger deprecation line is the ari-client npm package introspecting Asteris
 
 Redis lease check:
 ```bash
-docker exec infra-redis-1 redis-cli get "ncall:ari-leader:asterisk-1"
+docker exec infra-redis-1 redis-cli get "tas:ari-leader:asterisk-1"
 # Expected: api-<pid>
 ```
 
 Asterisk app subscription:
 ```bash
-docker exec infra-asterisk-1 asterisk -rx "ari show app ncall"
+docker exec infra-asterisk-1 asterisk -rx "ari show app tas"
 # Subscriptions: 0  (or 1+ if a stuck channel from a previous test)
 ```
 
@@ -116,24 +116,24 @@ const { connect, StringCodec } = require('./apps/api/node_modules/nats');
 const sc = StringCodec();
 (async () => {
   const nc = await connect({ servers: 'nats://localhost:4222' });
-  nc.subscribe('ncall.>', { callback: (_e, msg) => msg && console.log(msg.subject, sc.decode(msg.data)) });
+  nc.subscribe('tas.>', { callback: (_e, msg) => msg && console.log(msg.subject, sc.decode(msg.data)) });
   setTimeout(() => process.exit(0), 60000);
 })();"
 ```
 
 Expected: JSON payload with `callId`, `tenantId`, `channel`, `accountId` on subject
-`ncall.stasis.start`.
+`tas.stasis.start`.
 
 ## Step 7: Verify DB rows
 
 ```bash
 CALL_ID=<paste-callId-here>
 
-psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
+psql postgres://tas.tas:tas@localhost:6543/tas -c \
   "SELECT id, tenant_id, call_id, enqueued_at FROM queue_call WHERE call_id = '$CALL_ID';"
 # Expected: 1 row, tenant_id = '11111111-1111-1111-1111-111111111111'
 
-psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
+psql postgres://tas.tas:tas@localhost:6543/tas -c \
   "SELECT id, tenant_id, path, started_at FROM recording WHERE call_id = '$CALL_ID';"
 # Expected: 1 row, tenant_id = '11111111-1111-1111-1111-111111111111', path = 'recordings/<callId>.wav'
 ```
@@ -141,8 +141,8 @@ psql postgres://ncall.ncall:ncall@localhost:6543/ncall -c \
 ## Step 8: Verify MinIO object
 
 ```bash
-mc alias set local http://localhost:9000 ncall ncall1234
-mc stat local/ncall-recordings/recordings/$CALL_ID.wav
+mc alias set local http://localhost:9000 tas tas12345
+mc stat local/tas-recordings/recordings/$CALL_ID.wav
 ```
 
 Expected: object exists (size 0 — placeholder; actual WAV populated by Chunk 7).
@@ -152,8 +152,8 @@ Expected: object exists (size 0 — placeholder; actual WAV populated by Chunk 7
 - VS Code "Attach to API" (port 9229): set breakpoint in `stasis-start.handler.ts:handleStasisStart`.
   Fire another INVITE. Breakpoint should hit.
 - NATS visible: `docker exec infra-nats-1 nc -z localhost 4222 && echo OK`
-- Redis visible: `docker exec infra-redis-1 redis-cli keys 'ncall:ari-leader:*'`
-  → `ncall:ari-leader:asterisk-1` present
+- Redis visible: `docker exec infra-redis-1 redis-cli keys 'tas:ari-leader:*'`
+  → `tas:ari-leader:asterisk-1` present
 
 ## Automated equivalent
 
@@ -183,7 +183,7 @@ the same prerequisites: compose up, seeded, api-dev running.
 2. **Asterisk's `default` context conflicts with pbx_lua.** The base image ships
    `extensions.lua` that registers an "Alt. Switch: Lua/" on the default context;
    patterns in our `extensions.conf` are shadowed. pjsip.conf now points the kamailio
-   endpoint at `ncall-inbound` directly to sidestep this — do not change it back.
+   endpoint at `tas-inbound` directly to sidestep this — do not change it back.
 3. **`host.docker.internal:5060/udp` is flaky on macOS Docker Desktop.** Use the
    compose-network path (see Step 4) instead.
 4. **drachtio/sipp's `/entrypoint.sh` mis-parses SIPp's `-s` flag.** Always use

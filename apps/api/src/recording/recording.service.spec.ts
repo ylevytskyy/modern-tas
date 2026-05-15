@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecordingService } from './recording.service';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { tenant, account, did, call, recording } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { tenant, account, did, call, recording } from '@tas/db';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -59,7 +59,7 @@ describe('RecordingService', () => {
     expect(rec.startedAt).toBeInstanceOf(Date);
 
     expect(mockMinioClient.putObject).toHaveBeenCalledWith(
-      'ncall-recordings',
+      'tas-recordings',
       `recordings/${CALL_ID}.wav`,
       expect.any(Buffer),
     );

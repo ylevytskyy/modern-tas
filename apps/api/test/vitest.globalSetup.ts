@@ -6,9 +6,9 @@ let container: StartedPostgreSqlContainer;
 
 export async function setup() {
   container = await new PostgreSqlContainer('postgres:15')
-    .withDatabase('ncall')
-    .withUsername('ncall')
-    .withPassword('ncall')
+    .withDatabase('tas')
+    .withUsername('tas')
+    .withPassword('tas')
     .start();
 
   const url = container.getConnectionUri();

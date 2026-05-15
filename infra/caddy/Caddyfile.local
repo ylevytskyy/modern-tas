@@ -23,5 +23,5 @@ localhost {
     tls internal
     # Wildcard subdomains for future per-tenant routing (Chunks 2+).
     # In Chunk 1 this block simply responds 200 to confirm TLS works.
-    respond "ncall-clone: {host}" 200
+    respond "tas: {host}" 200
 }

@@ -1,4 +1,4 @@
-# Product Requirements Document — nCall-Inspired Multi-Tenant Answering-Service SaaS
+# Product Requirements Document — TAS-Inspired Multi-Tenant Answering-Service SaaS
 
 **Version:** 2.0
 **Date:** 2026-05-12
@@ -41,12 +41,12 @@ We are building a **multi-tenant, cloud-native, horizontally-scalable Telephone 
 
 The platform targets businesses that operate call-answering services — virtual receptionists, after-hours medical/legal/trades dispatchers, property-management duty desks — and is offered as a SaaS where each answering-service business is a **tenant** and each of *their* customers is an **account**.
 
-Two hard nCall-anchored constraints govern the build:
+Two hard TAS-anchored constraints govern the build:
 
-- **Operator UX parity** — workers currently using nCall's Windows desktop client must transition to the web app without retraining beyond the smallest possible delta. Screen layout, call-handling sequence, field semantics, and shortcut affordances are replicated.
-- **REST API compatibility** — the caller's live CRM already integrates against nCall's REST API server. It must switch to our endpoint with minimal or zero code changes. nCall's `/v1` URL contract, auth model, pagination, and filtering are reproduced verbatim for the resources the CRM uses; a modern `/api/v2` surface runs alongside.
+- **Operator UX parity** — workers currently using TAS's Windows desktop client must transition to the web app without retraining beyond the smallest possible delta. Screen layout, call-handling sequence, field semantics, and shortcut affordances are replicated.
+- **REST API compatibility** — the caller's live CRM already integrates against TAS's REST API server. It must switch to our endpoint with minimal or zero code changes. TAS's `/v1` URL contract, auth model, pagination, and filtering are reproduced verbatim for the resources the CRM uses; a modern `/api/v2` surface runs alongside.
 
-Everything else is open to first-principles design. The product replicates nCall's distinctive operator-desktop workflow in the browser (call control widget, account screen-pop with greeting and up-to-three configurable Call Actions, per-account custom message forms with required-field enforcement, multi-channel dispatch via per-contact Message Actions, Old Calls / Tasks / Reminders tabs, Home dashboard) and **fills the gaps nCall is publicly weak on**: calendar-driven on-call scheduling with Google/Outlook sync, an HA cloud-native deployment, native HIPAA/GDPR/PCI posture, real-time supervisor dashboard, native push-notification mobile delivery, and AI agent assist / post-call summarisation as first-class capabilities. **It also adds the call-center primitives nCall under-specifies**: queue routing with skills, voicemail, IVR, inbound SMS.
+Everything else is open to first-principles design. The product replicates TAS's distinctive operator-desktop workflow in the browser (call control widget, account screen-pop with greeting and up-to-three configurable Call Actions, per-account custom message forms with required-field enforcement, multi-channel dispatch via per-contact Message Actions, Old Calls / Tasks / Reminders tabs, Home dashboard) and **fills the gaps TAS is publicly weak on**: calendar-driven on-call scheduling with Google/Outlook sync, an HA cloud-native deployment, native HIPAA/GDPR/PCI posture, real-time supervisor dashboard, native push-notification mobile delivery, and AI agent assist / post-call summarisation as first-class capabilities. **It also adds the call-center primitives TAS under-specifies**: queue routing with skills, voicemail, IVR, inbound SMS.
 
 Minimum viable product (MVP) targets a single answering-service tenant going live on a single Asterisk node with up to ~25 concurrent operators, ~100 concurrent calls, ~50 client accounts. Architecture is designed for horizontal growth from day one: Kamailio behind a load balancer, an Asterisk pool dispatched by sticky-routing, rtpengine for media-plane NAT and WebRTC↔PSTN bridging (TURN deferred to v1.x), NATS JetStream for ARI event fan-out, Patroni-managed PostgreSQL, per-tenant Asterisk-context isolation. Recording is on by default with per-file envelope encryption and AMI-driven pause-during-DTMF for PCI redaction.
 
@@ -59,12 +59,12 @@ This section surfaces honest confidence per major area near the top so readers c
 | Area | Confidence | Primary risk |
 |------|-----------|--------------|
 | Telephony architecture | **High (~85%)** | Asterisk version-specific behaviour with PJSIP realtime + ARI under load |
-| nCall `/v1` REST compatibility | **High (~85%)** | Undocumented nCall behaviour discovered only against a live instance |
+| TAS `/v1` REST compatibility | **High (~85%)** | Undocumented TAS behaviour discovered only against a live instance |
 | Compliance framing (HIPAA/GDPR/PCI) | **Medium-High (~75%)** | Engineering controls are sound; full certification requires legal + 3rd-party audit |
 | Operator UX parity | **Medium (~65%)** | Original research had medium confidence on supervisor view, full keyboard shortcuts |
 | Functional requirements coverage (v2) | **Medium-High (~75%)** | Queue / voicemail / IVR added in v2 close the largest v1.1 gaps |
 | Data model completeness (v2) | **Medium-High (~70%)** | Expanded entity set; ancillary edge cases still discoverable during build |
-| Pricing strategy | **Low-Medium (~40%)** | Only 2021 third-party leak as nCall data point — needs validation |
+| Pricing strategy | **Low-Medium (~40%)** | Only 2021 third-party leak as TAS data point — needs validation |
 | MVP timeline (9–12 months, 4–5 senior engineers) | **Medium (~50%)** | Honest range vs v1.1's aggressive 6–9 months |
 | Overall usefulness as build-kickoff | **High (~85%)** | Document is actionable; gaps that remain are visible |
 
@@ -76,13 +76,13 @@ This section surfaces honest confidence per major area near the top so readers c
 
 ### 3.1 Goals
 
-- **G1.** Replace nCall for our own answering-service operations — operators take a call → identify the account → fill the per-account form → dispatch the message → log out faster than they currently do in nCall.
+- **G1.** Replace TAS for our own answering-service operations — operators take a call → identify the account → fill the per-account form → dispatch the message → log out faster than they currently do in TAS.
 - **G2.** Preserve CRM integration without rework — the existing CRM continues to function against our endpoint after a base-URL change and credential swap. **Zero schema rewrites on the CRM side** for the implemented resources.
 - **G3.** Multi-tenant from day one — data model, telephony isolation, and billing are tenant-scoped. The system safely hosts competing answering-service businesses without cross-tenant data leakage.
 - **G4.** Compliance-fit for medical, legal, and card-handling verticals — HIPAA (US healthcare), GDPR (EU personal data), PCI-DSS (payment processing during calls), with a defensible audit trail and tenant-isolated encryption-at-rest.
 - **G5.** Horizontally scalable telephony — adding capacity is "deploy another Asterisk container and register it with Kamailio dispatcher." No single-machine vertical-scaling bottleneck.
 - **G6.** Browser-first operator experience — web softphone (SIP.js) is the default. Hardware SIP phones supported but not required. No native desktop client to install.
-- **G7.** Call-center-class call handling — queueing, skills routing, overflow, voicemail, IVR are first-class. (NEW in v2: nCall is weaker here than Amtelco/Startel; we close the gap.)
+- **G7.** Call-center-class call handling — queueing, skills routing, overflow, voicemail, IVR are first-class. (NEW in v2: TAS is weaker here than Amtelco/Startel; we close the gap.)
 
 ### 3.2 Non-Goals
 
@@ -97,8 +97,8 @@ This section surfaces honest confidence per major area near the top so readers c
 | ID | Criterion | Measure |
 |----|-----------|---------|
 | S1 | Existing CRM works against new API | Zero CRM code changes on `Users`, `Calls`, `Messages`, `Contacts`, `todo` reads/writes. Smoke-test of all consumed endpoints passes |
-| S2 | Operator throughput | Median call handle time within ±10% of nCall baseline for the same script |
-| S3 | Operator onboarding | Trained nCall user productive on our web app in ≤ 30 minutes |
+| S2 | Operator throughput | Median call handle time within ±10% of TAS baseline for the same script |
+| S3 | Operator onboarding | Trained TAS user productive on our web app in ≤ 30 minutes |
 | S4 | Concurrent call capacity | 100 concurrent calls per Asterisk node on 4 vCPU / 8 GB with Opus passthrough |
 | S5 | HA failover | Killing one Kamailio or one Asterisk node mid-call: in-flight calls on that node end gracefully; new calls continue routing on remaining nodes within ≤ 30 s |
 | S6 | Recording integrity | 100% of recordings encrypted at rest; PCI pause produces a verifiable redaction window in audio + metadata |
@@ -114,8 +114,8 @@ This section surfaces honest confidence per major area near the top so readers c
 
 (Unchanged from v1.1; restated briefly.)
 
-- **Tenant** — answering-service business owner; current nCall/Amtelco/Startel customer migrating to cloud.
-- **Operator / TSR** — sits at a browser all day; familiar with nCall conventions; cares about speed and accuracy.
+- **Tenant** — answering-service business owner; current TAS/Amtelco/Startel customer migrating to cloud.
+- **Operator / TSR** — sits at a browser all day; familiar with TAS conventions; cares about speed and accuracy.
 - **Supervisor** — real-time queue + operator monitoring; listen/whisper/barge; QA review.
 - **Tenant Admin** — sets up accounts, forms, schedules, billing, integrations.
 - **Client** — the business being answered for; reads messages, manages on-call status, listens to recordings.
@@ -135,7 +135,7 @@ This section surfaces honest confidence per major area near the top so readers c
 - **FR-T5.** Authentication: username + password (Argon2id) with optional TOTP MFA. SAML/OIDC SSO for tenant_admin and supervisor in v1.x.
 - **FR-T6.** Users can act in multiple tenants only via explicit invitation; tenant-switch requires re-auth.
 - **FR-T7.** API authentication exposes both surfaces simultaneously:
-  - **HTTP Basic** (nCall-compatible) — `api_integration` user credentials, scoped to that user's tenant.
+  - **HTTP Basic** (TAS-compatible) — `api_integration` user credentials, scoped to that user's tenant.
   - **OAuth2 / PAT** (modern) — bearer token in `Authorization: Bearer …`, scoped to resource permissions.
 
 ### 5.2 Client accounts
@@ -163,7 +163,7 @@ This section surfaces honest confidence per major area near the top so readers c
   - Contact panel: caller history matched on CLI; VIP (green) / Ignore (red) badge.
   - Three Call Action buttons render with configured labels and `Alt+1/2/3` shortcuts.
   - Resource Panel shows links + info sheets.
-  - Client dropdown locked for 3 seconds (nCall parity; anti-mis-assignment).
+  - Client dropdown locked for 3 seconds (TAS parity; anti-mis-assignment).
 - **FR-C5.** WebRTC audio leg established concurrently: SIP.js → Kamailio WSS → Asterisk PJSIP WS, DTLS-SRTP fingerprints negotiated via rtpengine.
 
 #### 5.3.3 Call Action handling
@@ -183,7 +183,7 @@ This section surfaces honest confidence per major area near the top so readers c
 
 - **FR-C10.** On form save: required fields validated → Message persisted → Message Actions fire → call wrap-up complete → operator returns to `Available`.
 - **FR-C11.** On hangup without form save: Call recorded with status `abandoned_by_operator`; audit logged.
-- **FR-C12.** Operator state machine: `LoggedIn` → `Available` → `OnCall` → `Wrapping` (form open post-hangup) → `Available`. Admin-configurable `Break`, `Lunch`, `Training`. Operator chooses state from menu.
+- **FR-C12.** Operator state machine: `LoggedIn` → `Available` → `OTAS` → `Wrapping` (form open post-hangup) → `Available`. Admin-configurable `Break`, `Lunch`, `Training`. Operator chooses state from menu.
 - **FR-C13.** Keyboard shortcuts: `Alt+1/2/3` (Call Actions), `Ctrl+Alt+F` (search), `Ctrl+Alt+C` (copy formatted), `Ctrl+S` (save form), `Ctrl+H` (hangup), `Ctrl+Shift+Space` (toggle hold). Configurable per tenant + per user.
 
 #### 5.3.5 Call routing and queueing (NEW in v2)
@@ -233,9 +233,9 @@ This subsection is new and closes the largest functional gap in v1.1.
 
 (Unchanged from v1.1.)
 
-- **FR-S1.** Status-driven (per-contact `availability_status` self-managed via portal; nCall parity).
+- **FR-S1.** Status-driven (per-contact `availability_status` self-managed via portal; TAS parity).
 - **FR-S2.** Calendar-driven (RFC 5545 rrule schedules with tier and date overrides; Google + Outlook ICS sync).
-- **FR-S3.** `WhoIsOnCall(account_id, at_time)` merges both: calendar overrides status when shift explicitly assigned.
+- **FR-S3.** `WhoIsOTAS(account_id, at_time)` merges both: calendar overrides status when shift explicitly assigned.
 - **FR-S4.** Schedule UI: calendar grid per account; drag-to-reassign; copy-week-forward.
 - **FR-S5.** Coverage gap detection; warn at call arrival.
 - **FR-S6.** Escalation tier: `escalation_after_minutes` cascades unacked dispatches to next tier.
@@ -289,10 +289,10 @@ This subsection is new and closes the largest functional gap in v1.1.
 
 Two coexisting surfaces; see §7.5 for the full inventory.
 
-- **FR-API1.** `/v1/...` — **nCall-compatible**. Verbatim URL contract, HTTP Basic, XML/JSON/HTML content negotiation, `page_offset`/`page_limit`, field=value filtering with `today`/`yesterday`/`tomorrow` and `greater_than`/`less_than`, `output_fields=`, `field_names.{xml|json}`.
+- **FR-API1.** `/v1/...` — **TAS-compatible**. Verbatim URL contract, HTTP Basic, XML/JSON/HTML content negotiation, `page_offset`/`page_limit`, field=value filtering with `today`/`yesterday`/`tomorrow` and `greater_than`/`less_than`, `output_fields=`, `field_names.{xml|json}`.
 - **FR-API2.** `/api/v2/...` — modern. JSON only, OpenAPI 3.1, OAuth2 + PAT, cursor pagination, RFC 9457 problem-details, webhook subscriptions, `?fields=` selection.
 - **FR-API3.** Both surfaces serve from the same domain layer; neither is a translation shim.
-- **FR-API4.** Outbound **Web Message Actions** (nCall parity): admin-configurable HTTP webhooks fired on Message save.
+- **FR-API4.** Outbound **Web Message Actions** (TAS parity): admin-configurable HTTP webhooks fired on Message save.
 - **FR-API5.** Webhook subscriptions for `/api/v2`: event subscriptions with HMAC-signed payloads and at-least-once delivery.
 - **FR-API6.** **PHI-in-URL avoidance (NEW in v2)**: see §5.14.1.
 
@@ -346,7 +346,7 @@ IVR is intentionally **minimal in MVP**: enough to route by digit press, play pr
 
 ### 5.18 Inbound SMS (NEW in v2)
 
-Modern answering services receive SMS inbound. nCall does not natively model this.
+Modern answering services receive SMS inbound. TAS does not natively model this.
 
 - **FR-SMS1.** A DID can have **voice** capability, **SMS** capability, or both.
 - **FR-SMS2.** Inbound SMS to a tenant DID is delivered via provider webhook (Twilio, Telnyx) into NestJS.
@@ -359,7 +359,7 @@ Modern answering services receive SMS inbound. nCall does not natively model thi
 ### 5.19 Tasks and Reminders (filled in for v2)
 
 - **FR-TR1.** **Task** entity (client-assigned billable job): title, description, account, assignee operator, state machine `pending → in_progress → on_hold | completed`, billing mode (`timed` with rate + inclusive minutes, or `fixed` with amount), notes, due_at.
-- **FR-TR2.** Time tracking on `timed` tasks: explicit Start/Stop buttons. **Idle protection**: if the operator's state moves to `OnCall` or `Wrapping`, an active task timer auto-pauses (timeline preserves the pause as a gap). If the operator browser tab closes (heartbeat lost ≥ 60 s), timer auto-pauses with an "unclean stop" flag for supervisor review.
+- **FR-TR2.** Time tracking on `timed` tasks: explicit Start/Stop buttons. **Idle protection**: if the operator's state moves to `OTAS` or `Wrapping`, an active task timer auto-pauses (timeline preserves the pause as a gap). If the operator browser tab closes (heartbeat lost ≥ 60 s), timer auto-pauses with an "unclean stop" flag for supervisor review.
 - **FR-TR3.** **Reminder** entity: tenant_id, user_id (target operator) or account_id (for all operators on that account), title, body, due_at, fired_at, snooze_until, dismissed_at.
 - **FR-TR4.** Reminders fire as: in-app popup with sound (default), browser push if permitted, optional email digest. Snooze: 5 / 15 / 30 / 60 min presets + custom.
 - **FR-TR5.** A reminder due-while-the-operator-is-on-a-call is queued and surfaced on next `Available` transition (configurable: surface immediately if `urgent=true`).
@@ -532,11 +532,11 @@ Three React + TypeScript + Vite apps, shared component library (`packages/ui`):
 - **Admin** — tenant admin UI (accounts, forms, schedules, users, billing, integrations).
 - **Client Portal** — per-tenant subdomain; client_portal_user scope; inbox, recordings, on-call mgmt.
 
-State management: TanStack Query for server state, Zustand for transient UI state. Theme: light-default with blue accent (nCall parity), per-tenant brand colour override. i18next for translations.
+State management: TanStack Query for server state, Zustand for transient UI state. Theme: light-default with blue accent (TAS parity), per-tenant brand colour override. i18next for translations.
 
 ### 7.5 REST API surface
 
-#### 7.5.1 nCall-compatible `/v1` (unchanged from v1.1)
+#### 7.5.1 TAS-compatible `/v1` (unchanged from v1.1)
 
 | Resource | Path | Methods |
 |----------|------|---------|
@@ -548,7 +548,7 @@ State management: TanStack Query for server state, Zustand for transient UI stat
 | Contacts | `/v1/Contacts[/<id>]` | GET, POST, PUT, DELETE |
 | Clients | `/v1/Clients[/<id>\|/<id>/billing]` | GET, POST, PUT, DELETE |
 | Todo | `/v1/todo[/<id>]` | GET, POST, PUT, DELETE |
-| OnCall | `/v1/OnCall?account_id=&at=` | GET |
+| OTAS | `/v1/OTAS?account_id=&at=` | GET |
 | Field names | `/v1/<Resource>/field_names.{xml\|json}` | GET |
 
 **Plus (NEW in v2)**: for every list endpoint there exists a POST-body equivalent at `/v1/<Resource>/search` accepting the same field filters in the JSON request body, for HIPAA-PHI-in-URL avoidance (§5.14.1).
@@ -575,7 +575,7 @@ Resource collections (v2 enumerates the surface):
 | `/api/v2/queues` | full CRUD | `/{id}/snapshot` (live depth + waiting calls) |
 | `/api/v2/operators/skills` | full CRUD | |
 | `/api/v2/schedules` | full CRUD | `/{id}/preview?from=&to=` materialised shifts |
-| `/api/v2/oncall` | GET | `?account_id=&at=` |
+| `/api/v2/otas` | GET | `?account_id=&at=` |
 | `/api/v2/voicemails` | GET, PATCH (mark actioned) | `/{id}/audio`, `/{id}/transcript` |
 | `/api/v2/ivr-flows` | full CRUD | `/{id}/test-execute` |
 | `/api/v2/dids` | full CRUD | |
@@ -653,9 +653,9 @@ Message        id, tenant_id, call_id, account_id, form_id, form_version_id,
 Dispatch       id, tenant_id, message_id, contact_id, message_action_id,
                channel, destination, state, attempted_at, delivered_at,
                acknowledged_at, error, retry_count, payload_snapshot
-OnCallSchedule id, tenant_id, account_id, tier, rrule, contact_id,
+OTASSchedule id, tenant_id, account_id, tier, rrule, contact_id,
                valid_from, valid_until, source
-OnCallShift    id, tenant_id, account_id, contact_id, tier, start_at, end_at, source
+OTASShift    id, tenant_id, account_id, contact_id, tier, start_at, end_at, source
 Recording      id, tenant_id, call_id, started_at, ended_at, duration_seconds,
                storage_url, encrypted_dek (bytea), kek_id, codec,
                redaction_intervals (jsonb), retention_expires_at, pii_purged
@@ -726,7 +726,7 @@ ApiToken       id, tenant_id, user_id, name, token_hash, scopes[],
 - `Message`: `(tenant_id, account_id, timestamp_added desc)`, partial index on `(tenant_id, delivery_state) WHERE delivery_state in ('pending','failed')`.
 - `Dispatch`: `(tenant_id, state, attempted_at)` for retry worker; `(message_id)`.
 - `Contact`: `(tenant_id, account_id, retired)`; gin trigram index on `(first_name || ' ' || last_name)` for search.
-- `OnCallShift`: `(tenant_id, account_id, start_at)`; range exclusion constraint to enforce single primary per tier per window.
+- `OTASShift`: `(tenant_id, account_id, start_at)`; range exclusion constraint to enforce single primary per tier per window.
 - `AuditLog`: partitioned monthly; `(tenant_id, resource_type, resource_id, timestamp)` per partition.
 - `Recording`: `(tenant_id, retention_expires_at)` for lifecycle worker.
 
@@ -785,18 +785,18 @@ This complements the tenant-side anti-fraud monitor (§6.3) — that one protect
 
 ### 9.1 Market positioning
 
-> **Confidence note (v2):** Public price points below are inherited from v1.1 research; only nCall has a third-party-leaked figure (2021); competitor figures come from a 2021 industry article. Treat as **order-of-magnitude** indicators. **Validate with at least 5 prospect conversations before committing.**
+> **Confidence note (v2):** Public price points below are inherited from v1.1 research; only TAS has a third-party-leaked figure (2021); competitor figures come from a 2021 industry article. Treat as **order-of-magnitude** indicators. **Validate with at least 5 prospect conversations before committing.**
 
 | Vendor | Per-seat / month | Setup | Model |
 |--------|------------------|-------|-------|
-| nSolve nCall | ~$65–80 (2021 leak) | Low | On-prem |
+| nSolve TAS | ~$65–80 (2021 leak) | Low | On-prem |
 | Amtelco | ~$300 | ~$20k | On-prem |
 | Startel CMC | ~$375 | ~$17k | On-prem |
 | EVS7 Fox | $149 | Minimal | Cloud |
 | Virtual TAS | $89 | $1,495 | Cloud |
 | AI-native (Bland.ai etc.) | $25–200 flat | None | AI |
 
-We target **mid-market cloud SaaS** — more capable than EVS7/Virtual TAS, far more affordable than Amtelco/Startel, modern UX + AI built-in, with **nCall REST API compatibility** as a differentiator for migrators.
+We target **mid-market cloud SaaS** — more capable than EVS7/Virtual TAS, far more affordable than Amtelco/Startel, modern UX + AI built-in, with **TAS REST API compatibility** as a differentiator for migrators.
 
 ### 9.2 Pricing axes
 
@@ -824,7 +824,7 @@ Stripe Billing for tenant subscriptions; metered usage via Stripe Meters API; se
 
 ### 10.1 MVP (v1.0) — honest estimate
 
-> **Confidence note (v2):** v1.1 estimated 6–9 months; on reflection this was **aggressive** given the scope (multi-tenant + HIPAA/PCI/GDPR + horizontally-scalable telephony + nCall UX parity + two REST surfaces + queue/voicemail/IVR/inbound-SMS). **Honest estimate: 9–12 months** with a team of **4–5 senior engineers** (1 senior backend / telephony, 1 mid-senior backend, 1 senior frontend, 1 mid-senior frontend, 1 DevOps/SRE) plus a 0.5 product manager and 0.25 QA. Smaller team = pro-rata longer. Estimate volatility ±25%.
+> **Confidence note (v2):** v1.1 estimated 6–9 months; on reflection this was **aggressive** given the scope (multi-tenant + HIPAA/PCI/GDPR + horizontally-scalable telephony + TAS UX parity + two REST surfaces + queue/voicemail/IVR/inbound-SMS). **Honest estimate: 9–12 months** with a team of **4–5 senior engineers** (1 senior backend / telephony, 1 mid-senior backend, 1 senior frontend, 1 mid-senior frontend, 1 DevOps/SRE) plus a 0.5 product manager and 0.25 QA. Smaller team = pro-rata longer. Estimate volatility ±25%.
 
 **MVP scope:**
 - All FRs in §5.1 – §5.20.
@@ -867,14 +867,14 @@ Stripe Billing for tenant subscriptions; metered usage via Stripe Meters API; se
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|-----------|
 | CRM integration breakage despite "compatible" API | High | Medium | CI smoke-test against the CRM's known consumed endpoints; dry-run with CRM sandbox before cutover |
-| nCall undocumented behaviour surfaces late | Medium | High | "Compatibility sprint" mid-build against a live nCall instance; track deviations as documentation, not bugs |
+| TAS undocumented behaviour surfaces late | Medium | High | "Compatibility sprint" mid-build against a live TAS instance; track deviations as documentation, not bugs |
 | Asterisk + rtpengine + Kamailio operational complexity | High | Medium | Senior VoIP engineer for first 6 months; Sipwise NGCP + Wazo as reference; Homer for fast debugging |
 | HIPAA + PCI overlap is design-difficult | Medium | Medium | PCI defaults to delegated capture; HIPAA recording-by-default uses pause+redact carefully tested |
 | Cost of recording storage at scale | Medium | High | S3 lifecycle to Glacier after 90 days; per-tenant retention defaults; bill overage as metered add-on |
 | Single-Asterisk-node failure drops in-flight calls on that node | Low | High | Accepted; redundancy at node level not call level; pool size kept above min-N |
 | AI-native competitors commoditise operator workflow | High | Medium (long-term) | AI agent as first-class capability; position as "human-in-the-loop + AI handoff" |
 | GDPR EU residency adds infra cost | Medium | Medium | EU stack only when first EU tenant signs |
-| Operators reject web UI vs desktop habit | High | Low | Replicate nCall layout to the letter; usability-test with 3 real nCall operators at first MVP demo |
+| Operators reject web UI vs desktop habit | High | Low | Replicate TAS layout to the letter; usability-test with 3 real TAS operators at first MVP demo |
 | Kamailio config mis-configuration → outage | High | Medium | Config-as-code in git, peer review, staging cluster mirroring prod, kemi Lua hot-reloadable |
 | WebRTC connectivity failures from corporate NAT (no TURN in MVP) | Medium | Low-Medium | Accepted as MVP limitation; monitor failed-ICE rate; v1.1 coturn rollout when threshold breached |
 | Local-dev divergence from production | Medium | Medium | Same container images; CI runs against same `docker compose` stack |
@@ -909,7 +909,7 @@ Stripe Billing for tenant subscriptions; metered usage via Stripe Meters API; se
 4. Call recorded → encrypted with tenant KEK → uploaded to S3 → supervisor plays back via signed URL.
 5. Pause Recording mid-call → resulting WAV has silence in interval → metadata has matching `redaction_intervals`.
 6. CRM smoke-test against all consumed `/v1` endpoints passes 100%.
-7. Supervisor dashboard shows operator in `OnCall` state; supervisor `ChanSpy` listen-in works.
+7. Supervisor dashboard shows operator in `OTAS` state; supervisor `ChanSpy` listen-in works.
 8. Client portal user logs in → sees Message in inbox → plays recording → updates contact availability → operator's "Who is on-call" reflects within 5 s.
 9. Second Asterisk node joins dispatcher; calls distribute; first node drained without affecting in-flight calls on second.
 10. HIPAA + GDPR + PCI checklist signed off against implemented controls.
@@ -948,7 +948,7 @@ GET    /v1/Messages[.{xml|json}|/<id>]                   + POST/PUT/DELETE
 GET    /v1/Contacts[.{xml|json}|/<id>]                   + POST/PUT/DELETE
 GET    /v1/Clients[.{xml|json}|/<id>|/<id>/billing]      + POST/PUT/DELETE
 GET    /v1/todo[.json|/<id>]                             + POST/PUT/DELETE
-GET    /v1/OnCall.{xml|json}?account_id=&at=
+GET    /v1/OTAS.{xml|json}?account_id=&at=
 
 POST   /v1/<Resource>/search           (NEW in v2 — PHI-in-body alternative)
 ```
@@ -995,7 +995,7 @@ Filtering, pagination, field selection conventions per §7.5.1.
 
 ```
 git clone <repo>
-cd ncall-clone
+cd tas
 make dev-up         # brings up the entire docker-compose stack + seeds tenant
                      # services started:
                      #   kamailio, rtpengine, asterisk-1, postgres, redis, nats,
@@ -1025,7 +1025,7 @@ make dev-reset             # wipe volumes + reseed
 
 ### 17.1 Correctness
 
-All v1.1 correctness anchors carry forward (nCall URL contract, field names, pagination, filter shorthands, content negotiation; nCall desktop UX patterns; Kamailio module choices; rtpengine NAT mandate; Model B Asterisk; MixMonitor + AMI mute; envelope encryption; sticky routing via dispatcher + dialog DB-backed; Wazo + Sipwise NGCP reference). v2 additions are anchored in industry standards (JsonLogic for form rules, Whisper/Deepgram for ASR, JSON Schema for form data, RFC 5545 for schedules, RFC 9457 for API errors, WCAG 2.1 AA for accessibility) — these are well-trodden choices that should not surprise the implementing team.
+All v1.1 correctness anchors carry forward (TAS URL contract, field names, pagination, filter shorthands, content negotiation; TAS desktop UX patterns; Kamailio module choices; rtpengine NAT mandate; Model B Asterisk; MixMonitor + AMI mute; envelope encryption; sticky routing via dispatcher + dialog DB-backed; Wazo + Sipwise NGCP reference). v2 additions are anchored in industry standards (JsonLogic for form rules, Whisper/Deepgram for ASR, JSON Schema for form data, RFC 5545 for schedules, RFC 9457 for API errors, WCAG 2.1 AA for accessibility) — these are well-trodden choices that should not surprise the implementing team.
 
 ### 17.2 Comprehensiveness
 
@@ -1048,7 +1048,7 @@ The points where I would not bet my career on this PRD being right:
 
 - **9–12 month timeline.** Telephony projects historically slip. The risk register flags this; the recommended mitigation is aggressive de-scoping.
 - **Pricing.** $59–$99/seat is a reasonable opening; real prospect conversations will reshape it.
-- **nCall undocumented quirks.** A "compatibility sprint" against a live instance is necessary; planning for zero surprises would be naïve.
+- **TAS undocumented quirks.** A "compatibility sprint" against a live instance is necessary; planning for zero surprises would be naïve.
 - **HIPAA/PCI overlap on the same call.** Recording on by default + card-capture happening on the same call requires careful test choreography. Delegated capture mitigates but is not silver.
 - **Asterisk queue strategy in NestJS.** Latency budget is plausible but not proven; load tests at 100+ concurrent dequeues should confirm.
 

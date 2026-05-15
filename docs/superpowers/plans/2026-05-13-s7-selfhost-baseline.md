@@ -49,12 +49,12 @@ git status
 git log --oneline -3
 ```
 
-Expected: branch is `pot/S6-ncall-fixture-capture`, working tree clean, HEAD is `7e29d93` or later.
+Expected: branch is `pot/S6-tas-fixture-capture`, working tree clean, HEAD is `7e29d93` or later.
 
 - [ ] **Step 0.2: Create the new sprint-0 branch**
 
 ```bash
-git checkout -b sprint-0/temporal-selfhost-baseline pot/S6-ncall-fixture-capture
+git checkout -b sprint-0/temporal-selfhost-baseline pot/S6-tas-fixture-capture
 git status
 ```
 
@@ -119,7 +119,7 @@ Capture: current `@temporalio/worker` and `@temporalio/client` versions for `pac
 - [ ] **Step 1.1: Create the directory**
 
 ```bash
-mkdir -p /Users/lion/Documents/Projects/mine/ncall-clone/infra/temporal
+mkdir -p /Users/lion/Documents/Projects/mine/tas/infra/temporal
 ```
 
 - [ ] **Step 1.2: Author kind-cluster.yaml**
@@ -541,7 +541,7 @@ Expected: both checks succeed.
 - [ ] **Step 4.1: Stage and commit infra files**
 
 ```bash
-cd /Users/lion/Documents/Projects/mine/ncall-clone
+cd /Users/lion/Documents/Projects/mine/tas
 git add infra/temporal/
 git status   # verify only infra/temporal/* staged
 ```
@@ -589,7 +589,7 @@ Expected: HEAD is the new commit; working tree clean.
 - [ ] **Step 5.1: Create directories**
 
 ```bash
-mkdir -p /Users/lion/Documents/Projects/mine/ncall-clone/sprint-0/temporal-sdk-validation/{src,config}
+mkdir -p /Users/lion/Documents/Projects/mine/tas/sprint-0/temporal-sdk-validation/{src,config}
 ```
 
 - [ ] **Step 5.2: Author package.json**
@@ -598,7 +598,7 @@ Write `/sprint-0/temporal-sdk-validation/package.json`. Replace `<TEMPORAL_VERSI
 
 ```json
 {
-  "name": "@ncall-clone/temporal-sdk-validation",
+  "name": "@tas/temporal-sdk-validation",
   "version": "0.0.1",
   "private": true,
   "description": "ADR-0015 §Evidence item 1 partial-check worker. Smallest viable Temporal worker exercising the TypeScript SDK against the local self-host baseline.",
@@ -997,7 +997,7 @@ helm get values temporal-baseline -n temporal | tee /tmp/temporal-helm-values-ap
 - [ ] **Step 8.1: Add the sprint-0 directory**
 
 ```bash
-cd /Users/lion/Documents/Projects/mine/ncall-clone
+cd /Users/lion/Documents/Projects/mine/tas
 git add sprint-0/temporal-sdk-validation/
 git status   # verify only sprint-0/temporal-sdk-validation/* staged
 ```
@@ -1486,11 +1486,11 @@ git log --oneline -5
 
 - [ ] **Step 13.5: Update `pot_spike_workflow.md` memory**
 
-Update the auto-memory at `/Users/lion/.claude/projects/-Users-lion-Documents-Projects-mine-ncall-clone/memory/pot_spike_workflow.md`:
+Update the auto-memory at `/Users/lion/.claude/projects/-Users-lion-Documents-Projects-mine-tas/memory/pot_spike_workflow.md`:
 
 a. Move S7 from "Deferred" to "Completed (Green) + ratified" with reference to the new branch `sprint-0/temporal-selfhost-baseline` and the five commits.
 
-b. Update the Branch chain to add `sprint-0/temporal-selfhost-baseline` off `pot/S6-ncall-fixture-capture`.
+b. Update the Branch chain to add `sprint-0/temporal-selfhost-baseline` off `pot/S6-tas-fixture-capture`.
 
 c. Update the Open items list to remove "S7 self-host operational baseline + SDK identity validation" from Sprint-0 work still open.
 
@@ -1512,4 +1512,4 @@ These must all be true for the task to be complete (mirrors spec §9):
 
 ---
 
-*Plan written 2026-05-13 from spec `docs/superpowers/specs/2026-05-13-s7-selfhost-baseline-design.md` on branch `pot/S6-ncall-fixture-capture`. Implementation begins on a new branch `sprint-0/temporal-selfhost-baseline` per Task 0.*
+*Plan written 2026-05-13 from spec `docs/superpowers/specs/2026-05-13-s7-selfhost-baseline-design.md` on branch `pot/S6-tas-fixture-capture`. Implementation begins on a new branch `sprint-0/temporal-selfhost-baseline` per Task 0.*

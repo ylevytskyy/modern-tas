@@ -1,12 +1,12 @@
-# ncall-clone PoC stack — services grow through Tasks 8–15.
+# tas PoC stack — services grow through Tasks 8–15.
 # Chunk 1 scope: Postgres+Supavisor, Kamailio, Asterisk, rtpengine, MinIO, NATS, Redis, Temporal, Caddy.
 services:
   postgres:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ncall
-      POSTGRES_DB: ncall
+      POSTGRES_PASSWORD: tas
+      POSTGRES_DB: tas
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
       - pg-data:/var/lib/postgresql/data
@@ -24,7 +24,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://postgres:ncall@postgres:5432/_supavisor
+      DATABASE_URL: postgres://postgres:tas@postgres:5432/_supavisor
       SECRET_KEY_BASE: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
       VAULT_ENC_KEY: "0123456789abcdef0123456789abcdef"
       API_JWT_SECRET: "poc-only-not-prod"
@@ -44,7 +44,7 @@ services:
       supavisor-migrate:
         condition: service_completed_successfully
     environment:
-      DATABASE_URL: postgres://postgres:ncall@postgres:5432/_supavisor
+      DATABASE_URL: postgres://postgres:tas@postgres:5432/_supavisor
       SECRET_KEY_BASE: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
       VAULT_ENC_KEY: "0123456789abcdef0123456789abcdef"
       API_JWT_SECRET: "poc-only-not-prod"
@@ -111,9 +111,9 @@ services:
     image: minio/minio:RELEASE.2024-03-15T01-07-19Z
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ncall
-      MINIO_ROOT_PASSWORD: ncall1234
-      MC_HOST_local: "http://ncall:ncall1234@localhost:9000"
+      MINIO_ROOT_USER: tas
+      MINIO_ROOT_PASSWORD: tas12345
+      MC_HOST_local: "http://tas:tas12345@localhost:9000"
     volumes:
       - minio-data:/data
     ports:
@@ -153,7 +153,7 @@ services:
       DB: postgres12
       DB_PORT: "5432"
       POSTGRES_USER: postgres
-      POSTGRES_PWD: ncall
+      POSTGRES_PWD: tas
       POSTGRES_SEEDS: postgres
     depends_on:
       postgres:

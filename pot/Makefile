@@ -6,7 +6,7 @@ SPIKES := S1-telephony-happy-path \
           S3-ari-leader-hard-stop \
           S4-redaction-accuracy \
           S5-supavisor-set-local \
-          S6-ncall-fixture-capture \
+          S6-tas-fixture-capture \
           S7-temporal-baa \
           S8-caddy-le-posture
 

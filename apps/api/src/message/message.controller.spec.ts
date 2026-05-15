@@ -2,8 +2,8 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MessageController } from './message.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, tenant, did, user, call, message } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, tenant, did, user, call, message } from '@tas/db';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';

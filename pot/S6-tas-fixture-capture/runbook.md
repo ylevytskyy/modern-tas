@@ -6,7 +6,7 @@
 make check-prereqs
 ```
 
-Verifies: NCALL_BASE_URL, NCALL_USER, NCALL_PASS env vars set.
+Verifies: TAS_BASE_URL, TAS_USER, TAS_PASS env vars set.
 
 ## Capture loop
 

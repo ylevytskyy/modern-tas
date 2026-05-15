@@ -6,7 +6,7 @@
 
 ## TL;DR
 
-Five of eight PoT spikes are Green and ratified. Three are Deferred — vendor / data prereqs that cannot be synthesised without invalidating the named hazard (S4: medical-ASR + telephony PII fixtures; S6: live nCall instance + endpoint inventory; S7: Temporal Cloud BAA). ARCH v0.4 §2.4 declares G0 closeable only on Green / Yellow-with-remediation / Red — "Deferred" is unlisted. We recommend a **pragmatic reading** of the gate (Path B): adopt documented fallbacks for S6 + S7 as MVP-baseline, carve S4 out for an explicit Sprint-0 compliance re-decision, expand the gate enum to include "Deferred-with-fallback-plan" alongside Yellow, and proceed to MVP construction in parallel with the S4 deliberation.
+Five of eight PoT spikes are Green and ratified. Three are Deferred — vendor / data prereqs that cannot be synthesised without invalidating the named hazard (S4: medical-ASR + telephony PII fixtures; S6: live TAS instance + endpoint inventory; S7: Temporal Cloud BAA). ARCH v0.4 §2.4 declares G0 closeable only on Green / Yellow-with-remediation / Red — "Deferred" is unlisted. We recommend a **pragmatic reading** of the gate (Path B): adopt documented fallbacks for S6 + S7 as MVP-baseline, carve S4 out for an explicit Sprint-0 compliance re-decision, expand the gate enum to include "Deferred-with-fallback-plan" alongside Yellow, and proceed to MVP construction in parallel with the S4 deliberation.
 
 The alternative (Path A — strict reading) blocks MVP kickoff for an estimated 6–12 calendar weeks while S4 fixture capture, S6 vendor access, and S7 sales correspondence resolve, with no compensating reduction in hazard exposure (the three Deferred spikes' fallbacks are documented and the analytic content is captured).
 
@@ -35,7 +35,7 @@ If both signatures are obtained on this proposal as-written, G0 is declared clos
 | S3 | ARI leader 100 ms hard-stop | **Green** | `pot/S3` | ADR-0016 ✓ (amended) | Wire close 1 ms vs 100 ms budget; reconcile 1474 ms vs 7 s. **Two ADR-0016 amendments**: TTL > HB (3:1 ratio), Asterisk accepts multi-WS (better than ADR assumed). |
 | S4 | Two-pass redaction accuracy on 8 kHz μ-law | **Deferred** | — | ADR-0013 (Proposed) | Phase-0 blocked: AssemblyAI Universal-3 Pro Medical key + 30 annotated telephony fixtures. **HIPAA-load-bearing**; fallback options are weak. See §S4 detail below. |
 | S5 | Supavisor `SET LOCAL` parity | **Green** | `pot/S5` | ADR-0018 ✓ | Same backend pid across transactions; no setting leak across COMMIT boundary on a reused server backend. |
-| S6 | `/v1` byte-for-byte fixture capture | **Deferred** | — | (none — feeds M25 module) | Phase-0 blocked: live nCall instance access + CRM-consumed-endpoint inventory. Documented Yellow fallback exists (scrape CRM response cache) — see §S6 detail. |
+| S6 | `/v1` byte-for-byte fixture capture | **Deferred** | — | (none — feeds M25 module) | Phase-0 blocked: live TAS instance access + CRM-consumed-endpoint inventory. Documented Yellow fallback exists (scrape CRM response cache) — see §S6 detail. |
 | S7 | Temporal Cloud BAA + EU namespace | **Deferred** | — | ADR-0015 (Proposed) | Phase-0 blocked: vendor sales/legal correspondence (2–6 week cycle, not initiated). ADR-0015 documents a self-host fallback — see §S7 detail. |
 | S8 | Caddy 2.10+ permission + LE rate-limit | **Green** | `pot/S8` | ADR-0019 ✓ (amended) | HAProxy dreq 58 193 / 59 597 (97.6 % rejected at sustained 1000/s unknown-SNI); 0 cert files written for 59 k declined connections. **Three ADR-0019 amendments**: Caddy decline-LRU claim was false (the actual mechanism is storage short-circuit on non-2xx `ask` response); permission endpoint re-attributed as the load-bearing layer 2; threshold tunability footnote on the 1000/s/source production threshold. |
 
@@ -154,9 +154,9 @@ The conditions below operationalise this.
 
 ### S6 — `/v1` byte-for-byte fixture capture (no ADR; feeds M25 module)
 
-**Hazard the spike was killing**: PRD §7.5 may not match what live nCall actually returns. M25 (the `/v1` compatibility module) builds against a spec; if the spec is wrong, the live CRM will hit incompatibilities the test suite cannot catch.
+**Hazard the spike was killing**: PRD §7.5 may not match what live TAS actually returns. M25 (the `/v1` compatibility module) builds against a spec; if the spec is wrong, the live CRM will hit incompatibilities the test suite cannot catch.
 
-**Why deferred**: Live nCall instance access (vendor sandbox or read-only tenant) + CRM-consumed-endpoint inventory (from existing CRM source / access logs / dev interview) are not available. Any synthesis (PRD-driven generator, mock server) just echoes the spec back.
+**Why deferred**: Live TAS instance access (vendor sandbox or read-only tenant) + CRM-consumed-endpoint inventory (from existing CRM source / access logs / dev interview) are not available. Any synthesis (PRD-driven generator, mock server) just echoes the spec back.
 
 **Compliance regime**: GDPR-touch (the live CRM stores EU customer data; fixture capture must redact). Not the load-bearing compliance question.
 
@@ -171,7 +171,7 @@ The conditions below operationalise this.
 
 **Sprint-0 carry-over**:
 - Author `tools/crm-cache-scraper.ts` (or equivalent) that walks the existing CRM's HTTP cache and emits `/contracts/fixtures/v1-xml/<resource>/<query-fingerprint>.xml`.
-- Annotate any quirks observed (deviations from PRD §7.5) in `docs/ncall-compat/quirks.md` — this carry-forward already exists in spec.
+- Annotate any quirks observed (deviations from PRD §7.5) in `docs/tas-compat/quirks.md` — this carry-forward already exists in spec.
 - M25 module construction uses these fixtures for round-trip tests.
 
 **Live-capture upgrade trigger** (Sprint-N): when one of (a) vendor access becomes available, (b) M25 round-trip tests start failing in production against real CRM consumers, (c) feature work needs an endpoint the cache doesn't cover. At that point execute the original S6 plan with the now-available prereqs.
@@ -287,7 +287,7 @@ pot/scaffold? (original 8-spike skeleton — unchecked)
                  └─ pot/S4-redaction-accuracy       (Deferred, no tag)
                      └─ pot/S8-caddy-le-posture     pot/S8 at 03b3a9d
                          └─ pot/S7-temporal-baa     (Deferred, no tag)
-                             └─ pot/S6-ncall-fixture-capture (Deferred, no tag, current branch)
+                             └─ pot/S6-tas-fixture-capture (Deferred, no tag, current branch)
 ```
 
 ## Annex C — How "Deferred-with-fallback-plan" is captured if Path B is signed
@@ -307,4 +307,4 @@ The amendment is marked **pending G0 sign-off ratification**. Signatures on this
 
 ---
 
-*Drafted 2026-05-13 at end of Phase 0 spike execution on branch `pot/S6-ncall-fixture-capture`. To be reviewed and signed in a dedicated G0 sign-off meeting scheduled within 1 week of draft circulation.*
+*Drafted 2026-05-13 at end of Phase 0 spike execution on branch `pot/S6-tas-fixture-capture`. To be reviewed and signed in a dedicated G0 sign-off meeting scheduled within 1 week of draft circulation.*

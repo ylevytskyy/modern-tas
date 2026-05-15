@@ -321,7 +321,7 @@ Rationale: <one paragraph — typically Path B for solo founder; cite proposal �
 - **ADR ratification:** ADR-0013 ratified at Status: Accepted on 2026-05-14 with sub-decision <A/B/C>. See [`docs/adr/0013-redaction-pipeline.md` §Sub-decision (2026-05-14)](../docs/adr/0013-redaction-pipeline.md).
 - **PoC implication:** ML redaction pipeline is **not** in PoC tracer-bullet (PoC §5.2 cut). PoC asserts only operator-initiated PCI pause spans (Slice 2).
 
-### S6 — nCall fixture capture
+### S6 — TAS fixture capture
 
 - **Status:** Deferred with trigger rule
 - **Trigger:** If `/v1/Account/:id` controller in Chunk 2 of the chunk-plan requires a recorded CRM fixture response to pass its unit tests, assign S6 cache-scraper stub work to Chunk 2 scope. Otherwise S6 stays unowned for the PoC.

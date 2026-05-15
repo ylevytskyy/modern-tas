@@ -2,8 +2,8 @@
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WsGateway } from './ws.gateway';
-import { WsEvents } from '@ncall/shared-types';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import { WsEvents } from '@tas/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 describe('WsGateway', () => {
   let gateway: WsGateway;

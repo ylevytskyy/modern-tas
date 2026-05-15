@@ -23,10 +23,10 @@ export default defineConfig({
     globalSetup: './test/vitest.globalSetup.ts',
     include: ['src/**/*.spec.ts'],
     alias: {
-      '@ncall/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
-      '@ncall/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
-      '@ncall/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
-      '@ncall/ari-client': resolve(__dirname, '../../packages/ari-client/src/index.ts'),
+      '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
+      '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
+      '@tas/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
+      '@tas/ari-client': resolve(__dirname, '../../packages/ari-client/src/index.ts'),
     },
   },
 });

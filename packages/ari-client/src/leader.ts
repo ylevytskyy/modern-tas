@@ -53,7 +53,7 @@ export class AriLeaderClient {
   private isLeader = false;
   private ariHandle: AriClientHandle | null = null;
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
-  private readonly ARI_APP = process.env.ARI_APP ?? 'ncall';
+  private readonly ARI_APP = process.env.ARI_APP ?? 'tas';
 
   constructor(opts: AriLeaderClientOptions) {
     this.opts = opts;

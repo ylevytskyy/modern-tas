@@ -5,7 +5,7 @@ import { ArbiterService } from './arbiter.service';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
 import { WsGateway } from '../ws/ws.gateway';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 

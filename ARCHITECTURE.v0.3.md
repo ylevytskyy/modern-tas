@@ -1,4 +1,4 @@
-# nCall-Clone — High-Level Architecture (v0.3)
+# Telephone Answering Service (TAS) — High-Level Architecture (v0.3)
 
 **Status:** Draft, supersedes [v0.2](./ARCHITECTURE.v0.2.md). Resolves the seven new risks (N1–N7) and twenty-five PRD coverage gaps raised in [RISKS.v0.2.md](./RISKS.v0.2.md). Research current as of May 2026.
 
@@ -26,7 +26,7 @@
 | P1 | **Contracts first** | OpenAPI 3.1 + AsyncAPI 3.0 + JSON Schema files live in `/contracts/` and are PR-reviewed before module work starts. Mock servers (Prism/MSW) come from these specs. |
 | P2 | **Bounded contexts = modules** | A module owns its DB tables (no cross-module SQL joins), publishes events on NATS, exposes HTTP/RPC via its OpenAPI block. Cross-module access is *only* via published contracts. |
 | P3 | **Tenant ID is sacred — defense in depth** | Every table has `tenant_id` enforced by Postgres RLS *and* (for sensitive tables) a `BEFORE INSERT` trigger that asserts `NEW.tenant_id = current_setting('app.tenant_id')::uuid`. Every connection runs `SET LOCAL` in a transaction. Runtime role is non-owner and not `BYPASSRLS`. Supavisor `SET LOCAL` parity is CI-asserted on Day 1 (ADR-18). |
-| P4 | **Two API surfaces, one domain** | `/v1` (nCall-compat XML/JSON) and `/api/v2` (modern JSON) are both first-class facades over the *same* domain services. |
+| P4 | **Two API surfaces, one domain** | `/v1` (TAS-compat XML/JSON) and `/api/v2` (modern JSON) are both first-class facades over the *same* domain services. |
 | P5 | **Side effects through workers with durability tiers** | HTTP requests do not send SMS/email/recordings inline; they enqueue work. **Tier 1** (≤ 1 h, cancel-able, single-step): BullMQ. **Tier 2** (hours-to-days, compensable, multi-step, signal-driven): Temporal. **Tier 3** (compliance-bearing event fanout): NATS JetStream on a dedicated compliance cluster with `sync_interval=always`. |
 | P6 | **Stub all external deps in dev** | KMS, SIP trunk, SMS, email, push, calendar, CRM, Temporal — every external dependency has a local stub. `docker compose up` boots the whole product. |
 | P7 | **Compliance is a build-time check + a runtime owner** | RLS policies, audit triggers, encryption-at-rest, no-PHI-in-SMS, no-PHI-in-Temporal-SA — enforced by lints, schema constraints, and integration tests. Cross-framework workflows (erasure, deletion, portability) are owned by M26. |
@@ -149,8 +149,8 @@ Deltas from v0.2 only.
 | # | Module | Owner | Owns / Inbound / Outbound |
 |---|---|---|---|
 | **M26** | **Compliance Workflows** *(revised default)* | Compliance & Security | **Owns**: `compliance_request`, `compliance_step`, `legal_hold`, `pseudonym_map` (separate Postgres schema, dedicated per-tenant KMS key). **Inbound**: `/v1/compliance/erasure`, `/portability`, `/tenant-deletion`, `/legal-hold`; subscribes to `tenant.flagged_for_deletion`, `dpo.request.created`. **Outbound** (application services only): `M07.MessageService.redact`, `M10.RecordingService.bleepAndTombstone`, `M14.AuditService.append`, `M19.SmsService.purgeConversation`, `M21.PushService.tombstoneDevice`, `M01.KmsService.scheduleKeyDeletion`. **Runs on Temporal Cloud (HIPAA BAA, EU namespace for GDPR-scoped tenants; codec-server-encrypted payloads; no PHI in Search Attributes — CI-linted)**. **Default policy for healthcare-tagged tenants is `gdpr_strict`** (§5 ADR-14): hard-delete every record not under an active HIPAA retention obligation; for the HIPAA-mandated residual, invoke GDPR Art. 17(3)(b) and document the carve-out per tenant. `pseudonymise_until_retention_expires` is *deprecated as default* but available with mandatory per-tenant DPIA + EU counsel sign-off; `gdpr_wins` (full hard-delete) and `hipaa_wins` (refuse-with-justification) remain. **Events**: `compliance.request.{created,step.completed,step.failed,completed,aborted}`, `compliance.legal_hold.activated`, `compliance.kms.dek_destroyed`. |
-| **M27** | **Reports** *(license risk flagged)* | Analytics | **Owns**: `report_definition` (slug, scope=`tenant\|portal\|admin`, `cube_query_jsonb`, `viz_config_jsonb`, version), `report_schedule`, `report_run`, `report_subscription`. **Inbound**: `/v1/reports`, `POST /v1/reports/{id}/run`, `GET /v1/reports/{id}/runs/{runId}` (signed download). Subscribes to `cron.tick`, `billing.cycle.closed`, `oncall.gap_detected`. **Outbound**: Cube.dev **Cloud Enterprise tier** (or self-hosted, evaluated Sprint 0; see §5 ADR-15 for posture). JWT-signed `securityContext={tenant_id}`; PDF rendered by headless Chrome on capped BullMQ queue (4 concurrent / replica, 150 MB each); CSV/XLSX streamed from Cube SQL API. **30+ seed `report_definitions` ship in Sprint 8** (see §10 for catalogue); admin can clone+edit. Renderer = React in F04/F05/F06. |
-| **M28** | **BulkImport** *(extended)* | Domain backend | unchanged + **nCall migration connector** (closes §9.3 migration bundle): pre-built mappings for nCall's account/contact/oncall/template CSV exports + Postgres dumps; idempotent re-import via `(tenant_id, source_system, source_id)` dedupe key; reports diff between import passes. |
+| **M27** | **Reports** *(license risk flagged)* | Analytics | **Owns**: `report_definition` (slug, scope=`tenant\|portal\|admin`, `cube_query_jsonb`, `viz_config_jsonb`, version), `report_schedule`, `report_run`, `report_subscription`. **Inbound**: `/v1/reports`, `POST /v1/reports/{id}/run`, `GET /v1/reports/{id}/runs/{runId}` (signed download). Subscribes to `cron.tick`, `billing.cycle.closed`, `otas.gap_detected`. **Outbound**: Cube.dev **Cloud Enterprise tier** (or self-hosted, evaluated Sprint 0; see §5 ADR-15 for posture). JWT-signed `securityContext={tenant_id}`; PDF rendered by headless Chrome on capped BullMQ queue (4 concurrent / replica, 150 MB each); CSV/XLSX streamed from Cube SQL API. **30+ seed `report_definitions` ship in Sprint 8** (see §10 for catalogue); admin can clone+edit. Renderer = React in F04/F05/F06. |
+| **M28** | **BulkImport** *(extended)* | Domain backend | unchanged + **TAS migration connector** (closes §9.3 migration bundle): pre-built mappings for TAS's account/contact/otas/template CSV exports + Postgres dumps; idempotent re-import via `(tenant_id, source_system, source_id)` dedupe key; reports diff between import passes. |
 | **M29** | **Toll-Fraud Monitor** *(new; closes NFR-S13)* | Compliance & Security | **Owns**: `tollfraud_window` (Redis sorted-set sliding window — 60 s / 1 h / 24 h cost-per-minute per tenant), `tollfraud_alert`, `tollfraud_block` (in-effect SIP trunk blocks). **Inbound**: NATS `telephony.cdr.completed` (per-call rate ingest from M06). **Outbound**: NATS `tollfraud.alert.{warning,critical,blocked}`; calls `M16.TrunkService.block(tenant, reason)` on critical; emits Stripe metered usage event to M13 on cost overruns. **Tier-aware thresholds**: per-tenant baseline learned over 30-day rolling window; triggers warning at 3× baseline, critical at 10×, automatic block at 25× with 5 min cool-down + tenant-admin signal-cancel within 60 s. **Operationally**: lives as a small BullMQ-tier worker; no Temporal needed; reconciliation against Stripe usage every 5 min. |
 
 ### 4.2 Telephony & integration backend modules
@@ -275,7 +275,7 @@ The 12 v0.2 ADRs remain in force (status: **kept** or **amended**). Eleven new A
 ```
 /contracts/
   openapi/
-    v1.nCall.yaml         ← hand-curated (nCall parity, frozen)
+    v1.TAS.yaml         ← hand-curated (TAS parity, frozen)
     v2.api.yaml           ← generated from NestJS @nestjs/swagger + Zod schemas
   asyncapi/
     telephony.yaml        ← NATS subjects, payload schemas
@@ -294,7 +294,7 @@ The 12 v0.2 ADRs remain in force (status: **kept** or **amended**). Eleven new A
   examples/
     *.json
   fixtures/
-    v1-xml/                ← byte-for-byte captured nCall responses
+    v1-xml/                ← byte-for-byte captured TAS responses
     redaction-audio/       ← NEW. 10 synthetic recordings with planted PII spans for X10 sample audit harness.
 ```
 
@@ -415,7 +415,7 @@ Sprint 4-7  ── Core call path ───────────────�
 
 Sprint 8-11  ── Scheduling, Supervisor, Portal, Billing, Compliance ────
   Domain BE:     M08 Dispatch (incl. escalation), M09 Scheduling
-                 (incl. WhoIsOnCall single source + coverage-gap
+                 (incl. WhoIsOTAS single source + coverage-gap
                  emission), M11 Tasks, M12 Tenant→Client Billing,
                  M14 Audit.
   M26 Compliance Workflows scaffolded: erasure saga (gdpr_strict
@@ -426,7 +426,7 @@ Sprint 8-11  ── Scheduling, Supervisor, Portal, Billing, Compliance ──�
                  boundary bleep fallback + 2% manual QA queue.
   M27 Reports scaffolded with 5 seed report_definitions from medical
                  vertical (see §10).
-  M28 BulkImport scaffolded + nCall migration connector.
+  M28 BulkImport scaffolded + TAS migration connector.
   M29 Toll-Fraud Monitor shipped.
   FE Supervisor: F05 live grid + listen/whisper/barge (M15+M16) +
                  dispatch dashboard + coverage-gap banner +
@@ -523,7 +523,7 @@ ErasureWorkflow(request):                              // SAs: { request_id: uui
 **Seed report_definitions for medical vertical (5 of 30+):**
 1. `medical_hipaa_audit_summary` — daily audit-log volume by event type, accessor, retention status. Scope: admin.
 2. `medical_after_hours_volume` — calls answered outside business hours, by client. Scope: tenant + portal.
-3. `medical_oncall_coverage_gap_daily` — coverage gaps from M09. Scope: admin + tenant.
+3. `medical_otas_coverage_gap_daily` — coverage gaps from M09. Scope: admin + tenant.
 4. `medical_dispatch_sla` — time-to-dispatch p50/p95 per priority. Scope: admin + tenant.
 5. `medical_redaction_qa_backlog` — manual-QA queue age, by reviewer, by tenant. Scope: admin only.
 
@@ -577,7 +577,7 @@ ErasureWorkflow(request):                              // SAs: { request_id: uui
 | **Outbound INVITE traceparent** | inbound only | **outbound also carries `X-Trace-Context` (M19 + M16 transfer-supervised)** | NFR-O4 follow-on |
 | **Reports tier decision** | "F06 bullet" / Cube.dev | **Cube.dev Cloud Enterprise tier confirmed; SQL API parity verified; self-host evaluated and deferred** | M27 risk |
 | **Stripe self-serve flow** | unowned | **F04 + M13 saga: Checkout → tenant provisioning (M01) → onboarding-tour; cancellation invokes M26 PortabilityExportWorkflow** | §9.4 |
-| **Migration assistance bundle** | unowned | **M28 nCall migration connector: prebuilt mappings + idempotent re-import + diff** | §9.3 |
+| **Migration assistance bundle** | unowned | **M28 TAS migration connector: prebuilt mappings + idempotent re-import + diff** | §9.3 |
 | **Operator state disconnect/reconnect protocol** | unspecified | **2 s heartbeat; 10 s degraded-state hold; authoritative snapshot + 5 s buffered intent replay on reconnect** | M15↔F03 |
 | **HIPAA SRTP enforcement** | implied | **Kamailio `488` reject of non-SRTP INVITEs from HIPAA-tier tenants** | NFR-S2 |
 | **Pen test cadence** | unowned | **Compliance & Security pillar; annual; budget flagged in PRD-side §5c** | NFR-S14 |

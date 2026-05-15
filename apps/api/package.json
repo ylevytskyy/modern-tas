@@ -1,5 +1,5 @@
 {
-  "name": "@ncall/api",
+  "name": "@tas/api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,9 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "@ncall/ari-client": "workspace:*",
-    "@ncall/db": "workspace:*",
-    "@ncall/shared-types": "workspace:*",
+    "@tas/ari-client": "workspace:*",
+    "@tas/db": "workspace:*",
+    "@tas/shared-types": "workspace:*",
     "@nestjs/common": "10.3.8",
     "@nestjs/core": "10.3.8",
     "@nestjs/jwt": "10.2.0",

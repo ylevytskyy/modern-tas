@@ -1,5 +1,5 @@
 {
-  "name": "@ncall/ari-client",
+  "name": "@tas/ari-client",
   "version": "0.0.0",
   "private": true,
   "exports": {

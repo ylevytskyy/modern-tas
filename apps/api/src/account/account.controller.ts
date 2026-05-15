@@ -10,9 +10,9 @@ import { Inject } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { account } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { AccountDto } from '@ncall/shared-types';
+import { account } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { AccountDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 

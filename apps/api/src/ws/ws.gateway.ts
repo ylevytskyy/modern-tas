@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as jsonwebtoken from 'jsonwebtoken';
 import type { WebSocket } from 'ws';
-import { WsEvents } from '@ncall/shared-types';
-import type { WsIncomingCallPayload } from '@ncall/shared-types';
+import { WsEvents } from '@tas/shared-types';
+import type { WsIncomingCallPayload } from '@tas/shared-types';
 
 @Injectable()
 export class WsGateway {

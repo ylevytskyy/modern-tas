@@ -1,8 +1,8 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { NatsClientService } from '../nats/nats-client.service';
 import { WsGateway } from '../ws/ws.gateway';
-import { NatsSubjects } from '@ncall/shared-types';
-import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@ncall/shared-types';
+import { NatsSubjects } from '@tas/shared-types';
+import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@tas/shared-types';
 
 /** Single seeded operator for Chunk 3 PoC. Chunk 6 replaces with FIFO heap + skill matching. */
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';

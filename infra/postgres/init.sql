@@ -9,11 +9,11 @@ CREATE DATABASE _supavisor;
 CREATE SCHEMA _supavisor;
 
 -- Create the application user that Drizzle/seed uses.
--- \connect ncall works because POSTGRES_DB=ncall is created before init scripts run.
-\connect ncall
-CREATE USER ncall WITH PASSWORD 'ncall';
-GRANT ALL PRIVILEGES ON DATABASE ncall TO ncall;
+-- \connect tas works because POSTGRES_DB=tas is created before init scripts run.
+\connect tas
+CREATE USER tas WITH PASSWORD 'tas';
+GRANT ALL PRIVILEGES ON DATABASE tas TO tas;
 -- Postgres 15: GRANT ALL PRIVILEGES ON DATABASE does NOT convey CREATE on public schema.
 -- This explicit schema grant is required for drizzle-kit migrate to create tables.
-GRANT ALL ON SCHEMA public TO ncall;
-ALTER USER ncall CREATEDB;
+GRANT ALL ON SCHEMA public TO tas;
+ALTER USER tas CREATEDB;

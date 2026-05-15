@@ -4,7 +4,7 @@
 
 ## TL;DR
 
-**Five of eight spikes are Green and ratified.** Three are Deferred-Blocked on vendor dependencies (S4: AssemblyAI medical key + telephony fixture corpus; S6: live nCall instance access + CRM-consumed-endpoint inventory; S7: Temporal sales letter). No spike remains genuinely unstarted.
+**Five of eight spikes are Green and ratified.** Three are Deferred-Blocked on vendor dependencies (S4: AssemblyAI medical key + telephony fixture corpus; S6: live TAS instance access + CRM-consumed-endpoint inventory; S7: Temporal sales letter). No spike remains genuinely unstarted.
 
 ARCHITECTURE v0.4 §2.4 declares G0 closeable only when "All 8 spikes Green, or any Yellow has a written remediation plan signed by the senior architect + the spike's owner + the on-call compliance lead. **Red blocks MVP kickoff.**" The gate enum does not include "Deferred" — so G0 cannot close cleanly today; Sprint 0 must either land the vendor dependencies, adopt documented fallbacks, or expand the gate enum with senior-architect + compliance-lead sign-off.
 
@@ -19,7 +19,7 @@ Two ADRs were amended-then-ratified this session (ADR-0016 from S3 findings; ADR
 | S3 | ARI leader 100 ms hard-stop | **Green** | `pot/S3` | `pot/S3-ari-leader-hard-stop` | ADR-0016 | `pot/S3-ari-leader-hard-stop/results/20260513T052041Z/` | Wire close 1 ms vs 100 ms; reconcile 1474 ms vs 7 s. **Two ADR-0016 findings amended**: TTL > HB (3:1 ratio), Asterisk accepts multi-WS. Ratified. |
 | S4 | Two-pass redaction accuracy on 8 kHz μ-law | **Deferred** | — | `pot/S4-redaction-accuracy` | ADR-0013 | empty | Blocked: AssemblyAI Universal-3 Pro Medical key + 30 annotated telephony fixtures. Synthesis erases the exact hazard ADR names. |
 | S5 | Supavisor `SET LOCAL` parity | **Green** | `pot/S5` | `pot/S5-supavisor-set-local` | ADR-0018 | `pot/S5-supavisor-set-local/results/20260513T033050Z/` | Same backend pid across transactions; no leak across COMMIT. Ratified. |
-| S6 | `/v1` byte-for-byte fixture capture | **Deferred** | — | `pot/S6-ncall-fixture-capture` | (none — feeds M25 module) | empty | Blocked: live nCall instance access + CRM-consumed-endpoint inventory. Synthesis erases the hazard (unknown spec/reality deviation). Yellow fallback documented (scrape existing CRM cache). |
+| S6 | `/v1` byte-for-byte fixture capture | **Deferred** | — | `pot/S6-tas-fixture-capture` | (none — feeds M25 module) | empty | Blocked: live TAS instance access + CRM-consumed-endpoint inventory. Synthesis erases the hazard (unknown spec/reality deviation). Yellow fallback documented (scrape existing CRM cache). |
 | S7 | Temporal Cloud BAA + EU namespace | **Deferred** | — | `pot/S7-temporal-baa` (current branch) | ADR-0015 | empty | Sales/legal correspondence — 2–6 week cycle, not initiated. Self-host fallback documented in ADR-0015. |
 | S8 | Caddy 2.10+ permission + LE rate-limit | **Green** | `pot/S8` | `pot/S8-caddy-le-posture` | ADR-0019 | `pot/S8-caddy-le-posture/results/20260513T093513Z/` | HAProxy dreq 58 193/59 597; 0 cert files written for 59 k declined. **Three ADR-0019 findings amended**: Caddy LRU claim false (storage short-circuit is the real mechanism); permission endpoint is layer 2; threshold tunability footnote. Ratified. |
 
@@ -41,7 +41,7 @@ Two ADRs were amended-then-ratified this session (ADR-0016 from S3 findings; ADR
 1. **S1 Layer 2** (rtpengine media smoke) — deferred from S1 by user decision 2026-05-13. ~4 h work + ~6 expected scaffold bugs (macOS-fragile). Not blocking G0 directly; risk-reduction for media-path before MVP.
 2. **S4 prereqs OR de-scope** — AssemblyAI Universal-3 Pro Medical key + 30 annotated telephony fixtures with documented PII spans. Alternative: rewrite ADR-0013 to remove the ML pipeline.
 3. **S7 prereqs OR fallback** — Either initiate Temporal sales contact + receive BAA letter (2–6 weeks), or adopt the documented self-host fallback in ADR-0015 (+0.5–1 FTE platform-eng).
-4. **S6 prereqs OR fallback** — Either get a live nCall test tenant (vendor or existing tenant with read-only user), or scrape the existing CRM's response cache (lower fidelity, kept as the documented Yellow remediation in the spike README).
+4. **S6 prereqs OR fallback** — Either get a live TAS test tenant (vendor or existing tenant with read-only user), or scrape the existing CRM's response cache (lower fidelity, kept as the documented Yellow remediation in the spike README).
 
 ### G0 enum problem
 

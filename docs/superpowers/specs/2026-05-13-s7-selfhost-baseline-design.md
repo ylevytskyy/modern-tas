@@ -4,7 +4,7 @@
 
 - **Date drafted:** 2026-05-13
 - **Source brainstorm session:** this document captures decisions from that session
-- **Branch (planned):** `sprint-0/temporal-selfhost-baseline` off `pot/S6-ncall-fixture-capture`
+- **Branch (planned):** `sprint-0/temporal-selfhost-baseline` off `pot/S6-tas-fixture-capture`
 - **Predecessor:** ADR-0015 §Decision rewrite (commit `13ca47b`, pending G0 sign-off ratification)
 - **Successor:** writing-plans skill creates the implementation plan from this spec
 
@@ -263,7 +263,7 @@ Both files end with the same line: *"ADR-0015 status flip Proposed → Accepted 
 ### 7.1 Branch
 
 ```
-git checkout -b sprint-0/temporal-selfhost-baseline pot/S6-ncall-fixture-capture
+git checkout -b sprint-0/temporal-selfhost-baseline pot/S6-tas-fixture-capture
 ```
 
 Off the spike-chain tip — the work logically follows the in-flight G0 bundle (ADR-0015 rewrite at `13ca47b`, ARCH §2.4 amendment at `b948a9e`). Inheriting these commits as parents is the simplest representation of the dependency.
@@ -336,4 +336,4 @@ This Sprint-0 task is complete when:
 
 ---
 
-*Drafted 2026-05-13 in brainstorm session on branch `pot/S6-ncall-fixture-capture`. Implementation plan to be created next via the writing-plans skill.*
+*Drafted 2026-05-13 in brainstorm session on branch `pot/S6-tas-fixture-capture`. Implementation plan to be created next via the writing-plans skill.*

@@ -1,6 +1,6 @@
-# ncall-clone
+# Telephone Answering Service (TAS)
 
-A nCall-inspired multi-tenant Telephone Answering Service (TAS) SaaS, currently at the **end of Phase 0 (Proof of Technology)** with one Sprint-0 deliverable landed. This repository holds the architecture documents, ADRs, and the first runnable artefact: a local self-hosted Temporal workflow engine that ratifies ADR-0015.
+A modern multi-tenant Telephone Answering Service (TAS) SaaS, currently at the **end of Phase 0 (Proof of Technology)** with one Sprint-0 deliverable landed. This repository holds the architecture documents, ADRs, and the first runnable artefact: a local self-hosted Temporal workflow engine that ratifies ADR-0015.
 
 The product itself isn't built yet. There's no application binary, no database migrations, no API server. What you can run today is the **Temporal self-host baseline** described below — that's it.
 
@@ -92,8 +92,8 @@ If any tool is missing, install it before continuing. If Docker Memory is below 
 ### 1. Get the code on the right branch
 
 ```bash
-git clone <this-repo-url> ncall-clone
-cd ncall-clone
+git clone <this-repo-url> tas
+cd tas
 git checkout sprint-0/temporal-selfhost-baseline
 ```
 

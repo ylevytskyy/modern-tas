@@ -162,7 +162,7 @@ The v0.1 critical-risk delta is otherwise good: C1 (RLS) → ADR-01 likely holds
 | **NFR-S14** | Annual pen-test cadence | Not allocated as deliverable | **H** |
 | **NFR-A6** | S3 cross-region replication for HIPAA tenants | Not in M10 / X02; ADR-09 mentions SSE-KMS Bucket Keys but not CRR | **H** |
 | **NFR-A8** | Quarterly DR drill | Not allocated; chaos drills listed in Sprint 12-15 are different scope | **H** |
-| **§9.3** | Migration assistance bundle ($2-5K) — nCall data import + CRM endpoint swap | Not allocated; M28 BulkImport is generic, not migration-specific | **M** |
+| **§9.3** | Migration assistance bundle ($2-5K) — TAS data import + CRM endpoint swap | Not allocated; M28 BulkImport is generic, not migration-specific | **M** |
 | **§9.4 / §10.2** | Stripe self-serve sign-up + cancellation+export gate | M13 owns Stripe tables; self-serve flow has no UI owner | **M** |
 | **FR-C13** | Per-tenant + per-user keyboard shortcut overrides | Not in any v0.2 module | **M** |
 | **FR-F8** | Hyperlink-token grammar `[Dial:…]` etc. | §5b open question; F03 needs spec before multi-line state machine completes | **M** |

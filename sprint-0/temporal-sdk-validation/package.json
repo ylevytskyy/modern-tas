@@ -1,5 +1,5 @@
 {
-  "name": "@ncall-clone/temporal-sdk-validation",
+  "name": "@tas/temporal-sdk-validation",
   "version": "0.0.1",
   "private": true,
   "description": "ADR-0015 §Evidence item 1 partial-check worker. Smallest viable Temporal worker exercising the TypeScript SDK against the local self-host baseline.",

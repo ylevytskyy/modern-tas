@@ -31,9 +31,9 @@ describe('NatsClientService', () => {
 
   it('publish() calls nc.publish with subject and encoded payload', () => {
     const payload = { callId: 'abc', tenantId: 'tenant-1', channel: 'ch-1', accountId: 'acct-1' };
-    service.publish('ncall.stasis.start', payload);
+    service.publish('tas.stasis.start', payload);
     expect(mockNc.publish).toHaveBeenCalledWith(
-      'ncall.stasis.start',
+      'tas.stasis.start',
       expect.any(Uint8Array),
     );
     const encoded = mockNc.publish.mock.calls[0][1] as Uint8Array;
@@ -43,9 +43,9 @@ describe('NatsClientService', () => {
 
   it('subscribe() calls nc.subscribe and registers callback', () => {
     const handler = vi.fn();
-    service.subscribe('ncall.stasis.start', handler);
+    service.subscribe('tas.stasis.start', handler);
     expect(mockNc.subscribe).toHaveBeenCalledWith(
-      'ncall.stasis.start',
+      'tas.stasis.start',
       expect.objectContaining({ callback: expect.any(Function) }),
     );
   });

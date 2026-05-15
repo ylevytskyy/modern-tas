@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DB_TOKEN } from '../database/database.module';
-import { recording } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
+import { recording } from '@tas/db';
+import type { Db } from '@tas/db/client';
 import type { Client as MinioClient } from 'minio';
 
-const MINIO_BUCKET = 'ncall-recordings';
+const MINIO_BUCKET = 'tas-recordings';
 
 export interface StartRecordingParams {
   callId: string;

@@ -198,7 +198,7 @@ make poc-readout      # scaffold readout.md from last run
 ## 8. Repo layout
 
 ```
-ncall-clone/
+tas/
 ├── apps/
 │   ├── api/              # NestJS — /v1 facade + arbiter + ARI leader
 │   ├── web/              # Next.js App Router — F03 operator screen-pop

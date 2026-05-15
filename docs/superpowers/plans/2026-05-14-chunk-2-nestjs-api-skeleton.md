@@ -27,7 +27,7 @@ Create a `DatabaseModule` (global, single-instance) that provides the `Db` token
 ```ts
 // apps/api/src/database/database.module.ts
 import { Global, Module } from '@nestjs/common';
-import { makeDb, Db } from '@ncall/db/client';
+import { makeDb, Db } from '@tas/db/client';
 
 export const DB_TOKEN = 'DB';
 
@@ -37,7 +37,7 @@ export const DB_TOKEN = 'DB';
     {
       provide: DB_TOKEN,
       useFactory: () =>
-        makeDb(process.env.DATABASE_URL ?? 'postgres://ncall:ncall@localhost:6543/ncall.ncall'),
+        makeDb(process.env.DATABASE_URL ?? 'postgres://tas:tas@localhost:6543/tas.tas'),
     },
   ],
   exports: [DB_TOKEN],
@@ -49,7 +49,7 @@ Controllers inject `@Inject(DB_TOKEN) private readonly db: Db`. This pattern avo
 
 ### D4 — `apps/api` dev connection: Supavisor (port 6543)
 
-`apps/api` dev connects through Supavisor at `postgres://ncall:ncall@localhost:6543/ncall.ncall` (not direct at 5432). This matches production-path behaviour (transaction-mode pooler). The `poc-seed` Makefile target already connects direct at 5432 for migration — that stays. `apps/api` runtime never runs migrations; it only queries. Testcontainers unit tests connect direct at the ephemeral container port (no Supavisor there — irrelevant for test isolation).
+`apps/api` dev connects through Supavisor at `postgres://tas:tas@localhost:6543/tas.tas` (not direct at 5432). This matches production-path behaviour (transaction-mode pooler). The `poc-seed` Makefile target already connects direct at 5432 for migration — that stays. `apps/api` runtime never runs migrations; it only queries. Testcontainers unit tests connect direct at the ephemeral container port (no Supavisor there — irrelevant for test isolation).
 
 ### D5 — Multi-tenancy hook
 
@@ -153,7 +153,7 @@ export const dispatchAttempt = pgTable("dispatch_attempt", {
 - [ ] Generate migration from workspace root:
 
 ```bash
-pnpm --filter @ncall/db migrate:gen
+pnpm --filter @tas/db migrate:gen
 ```
 
 (The `migrate:gen` script in `packages/db/package.json` runs `drizzle-kit generate:pg --config drizzle.config.ts`. drizzle-kit 0.20.14 uses the dialect-suffixed `generate:pg` subcommand — bare `drizzle-kit generate` errors with `Unknown command`.)
@@ -166,7 +166,7 @@ ALTER TABLE "message" ADD CONSTRAINT "message_tenant_id_tenant_id_fk" FOREIGN KE
 
 > **Seed note:** `packages/db/src/seed.ts` does not insert any `message` rows — no seed update needed.
 
-- [ ] Run `pnpm --filter @ncall/db typecheck` → exits 0 after the schema change.
+- [ ] Run `pnpm --filter @tas/db typecheck` → exits 0 after the schema change.
 
 ---
 
@@ -178,7 +178,7 @@ ALTER TABLE "message" ADD CONSTRAINT "message_tenant_id_tenant_id_fk" FOREIGN KE
 
 ```json
 {
-  "name": "@ncall/shared-types",
+  "name": "@tas/shared-types",
   "version": "0.0.0",
   "private": true,
   "exports": {
@@ -264,13 +264,13 @@ export interface MessageCreatedDto {
 
 /** NATS subjects */
 export const NatsSubjects = {
-  MESSAGE_CREATED: 'ncall.message.created',
-  CALL_STARTED: 'ncall.call.started',
-  CALL_ENDED: 'ncall.call.ended',
+  MESSAGE_CREATED: 'tas.message.created',
+  CALL_STARTED: 'tas.call.started',
+  CALL_ENDED: 'tas.call.ended',
   /** Published by Asterisk ARI StasisStart handler (Chunk 3). */
-  STASIS_START: 'ncall.stasis.start',
+  STASIS_START: 'tas.stasis.start',
   /** Published by Asterisk ARI StasisEnd handler (Chunk 3). */
-  STASIS_END: 'ncall.stasis.end',
+  STASIS_END: 'tas.stasis.end',
 } as const;
 
 /** WS event names (sent to F03 operator UI) */
@@ -307,7 +307,7 @@ export * from './rest';
 export * from './events';
 ```
 
-- [ ] Run `pnpm --filter @ncall/shared-types typecheck` → exits 0.
+- [ ] Run `pnpm --filter @tas/shared-types typecheck` → exits 0.
 
 ---
 
@@ -319,7 +319,7 @@ export * from './events';
 
 ```json
 {
-  "name": "@ncall/api",
+  "name": "@tas/api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -329,8 +329,8 @@ export * from './events';
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "@ncall/db": "workspace:*",
-    "@ncall/shared-types": "workspace:*",
+    "@tas/db": "workspace:*",
+    "@tas/shared-types": "workspace:*",
     "@nestjs/common": "10.3.8",
     "@nestjs/core": "10.3.8",
     "@nestjs/jwt": "10.2.0",
@@ -374,8 +374,8 @@ export * from './events';
 
 ```ts
 import { Global, Module } from '@nestjs/common';
-import { makeDb } from '@ncall/db/client';
-import type { Db } from '@ncall/db/client';
+import { makeDb } from '@tas/db/client';
+import type { Db } from '@tas/db/client';
 
 export const DB_TOKEN = 'DB';
 
@@ -387,7 +387,7 @@ export const DB_TOKEN = 'DB';
       useFactory: (): Db =>
         makeDb(
           process.env.DATABASE_URL ??
-            'postgres://ncall:ncall@localhost:6543/ncall.ncall',
+            'postgres://tas:tas@localhost:6543/tas.tas',
         ),
     },
   ],
@@ -427,7 +427,7 @@ bootstrap();
 ```
 
 - [ ] Run `pnpm install` from workspace root to hoist deps.
-- [ ] Run `pnpm --filter @ncall/api typecheck` → exits 0 (only main.ts + app.module.ts at this point).
+- [ ] Run `pnpm --filter @tas/api typecheck` → exits 0 (only main.ts + app.module.ts at this point).
 
 ---
 
@@ -447,9 +447,9 @@ export default defineConfig({
     globalSetup: './test/vitest.globalSetup.ts',
     include: ['src/**/*.spec.ts'],
     alias: {
-      '@ncall/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
-      '@ncall/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
-      '@ncall/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
+      '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
+      '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
+      '@tas/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
     },
   },
 });
@@ -466,9 +466,9 @@ let container: StartedPostgreSqlContainer;
 
 export async function setup() {
   container = await new PostgreSqlContainer('postgres:15')
-    .withDatabase('ncall')
-    .withUsername('ncall')
-    .withPassword('ncall')
+    .withDatabase('tas')
+    .withUsername('tas')
+    .withPassword('tas')
     .start();
 
   const url = container.getConnectionUri();
@@ -566,7 +566,7 @@ describe('JwtAuthGuard', () => {
 });
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → confirm RED (module not found error for `./jwt-auth.guard`).
+- [ ] Run `pnpm --filter @tas/api test` → confirm RED (module not found error for `./jwt-auth.guard`).
 
 - [ ] Create `apps/api/src/auth/jwt-auth.guard.ts` (GREEN implementation):
 
@@ -621,7 +621,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → guard spec GREEN.
+- [ ] Run `pnpm --filter @tas/api test` → guard spec GREEN.
 
 ---
 
@@ -637,8 +637,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { AccountController } from './account.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, tenant } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, tenant } from '@tas/db';
 
 // DATABASE_URL is set by vitest.globalSetup.ts (testcontainers)
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -683,7 +683,7 @@ describe('AccountController', () => {
 });
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → RED (AccountController not found).
+- [ ] Run `pnpm --filter @tas/api test` → RED (AccountController not found).
 
 - [ ] Create `apps/api/src/account/account.controller.ts`:
 
@@ -700,9 +700,9 @@ import { Inject } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { account } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { AccountDto } from '@ncall/shared-types';
+import { account } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { AccountDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 
@@ -746,7 +746,7 @@ import { AuthModule } from '../auth/auth.module';
 export class AccountModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → account spec GREEN; guard spec still GREEN.
+- [ ] Run `pnpm --filter @tas/api test` → account spec GREEN; guard spec still GREEN.
 
 ---
 
@@ -760,8 +760,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { ContactController } from './contact.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, contact, tenant } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, contact, tenant } from '@tas/db';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const ACCOUNT_ID = '22222222-2222-2222-2222-222222222222';
@@ -800,7 +800,7 @@ describe('ContactController', () => {
 });
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → RED (ContactController not found).
+- [ ] Run `pnpm --filter @tas/api test` → RED (ContactController not found).
 
 - [ ] Create `apps/api/src/contact/contact.controller.ts`:
 
@@ -817,9 +817,9 @@ import {
 import { eq, and } from 'drizzle-orm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { contact, account } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { ContactDto } from '@ncall/shared-types';
+import { contact, account } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { ContactDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 
@@ -874,7 +874,7 @@ import { AuthModule } from '../auth/auth.module';
 export class ContactModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → contact spec GREEN; all prior GREEN.
+- [ ] Run `pnpm --filter @tas/api test` → contact spec GREEN; all prior GREEN.
 
 ---
 
@@ -888,8 +888,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { FormController } from './form.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, form, tenant } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, form, tenant } from '@tas/db';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const ACCOUNT_ID = '22222222-2222-2222-2222-222222222222';
@@ -935,7 +935,7 @@ describe('FormController', () => {
 });
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → RED.
+- [ ] Run `pnpm --filter @tas/api test` → RED.
 
 - [ ] Create `apps/api/src/form/form.controller.ts`:
 
@@ -952,9 +952,9 @@ import {
 import { eq, and } from 'drizzle-orm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { form, account } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { FormDto } from '@ncall/shared-types';
+import { form, account } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { FormDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 
@@ -1006,7 +1006,7 @@ import { AuthModule } from '../auth/auth.module';
 export class FormModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → form spec GREEN; all prior GREEN.
+- [ ] Run `pnpm --filter @tas/api test` → form spec GREEN; all prior GREEN.
 
 ---
 
@@ -1021,8 +1021,8 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MessageController } from './message.controller';
 import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@ncall/db/client';
-import { account, tenant, did, user, call, message } from '@ncall/db';
+import { makeDb } from '@tas/db/client';
+import { account, tenant, did, user, call, message } from '@tas/db';
 import { eq } from 'drizzle-orm';
 
 const TENANT_ID = '11111111-1111-1111-1111-111111111111';
@@ -1072,7 +1072,7 @@ describe('MessageController', () => {
 });
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → RED.
+- [ ] Run `pnpm --filter @tas/api test` → RED.
 
 - [ ] Create `apps/api/src/message/message.controller.ts`:
 
@@ -1088,9 +1088,9 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DB_TOKEN } from '../database/database.module';
-import { message } from '@ncall/db';
-import type { Db } from '@ncall/db/client';
-import type { CreateMessageDto, MessageCreatedDto } from '@ncall/shared-types';
+import { message } from '@tas/db';
+import type { Db } from '@tas/db/client';
+import type { CreateMessageDto, MessageCreatedDto } from '@tas/shared-types';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
 
@@ -1134,7 +1134,7 @@ import { AuthModule } from '../auth/auth.module';
 export class MessageModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api test` → message spec GREEN; full suite GREEN.
+- [ ] Run `pnpm --filter @tas/api test` → message spec GREEN; full suite GREEN.
 
 ---
 
@@ -1165,8 +1165,8 @@ import { MessageModule } from './message/message.module';
 export class AppModule {}
 ```
 
-- [ ] Run `pnpm --filter @ncall/api typecheck` → exits 0.
-- [ ] Run `pnpm --filter @ncall/api test` → full suite GREEN.
+- [ ] Run `pnpm --filter @tas/api typecheck` → exits 0.
+- [ ] Run `pnpm --filter @tas/api test` → full suite GREEN.
 
 ---
 
@@ -1201,9 +1201,9 @@ export class AppModule {}
 ```makefile
 # Start the API in debug mode (attach VS Code "Attach to API" on port 9229).
 api-dev:
-	DATABASE_URL=postgres://ncall:ncall@localhost:6543/ncall.ncall \
+	DATABASE_URL=postgres://tas:tas@localhost:6543/tas.tas \
 	APP_JWT_SECRET=poc-only-not-prod \
-	pnpm --filter @ncall/api run dev
+	pnpm --filter @tas/api run dev
 
 # Mint a short-lived HS256 JWT for smoke-testing /v1 endpoints.
 # Usage: make poc-jwt  — copy the printed token into Authorization: Bearer <token>
@@ -1242,12 +1242,12 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 
 ## Exit criteria checklist
 
-- [ ] `pnpm --filter @ncall/db typecheck` exits 0 after `message.ts` schema change (T15b)
+- [ ] `pnpm --filter @tas/db typecheck` exits 0 after `message.ts` schema change (T15b)
 - [ ] Migration `0003_*.sql` generated and contains `ALTER TABLE "message" ADD COLUMN "tenant_id" uuid NOT NULL` (T15b)
-- [ ] `pnpm --filter @ncall/api test` exits 0 (no `make poc-up` required — testcontainers handles Postgres)
+- [ ] `pnpm --filter @tas/api test` exits 0 (no `make poc-up` required — testcontainers handles Postgres)
 - [ ] Message controller test asserts `row.tenantId === TENANT_ID` (T19d D5 gate)
-- [ ] `pnpm --filter @ncall/shared-types typecheck` exits 0
-- [ ] `pnpm --filter @ncall/api typecheck` exits 0
+- [ ] `pnpm --filter @tas/shared-types typecheck` exits 0
+- [ ] `pnpm --filter @tas/api typecheck` exits 0
 - [ ] `make poc-up && make poc-seed` succeed (Chunk 1 deliverable; verify still works)
 - [ ] `make poc-jwt` prints a valid JWT
 - [ ] `curl` smoke returns seeded account JSON (name "Demo Account")

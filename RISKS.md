@@ -188,7 +188,7 @@ The single most damaging risks. Each combines findings from multiple research st
 **Refs:** R-W12
 
 - V8 insertion-order is *de facto* stable but not guaranteed by ECMA for non-integer keys. Any DB→JSON middleware that touches the intermediate object can perturb element order. CRM XML parsers may be order-sensitive.
-- **Mitigation:** Round-trip fixture test that byte-compares produced XML to a captured nCall reference response. Failure here breaks the CRM compatibility constraint, which the project memory marks non-negotiable.
+- **Mitigation:** Round-trip fixture test that byte-compares produced XML to a captured TAS reference response. Failure here breaks the CRM compatibility constraint, which the project memory marks non-negotiable.
 
 ### S11. TLS cert provisioning for custom portal domains — no module
 **Refs:** R-C10
@@ -220,7 +220,7 @@ Requirements in PRD with no architectural owner or significantly under-specified
 |---|---|---|---|
 | §4.1 #14, §5.9, §5.13 | 30+ standard reports engine | No reports module exists. F06 mentions "reports" in one line. Multiple modules could claim ownership (M06, M12). | **H** |
 | FR-X11 | Bulk CSV import with column mapping | No module, no worker, no ingress pipeline. | **H** |
-| FR-S5 | Coverage-gap detection + operator console warning on gap | M09 emits `oncall.gap_detected`, nothing consumes. Admin report + FE warning unallocated. | **H** |
+| FR-S5 | Coverage-gap detection + operator console warning on gap | M09 emits `otas.gap_detected`, nothing consumes. Admin report + FE warning unallocated. | **H** |
 | NFR-S13 | Per-tenant toll-fraud monitor (Redis sliding window) | Pike rate-limit covers per-IP; per-tenant cost-window has no owner. | **H** |
 | FR-D2 | Email open-tracking webhook callback | M19 has `/integrations/sms/dlr/{provider}` ingress; email equivalent missing. | **H** |
 | FR-F2 | Computed field (formula over other fields) | JSON Schema chosen as form DSL; JSON Schema has no formula. Extension unspecified. | **H** |
@@ -234,7 +234,7 @@ Requirements in PRD with no architectural owner or significantly under-specified
 | FR-F8 | Hyperlink tokens `[Dial:…][Search:…][Client:…][Contact:…]` | F03 consumes them; no module owns token grammar or action dispatch wiring. | M |
 | §9.4, §10.2 | Stripe Billing self-serve sign-up + checkout | M13 has subscription tables; self-serve UX (signup flow, checkout, cancellation+export gate) unallocated. | M |
 | §5.8 | White-label custom domain (optional) | Wildcard subdomain works; custom domain needs ACME + DNS automation, no module. | M (see S11) |
-| §9.3 | Migration assistance bundle: nCall data import tooling | Commercial offering with engineering dependency; invisible in ARCH. | M |
+| §9.3 | Migration assistance bundle: TAS data import tooling | Commercial offering with engineering dependency; invisible in ARCH. | M |
 | §11 Q5 / FR-P8 | Web push (VAPID) for portal users | M21 covers FCM/APNS only; VAPID key mgmt absent. | M |
 | FR-O5 / NFR-O4 | `X-Call-UUID` OTel trace through Kamailio → channel var → ARI → NestJS | X05 names requirement; no design for SIP header survival across hops. | M |
 | §8.2 / NFR-S11 | GDPR right-to-portability (Art. 20) export | Right-to-erasure covered (FR-R9); portability has no module. | M |
@@ -265,7 +265,7 @@ These are partially in ARCH but with unclear or overlapping ownership. Each is a
 - **F03 (Operator Console)** cannot begin until the multi-line state machine xstate diagram exists (ARCH §11 admits this is unresolved). The pre-work is unscheduled.
 - **`packages/templates`** (referenced in M08 worked example): no module entry, no owner, no schema, no test plan. Every dispatch channel depends on it.
 - **X10 (Compliance test suite)**: described as nightly + on release; no mapping from compliance test to NFR; co-owned by Security + QA with no tie-breaker.
-- **M09 (On-Call Scheduling)**: `Owns (tables)` column omits coverage-gap detection (FR-S5), the calendar-vs-status merge algorithm (FR-S3), and the materialised `OnCallShift` table.
+- **M09 (On-Call Scheduling)**: `Owns (tables)` column omits coverage-gap detection (FR-S5), the calendar-vs-status merge algorithm (FR-S3), and the materialised `OTASShift` table.
 
 ---
 
@@ -314,7 +314,7 @@ PRD §12 has 14 numbered ACs. ARCH coverage:
 11. SIP.js vs JsSIP vs raw WebRTC for F03 — before multi-line state machine work begins. (S8)
 12. Recording volume backing (node-local emptyDir vs RWX PVC vs Asterisk → S3 direct) — before M10. (S1)
 13. NestJS JetStream transport — hand-roll or switch backbone — before X08 worker conventions are set. (S9)
-14. fast-xml-parser fixture round-trip tests against a captured nCall response — before M25. (S10)
+14. fast-xml-parser fixture round-trip tests against a captured TAS response — before M25. (S10)
 15. KEK multi-version decrypt path — before X02 hardening. (S6)
 16. DEK in S3 metadata vs per-tenant IAM role + KMS grant model. (S4)
 17. Audit-log `tenant_id` integrity (trigger or CHECK constraint) — before M14. (S5)
@@ -351,7 +351,7 @@ PRD §12 has 14 numbered ACs. ARCH coverage:
 - **The §5 "decisions resolved up front" table is a strength**, but several entries (Prisma 5, NATS JetStream, fast-xml-parser, BullMQ on Redis) were made without ADRs documenting the alternatives considered. Each carries a non-trivial risk surfaced above.
 - **The §11 "what is not locked down" list is honest** but understates the dependency chain: the Form Designer UX, the operator multi-line state machine, and the ARI leader fencing are all prerequisites for entire MVP modules to start. They cannot be left as "iterate later."
 - **35 deliverables in 6–9 months across 12 parallel tracks** is aggressive even with contract-first discipline. The contract-first promise breaks down at workflow boundaries that OpenAPI cannot express (e.g. "when does dispatch state propagate to portal?"). Plan for an integration sprint at every milestone, not only at MVP cut.
-- **The PRD risk table (§11)** already names several of the risks above (CRM breakage, undocumented nCall quirks, Kamailio config complexity, recording storage cost, WebRTC NAT failures). The architecture inherits but does not visibly close any of them. Re-stating PRD risks as ARCH-owned mitigations would be valuable.
+- **The PRD risk table (§11)** already names several of the risks above (CRM breakage, undocumented TAS quirks, Kamailio config complexity, recording storage cost, WebRTC NAT failures). The architecture inherits but does not visibly close any of them. Re-stating PRD risks as ARCH-owned mitigations would be valuable.
 
 ---
 
@@ -362,7 +362,7 @@ PRD §12 has 14 numbered ACs. ARCH coverage:
 3. **Add module M27 Reports** with a single owner and rendering surface. (gap.)
 4. **Move NFR-P1 validation to Sprint 1–3.** The 100-concurrent claim is load-bearing for the architecture and must be measured early, not at the end.
 5. **Rewrite NFR-A2 and NFR-A4** to honestly bound the in-flight-call survival claim for Kamailio + rtpengine node failure (or fund the design work to actually deliver it).
-6. **Open a pilot-tenant compatibility track** that captures the running nCall instance's `/v1` responses as fixtures, and round-trip them through M25 byte-for-byte. Surface S10 and undocumented quirks before the CRM cutover, not after.
+6. **Open a pilot-tenant compatibility track** that captures the running TAS instance's `/v1` responses as fixtures, and round-trip them through M25 byte-for-byte. Surface S10 and undocumented quirks before the CRM cutover, not after.
 7. **Add documentation as an explicit deliverable** (AC §12 #13) with an owner and a sprint gate.
 
 ---

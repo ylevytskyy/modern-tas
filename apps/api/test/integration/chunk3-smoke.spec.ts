@@ -45,7 +45,7 @@ const SEEDED_TENANT_ID = '11111111-1111-1111-1111-111111111111';
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 
 const NATS_URL = process.env.NATS_URL ?? 'nats://localhost:4222';
-const DB_URL = process.env.DATABASE_URL ?? 'postgres://ncall.ncall:ncall@localhost:6543/ncall';
+const DB_URL = process.env.DATABASE_URL ?? 'postgres://tas.tas:tas@localhost:6543/tas';
 const API_WS_URL = 'ws://localhost:3000/ws';
 const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT ?? 'localhost';
 const MINIO_PORT = Number(process.env.MINIO_PORT ?? 9000);
@@ -123,8 +123,8 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
       endPoint: MINIO_ENDPOINT,
       port: MINIO_PORT,
       useSSL: false,
-      accessKey: process.env.MINIO_ACCESS_KEY ?? 'ncall',
-      secretKey: process.env.MINIO_SECRET_KEY ?? 'ncall1234',
+      accessKey: process.env.MINIO_ACCESS_KEY ?? 'tas',
+      secretKey: process.env.MINIO_SECRET_KEY ?? 'tas12345',
     });
   });
 
@@ -138,7 +138,7 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
     'SIPp INVITE fires: NATS stasis_start + WS incoming_call; NATS→WS latency < 800ms; DB rows tenant_id; MinIO object exists',
     async () => {
       // Set up listeners BEFORE firing SIPp (so no events are missed)
-      const natsPromise = waitForNatsMessage(nc, 'ncall.stasis.start', 15000);
+      const natsPromise = waitForNatsMessage(nc, 'tas.stasis.start', 15000);
       const wsPromise = waitForWsEvent(
         ws,
         (parsed) => parsed.event === 'call.screenpop' && parsed.data?.type === 'incoming_call',
@@ -212,7 +212,7 @@ describe('Chunk 3 smoke — SIPp INVITE → NATS + WS + DB + MinIO', () => {
 
       // MinIO: recording placeholder object exists (spec exit criterion line 114)
       await expect(
-        minio.statObject('ncall-recordings', `recordings/${callId}.wav`),
+        minio.statObject('tas-recordings', `recordings/${callId}.wav`),
       ).resolves.toBeDefined();
 
       // Cleanup: kill SIPp container if still running (the Stasis app doesn't
