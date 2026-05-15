@@ -76,3 +76,22 @@ alice: $(BIN) $(LOGS)
 bob: $(BIN) $(LOGS)
 	$(BIN) --config-file=accounts/bob.cfg \
 	  --log-file=$(LOGS)/bob-$$(date -u +%FT%H-%M-%SZ).log
+
+# Tail the most-recent log for the given account. Intended for a second
+# terminal pane while pjsua's TUI runs in the first. `ls -t` sorts newest
+# first; we take the first match.
+tail-alice:
+	@latest=$$(ls -t $(LOGS)/alice-*.log 2>/dev/null | head -1); \
+	  if [ -z "$$latest" ]; then \
+	    echo "No alice logs yet — run 'make alice' first."; exit 1; \
+	  fi; \
+	  echo "Tailing $$latest"; \
+	  tail -f "$$latest"
+
+tail-bob:
+	@latest=$$(ls -t $(LOGS)/bob-*.log 2>/dev/null | head -1); \
+	  if [ -z "$$latest" ]; then \
+	    echo "No bob logs yet — run 'make bob' first."; exit 1; \
+	  fi; \
+	  echo "Tailing $$latest"; \
+	  tail -f "$$latest"
