@@ -36,7 +36,7 @@ describe('DispatchMessage workflow', () => {
 
     const handle = await env.client.workflow.start(dispatchMessage, {
       taskQueue: 'test',
-      workflowId: 'wf-test-1',
+      workflowId: `wf-test-${Date.now()}`,
       args: [{
         messageId: 'm-1',
         operatorId: 'op-1',
