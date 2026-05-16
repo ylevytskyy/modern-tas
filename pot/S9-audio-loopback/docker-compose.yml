@@ -6,10 +6,10 @@ services:
     ports:
       - "5060:5060/udp"
       - "10000-10010:10000-10010/udp"
-    volumes:
-      - ./asterisk-image/pjsip.conf:/etc/asterisk/pjsip.conf:ro
-      - ./asterisk-image/extensions.conf:/etc/asterisk/extensions.conf:ro
-      - ./asterisk-image/rtp.conf:/etc/asterisk/rtp.conf:ro
+    # Configs baked into the image (see asterisk-image/Dockerfile) so the
+    # stack works under Docker Desktop on Linux hosts whose project path
+    # isn't on the shared-folder list. `make up` rebuilds on every boot,
+    # so config edits don't require an explicit rebuild.
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "asterisk", "-rx", "core show version"]
