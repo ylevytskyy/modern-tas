@@ -14,6 +14,7 @@ import { ArbiterModule } from './arbiter/arbiter.module';
 import { WsModule } from './ws/ws.module';
 import { RecordingModule } from './recording/recording.module';
 import { TemporalModule } from './temporal/temporal.module';
+import { DevModule } from './dev/dev.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TemporalModule } from './temporal/temporal.module';
     WsModule,
     RecordingModule,
     TemporalModule,
+    DevModule,
   ],
 })
 export class AppModule {}
