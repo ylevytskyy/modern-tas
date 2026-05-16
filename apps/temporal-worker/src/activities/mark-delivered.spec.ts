@@ -40,11 +40,24 @@ describe('markDelivered', () => {
     expect(row.deliveredAt).not.toBeNull();
   });
 
-  it('is idempotent: re-running does not blow up and keeps delivered_at non-null', async () => {
+  it('is idempotent: re-running keeps delivered_at unchanged (proves WHERE guard)', async () => {
+    // Reset to a known pre-delivery state so this test stands alone regardless of run order.
+    await db.update(dispatchAttempt)
+      .set({ deliveredAt: null })
+      .where(eq(dispatchAttempt.messageId, messageId));
+
     const activity = makeMarkDelivered(db);
+
+    // First call — should set delivered_at.
     await activity({ messageId });
+    const [firstRow] = await db.select().from(dispatchAttempt).where(eq(dispatchAttempt.messageId, messageId));
+    expect(firstRow.deliveredAt).not.toBeNull();
+    const firstAt = firstRow.deliveredAt!.getTime();
+
+    // Second call — WHERE isNull guard must prevent overwrite.
     await activity({ messageId });
-    const [row] = await db.select().from(dispatchAttempt).where(eq(dispatchAttempt.messageId, messageId));
-    expect(row.deliveredAt).not.toBeNull();
+    const [secondRow] = await db.select().from(dispatchAttempt).where(eq(dispatchAttempt.messageId, messageId));
+    expect(secondRow.deliveredAt).not.toBeNull();
+    expect(secondRow.deliveredAt!.getTime()).toBe(firstAt);
   });
 });
