@@ -3,3 +3,5 @@ node_modules/
 dist/
 *.tsbuildinfo
 .env.local
+# un-ignore source lib/ (root .gitignore has a blanket lib/ rule for compiled output)
+!lib/
