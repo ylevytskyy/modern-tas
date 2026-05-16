@@ -19,6 +19,7 @@
     "drizzle-orm": "0.30.4",
     "ioredis": "^5.4.1",
     "minio": "^8.0.7",
+    "@temporalio/client": "1.11.0",
     "nats": "^2.29.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.1",

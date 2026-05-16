@@ -35,6 +35,9 @@ importers:
       '@tas/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      '@temporalio/client':
+        specifier: 1.11.0
+        version: 1.11.0
       drizzle-orm:
         specifier: 0.30.4
         version: 0.30.4(postgres@3.4.4)
