@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MessageController } from './message.controller';
 import { DB_TOKEN } from '../database/database.module';
+import { TemporalClientService } from '../temporal/temporal-client.service';
 import { makeDb } from '@tas/db/client';
 import { account, tenant, did, user, call, message } from '@tas/db';
 import { eq } from 'drizzle-orm';
@@ -34,7 +35,10 @@ describe('MessageController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MessageController],
-      providers: [{ provide: DB_TOKEN, useValue: db }],
+      providers: [
+        { provide: DB_TOKEN, useValue: db },
+        { provide: TemporalClientService, useValue: { start: vi.fn().mockResolvedValue({ workflowId: 'wf-stub' }) } },
+      ],
     }).compile();
 
     controller = module.get(MessageController);
@@ -49,5 +53,29 @@ describe('MessageController', () => {
     // D5 assertion: tenantId must be persisted in the row (required by Chunk 3 assert-tenant helper)
     const [row] = await db.select().from(message).where(eq(message.id, result.id));
     expect(row.tenantId).toBe(TENANT_ID);
+  });
+
+  it('starts the DispatchMessage workflow with messageId + operatorId + tenantId', async () => {
+    const start = vi.fn().mockResolvedValue({ workflowId: 'wf-x' });
+    const temporal = { start } as any;
+    const module2: TestingModule = await Test.createTestingModule({
+      controllers: [MessageController],
+      providers: [
+        { provide: DB_TOKEN, useValue: db },
+        { provide: TemporalClientService, useValue: temporal },
+      ],
+    }).compile();
+    const c2 = module2.get(MessageController);
+    const req = { user: { sub: OPERATOR_ID, tenantId: TENANT_ID, role: 'operator' } };
+    const dto = { callId: CALL_ID, accountId: ACCOUNT_ID, operatorId: OPERATOR_ID, body: 'Workflow trigger' };
+    const result = await c2.create(dto, req as any);
+    expect(start).toHaveBeenCalledOnce();
+    const [workflowType, opts] = start.mock.calls[0];
+    expect(workflowType).toBe('DispatchMessage');
+    expect(opts.taskQueue).toBe('dispatch-message');
+    expect(opts.workflowId).toBe(`dispatch-${result.id}`);
+    expect(opts.args[0]).toMatchObject({
+      messageId: result.id, operatorId: OPERATOR_ID, tenantId: TENANT_ID,
+    });
   });
 });
