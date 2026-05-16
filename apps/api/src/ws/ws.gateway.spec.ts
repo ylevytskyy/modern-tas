@@ -27,6 +27,7 @@ describe('WsGateway', () => {
       type: 'incoming_call',
       callId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
       tenantId: '11111111-1111-1111-1111-111111111111',
+      accountId: '22222222-2222-2222-2222-222222222222',
       callerE164: '+15555550200',
     };
 
@@ -41,7 +42,7 @@ describe('WsGateway', () => {
 
   it('sendToOperator: no-ops when operator has no connection', () => {
     expect(() => gateway.sendToOperator('no-such-operator', {
-      type: 'incoming_call', callId: 'x', tenantId: 'y', callerE164: '+1',
+      type: 'incoming_call', callId: 'x', tenantId: 'y', accountId: 'z', callerE164: '+1',
     })).not.toThrow();
   });
 });
