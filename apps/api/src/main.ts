@@ -8,6 +8,7 @@ import type { IncomingMessage } from 'http';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({ origin: process.env.WEB_ORIGIN ?? 'http://localhost:3001', credentials: true });
   app.setGlobalPrefix('v1', {
     exclude: [{ path: 'internal/(.*)', method: RequestMethod.ALL }],
   });
