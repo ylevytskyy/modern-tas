@@ -47,12 +47,16 @@ $(BIN): $(BUILD_DIR)/.git/config
 	cd $(BUILD_DIR) && $(MAKE) dep
 	cd $(BUILD_DIR) && $(MAKE)
 	@mkdir -p bin
-	@count=$$(ls $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* 2>/dev/null | wc -l | tr -d ' '); \
+	@# pjproject names the binary `pjsua-<host-triplet>` — apple-darwin on
+	@# macOS, x86_64-pc-linux-gnu / aarch64-unknown-linux-gnu on Linux.
+	@# Match any triplet so the same Makefile works on both. The directory
+	@# only contains one pjsua-* binary per build, so the broad glob is safe.
+	@count=$$(ls $(BUILD_DIR)/pjsip-apps/bin/pjsua-* 2>/dev/null | wc -l | tr -d ' '); \
 	  if [ "$$count" != "1" ]; then \
-	    echo "Error: expected exactly 1 pjsua-*-apple-darwin* binary in $(BUILD_DIR)/pjsip-apps/bin/, found $$count. Run 'make uninstall' and rebuild."; \
+	    echo "Error: expected exactly 1 pjsua-* binary in $(BUILD_DIR)/pjsip-apps/bin/, found $$count. Run 'make uninstall' and rebuild."; \
 	    exit 1; \
 	  fi
-	cp $(BUILD_DIR)/pjsip-apps/bin/pjsua-*-apple-darwin* $(BIN)
+	cp $(BUILD_DIR)/pjsip-apps/bin/pjsua-* $(BIN)
 	@echo ""
 	@echo "Built $(BIN). Verify with: $(BIN) --version"
 
