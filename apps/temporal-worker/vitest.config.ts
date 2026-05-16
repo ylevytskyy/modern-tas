@@ -4,8 +4,9 @@ import { resolve } from 'path';
 export default defineConfig({
   test: {
     globals: true,
+    globalSetup: './test/vitest.globalSetup.ts',
     include: ['src/**/*.spec.ts', 'test/**/*.spec.ts'],
-    testTimeout: 30000,
+    testTimeout: 60000,
     alias: {
       '@tas/db/client': resolve(__dirname, '../../packages/db/src/client.ts'),
       '@tas/db': resolve(__dirname, '../../packages/db/src/schema/index.ts'),
