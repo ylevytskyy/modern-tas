@@ -45,5 +45,6 @@ export interface WsIncomingCallPayload {
   type: 'incoming_call';
   callId: string;
   tenantId: string;
+  accountId: string;
   callerE164: string;
 }
