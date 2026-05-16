@@ -21,6 +21,7 @@
   "devDependencies": {
     "@temporalio/testing": "1.11.0",
     "@testcontainers/postgresql": "10.9.0",
+    "@types/node": "^24",
     "testcontainers": "10.9.0",
     "tsx": "4.7.1",
     "typescript": "5.4.2",

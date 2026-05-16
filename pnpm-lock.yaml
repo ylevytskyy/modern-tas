@@ -130,6 +130,9 @@ importers:
       '@testcontainers/postgresql':
         specifier: 10.9.0
         version: 10.9.0
+      '@types/node':
+        specifier: ^24
+        version: 24.12.4
       testcontainers:
         specifier: 10.9.0
         version: 10.9.0
