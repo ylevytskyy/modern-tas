@@ -93,3 +93,16 @@ This session's gap was operational, not in the diff:
 1. **`apps/api/.env` is not auto-loaded.** Either add `--env-file=.env` to the `dev` script (Node ≥20.6 / tsx supports it), or import `dotenv/config` at the top of `main.ts`. Until then, env vars must be exported in the shell before `pnpm --filter @tas/api run dev`. The plan §Task 16 Step 4 already documents the export pattern; the foot-gun is that the `.env` file in-repo looks load-bearing but isn't.
 2. **tsx + esbuild + NestJS DI:** `private readonly foo: Foo` constructor params do **not** get auto-wired. Use `@Inject(Foo)` explicitly. Already noted in `apps/api/src/auth/jwt-auth.guard.ts`; promote to a project README so future controllers don't bite this.
 3. **Temporal workflow function names match by string.** The exported function name in `workflows/*.ts` must equal the string in `client.workflow.start('Name', …)`. Unit tests that pass the function reference extract the name automatically and hide the mismatch.
+
+---
+
+## Post-rewire spot-check (2026-05-17, Chunk 5 Phase 0)
+
+Verifies the ADR-0025 topology rewire on Linux + Docker Desktop. Kamailio + rtpengine removed; INVITEs enter Asterisk directly on UDP/5060.
+
+- Stack boot: `make poc-up` Green (one fewer service — no kamailio, no rtpengine; caddy skipped due to host port 80 collision, same as Chunk 4).
+- pjsua probe: `pjsua --null-audio --auto-loop --no-tcp --local-port=5062 --duration=5 sip:+15555550100@localhost:5060`.
+- Asterisk log: `Executing [+15555550100@tas-inbound:2] Stasis("PJSIP/carrier-sipp-00000000", "tas") in new stack`.
+- api log: `Nest application successfully started` + ARI connected; StasisStart handled (DB evidence below).
+- Postgres: fresh rows in `call`, `queue_call`, `recording` with `tenant_id = 11111111-1111-1111-1111-111111111111` and `call_id = a86f64a2-11bc-4dc7-874c-ef61b2b3ec5a`.
+- End-to-end NATS → arbiter → DB chain works on the rewired stack; F03 browser-side WS push not retested here (covered by Chunk 4 smoke).
