@@ -15,13 +15,13 @@ export function ScreenPop(props: ScreenPopProps) {
   }
   const { call, accepted, paused, onAccept, onPciToggle } = props;
   return (
-    <section aria-label="screen-pop">
+    <section aria-label="screen-pop" data-testid="screen-pop" data-call-id={call.callId}>
       <h2>Incoming call</h2>
       <dl>
         <dt>From</dt><dd>{call.callerE164}</dd>
         <dt>Call ID</dt><dd>{call.callId}</dd>
       </dl>
-      {!accepted && <button onClick={onAccept}>Accept</button>}
+      {!accepted && <button onClick={onAccept} data-testid="accept-call">Accept</button>}
       {accepted && (
         <>
           <button onClick={onPciToggle}>{paused ? 'Resume' : 'PCI pause'}</button>

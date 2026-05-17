@@ -16,6 +16,7 @@ export default function OperatorPage() {
   const [call, setCall] = useState<WsIncomingCallPayload | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [wsReady, setWsReady] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -28,6 +29,7 @@ export default function OperatorPage() {
   useEffect(() => {
     if (!token) return;
     const client = createWsClient({ url: WS_URL, token });
+    client.onOpen(() => setWsReady(true));
     client.onScreenPop((payload) => {
       setCall(payload);
       setAccepted(false);
@@ -51,7 +53,8 @@ export default function OperatorPage() {
   }
 
   return (
-    <main>
+    <main data-ws-ready={wsReady ? 'true' : 'false'}>
+      {wsReady && <span data-testid="ws-ready" hidden />}
       <h1>Operator</h1>
       <ScreenPop
         call={call}
