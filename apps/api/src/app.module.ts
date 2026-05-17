@@ -13,6 +13,9 @@ import { TelephonyModule } from './telephony/telephony.module';
 import { ArbiterModule } from './arbiter/arbiter.module';
 import { WsModule } from './ws/ws.module';
 import { RecordingModule } from './recording/recording.module';
+import { TemporalModule } from './temporal/temporal.module';
+import { DevModule } from './dev/dev.module';
+import { InternalModule } from './internal/internal.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { RecordingModule } from './recording/recording.module';
     ArbiterModule,
     WsModule,
     RecordingModule,
+    TemporalModule,
+    DevModule,
+    InternalModule,
   ],
 })
 export class AppModule {}

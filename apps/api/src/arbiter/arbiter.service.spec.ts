@@ -49,11 +49,13 @@ describe('ArbiterService', () => {
         type: 'incoming_call',
         callId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         tenantId: '11111111-1111-1111-1111-111111111111',
+        accountId: '22222222-2222-2222-2222-222222222222',
       }),
     );
 
     const [, wsPayload] = mockWsGateway.sendToOperator.mock.calls[0] as [string, WsIncomingCallPayload];
     expect(wsPayload.type).toBe('incoming_call');
     expect(wsPayload.callId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(wsPayload.accountId).toBe('22222222-2222-2222-2222-222222222222');
   });
 });

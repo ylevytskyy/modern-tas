@@ -26,6 +26,7 @@ export class ArbiterService implements OnModuleInit {
       type: 'incoming_call',
       callId: payload.callId,
       tenantId: payload.tenantId,
+      accountId: payload.accountId,
       callerE164: '', // TODO Chunk 6: populate from call row
     };
     this.wsGateway.sendToOperator(SEEDED_OPERATOR_ID, wsPayload);

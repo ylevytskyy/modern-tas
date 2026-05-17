@@ -15,6 +15,8 @@ export class WsGateway {
         sub: string; tenantId: string; role: string;
       };
       const operatorId = payload.sub;
+      const prev = this.connections.get(operatorId);
+      if (prev) prev.removeAllListeners('close');
       this.connections.set(operatorId, ws);
       ws.on('close', () => { this.connections.delete(operatorId); });
     } catch {
@@ -26,9 +28,10 @@ export class WsGateway {
     this.connections.set(operatorId, ws);
   }
 
-  sendToOperator(operatorId: string, payload: WsIncomingCallPayload): void {
+  sendToOperator(operatorId: string, payload: WsIncomingCallPayload): boolean {
     const ws = this.connections.get(operatorId);
-    if (!ws || ws.readyState !== 1 /* OPEN */) return;
+    if (!ws || ws.readyState !== 1 /* OPEN */) return false;
     ws.send(JSON.stringify({ event: WsEvents.CALL_SCREEN_POP, data: payload }));
+    return true;
   }
 }

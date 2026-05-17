@@ -12,6 +12,14 @@ RUN apt-get update && \
 
 RUN chown -R root:root /var/lib/asterisk /var/spool/asterisk /var/log/asterisk /var/run/asterisk 2>/dev/null || true
 
+# Configs are baked in rather than bind-mounted so the image runs under
+# Docker Desktop on hosts whose project path isn't in the file-sharing
+# list (e.g. /media on Linux). `make up` already rebuilds on every boot,
+# so config edits propagate without an explicit rebuild step.
+COPY pjsip.conf /etc/asterisk/pjsip.conf
+COPY extensions.conf /etc/asterisk/extensions.conf
+COPY rtp.conf /etc/asterisk/rtp.conf
+
 USER root
 EXPOSE 5060/udp 10000-10010/udp
 

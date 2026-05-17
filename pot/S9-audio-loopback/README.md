@@ -131,5 +131,4 @@ Stretch case (Docker networking turns out to be fussy):
 
 ## Status
 
-**Proposed** — 2026-05-15. Ratification gated on G1–G5 all Green in a
-single sitting.
+**Green** — 2026-05-16 on Linux + Docker Desktop. G1–G5 all Green in a single sitting; evidence at `results/2026-05-16T07-48-47Z-loopback.md`, tag `pot/S9`. Three Linux-specific quirks captured in `runbook.md` §Failure-mode triage. Validates ADR-0025 audio path; supersedes the S1 Layer-2 rtpengine media-smoke carry-over for MVP per `pot/g0-closed.md` §S1 Layer-2.

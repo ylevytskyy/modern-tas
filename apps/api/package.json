@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx --inspect=0.0.0.0:9229 src/main.ts",
+    "dev": "tsx --env-file-if-exists=.env --inspect=0.0.0.0:9229 src/main.ts",
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts"
@@ -19,6 +19,7 @@
     "drizzle-orm": "0.30.4",
     "ioredis": "^5.4.1",
     "minio": "^8.0.7",
+    "@temporalio/client": "1.11.0",
     "nats": "^2.29.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.1",
