@@ -6,7 +6,10 @@ import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import jwt from 'jsonwebtoken';
 
-const SECRET = 'poc-only-not-prod';
+// Match the guard's resolution (jwt-auth.guard.ts:26) — when APP_JWT_SECRET is
+// set in env (CI), use it; otherwise fall back to the PoC default. A hardcoded
+// value here would diverge from the guard whenever env is set.
+const SECRET = process.env.APP_JWT_SECRET ?? 'poc-only-not-prod';
 
 function makeContext(token: string | undefined): ExecutionContext {
   const req = {
