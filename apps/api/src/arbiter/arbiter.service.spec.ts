@@ -13,7 +13,7 @@ describe('ArbiterService', () => {
   let arbiter: ArbiterService;
   let module: TestingModule;
 
-  const mockWsGateway = { sendToOperator: vi.fn() };
+  const mockWsGateway = { sendToOperator: vi.fn(), sendCallEnded: vi.fn() };
   const mockNc = {
     publish: vi.fn(),
     subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
@@ -57,5 +57,19 @@ describe('ArbiterService', () => {
     expect(wsPayload.type).toBe('incoming_call');
     expect(wsPayload.callId).toMatch(/^[0-9a-f-]{36}$/);
     expect(wsPayload.accountId).toBe('22222222-2222-2222-2222-222222222222');
+  });
+
+  it('dispatchCallEnded: forwards call.ended to seeded operator via sendCallEnded', () => {
+    arbiter.dispatchCallEnded({
+      callId: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+      tenantId: '11111111-1111-1111-1111-111111111111',
+      endedBy: 'caller',
+      endedAt: new Date().toISOString(),
+    });
+
+    expect(mockWsGateway.sendCallEnded).toHaveBeenCalledWith(
+      SEEDED_OPERATOR_ID,
+      { callId: 'cccccccc-cccc-cccc-cccc-cccccccccccc', endedBy: 'caller' },
+    );
   });
 });

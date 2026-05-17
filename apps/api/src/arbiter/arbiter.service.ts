@@ -2,7 +2,7 @@ import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { NatsClientService } from '../nats/nats-client.service';
 import { WsGateway } from '../ws/ws.gateway';
 import { NatsSubjects } from '@tas/shared-types';
-import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@tas/shared-types';
+import type { NatsStasisStartPayload, NatsCallEndedPayload, WsIncomingCallPayload } from '@tas/shared-types';
 
 /** Single seeded operator for Chunk 3 PoC. Chunk 6 replaces with FIFO heap + skill matching. */
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
@@ -19,6 +19,10 @@ export class ArbiterService implements OnModuleInit {
       NatsSubjects.STASIS_START,
       (payload) => void this.dispatch(payload),
     );
+    this.nats.subscribe<NatsCallEndedPayload>(
+      NatsSubjects.CALL_ENDED,
+      (payload) => void this.dispatchCallEnded(payload),
+    );
   }
 
   async dispatch(payload: NatsStasisStartPayload): Promise<void> {
@@ -30,5 +34,13 @@ export class ArbiterService implements OnModuleInit {
       callerE164: '', // TODO Chunk 6: populate from call row
     };
     this.wsGateway.sendToOperator(SEEDED_OPERATOR_ID, wsPayload);
+  }
+
+  dispatchCallEnded(payload: NatsCallEndedPayload): void {
+    // PoC: single seeded operator. Chunk 7+: look up operatorId from call row / routing table.
+    this.wsGateway.sendCallEnded(SEEDED_OPERATOR_ID, {
+      callId: payload.callId,
+      endedBy: payload.endedBy,
+    });
   }
 }
