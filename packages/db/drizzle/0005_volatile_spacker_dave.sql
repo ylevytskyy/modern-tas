@@ -1,0 +1,1 @@
+ALTER TABLE "dispatch_attempt" ADD COLUMN "failure_reason" text;

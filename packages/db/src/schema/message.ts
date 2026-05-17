@@ -20,4 +20,5 @@ export const dispatchAttempt = pgTable("dispatch_attempt", {
   attemptedAt: timestamp("attempted_at", { withTimezone: true }).defaultNow().notNull(),
   deliveredAt: timestamp("delivered_at", { withTimezone: true }),
   error: text("error"),
+  failureReason: text("failure_reason"),
 });
