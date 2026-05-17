@@ -6,7 +6,13 @@ export interface SubmitResult {
 }
 
 export class OperatorPage {
-  constructor(private readonly page: Page) {}
+  // Field declared separately (not as a constructor parameter property) so
+  // Node 22's native --experimental-strip-types loader (used by Playwright in
+  // CI) accepts the file. Parameter properties require full TS transform mode.
+  private readonly page: Page;
+  constructor(page: Page) {
+    this.page = page;
+  }
 
   async goto(_operatorId: string): Promise<void> {
     // operatorId currently comes from NEXT_PUBLIC_OPERATOR_ID env var on the page;
