@@ -33,7 +33,7 @@ jobs:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - run: npx playwright install --with-deps chromium
+      - run: pnpm --filter @tas/e2e exec playwright install --with-deps chromium
 
       - run: make poc-up-all-docker
 
