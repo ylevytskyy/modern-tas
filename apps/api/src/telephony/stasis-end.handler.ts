@@ -11,16 +11,10 @@ import { NatsSubjects } from '@tas/shared-types';
 import type { NatsCallEndedPayload } from '@tas/shared-types';
 
 /**
- * Q.850 codes emitted by caller-side hangup (Normal Clearing, User Busy, No Answer,
- * Call Rejected) plus transport-close codes Asterisk PJSIP emits when the remote TCP
- * peer closes without SIP signaling (32 = No circuit, 34 = No circuit available).
- *
- * Cause codes 32 and 34 appear in the ChannelHangupRequest event when SIPp's TCP
- * connection closes after the scenario completes (no CANCEL/BYE sent). In the PoC
- * topology (single inbound carrier, no operator legs), these always mean the caller
- * disconnected. Chunk 7+ can narrow this further if outbound operator legs are added.
+ * Q.850 codes emitted by caller-side hangup:
+ * 16 = Normal Clearing, 17 = User Busy, 19 = No Answer, 21 = Call Rejected.
  */
-const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21, 32, 34]);
+const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21]);
 
 /**
  * Derives who ended the call from the Asterisk Q.850 hangup cause and channel direction.
@@ -37,16 +31,16 @@ const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21, 32, 34]);
  * NOTE on undefined cause:
  * Asterisk's StasisEnd event does NOT include a cause code in its ARI schema.
  * The cause is captured from the preceding ChannelHangupRequest event. When
- * ChannelHangupRequest is absent (e.g., ARI channel delete in PoC test harness),
- * cause is undefined. In the PoC, all inbound channels are carrier-side, so
- * undefined cause on an inbound channel is treated as 'caller' (safe PoC assumption).
+ * ChannelHangupRequest is absent, cause is undefined — treated as 'system' (unknown
+ * initiator). The ARI fallback path uses DELETE /channels/{id}?reason=normal to ensure
+ * Asterisk emits ChannelHangupRequest(cause=16) before StasisEnd, so cause should
+ * always be defined on the local-fallback path.
  */
 export function deriveEndedBy(
   hangupCause: number | undefined,
   isInbound: boolean,
 ): 'caller' | 'operator' | 'system' {
-  // PoC: no operator channels exist; undefined cause on inbound = caller disconnected.
-  if (hangupCause === undefined) return isInbound ? 'caller' : 'system';
+  if (hangupCause === undefined) return 'system';
   if (!CALLER_INITIATED_CAUSES.has(hangupCause)) return 'system';
   return isInbound ? 'caller' : 'operator';
 }

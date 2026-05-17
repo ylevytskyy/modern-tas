@@ -54,8 +54,10 @@ async function triggerAriHangupIfNeeded(callId: string): Promise<void> {
   const channel = channels.find((c) => c.id === channelId);
   if (!channel) return; // Already hung up by SIPp CANCEL — normal CI path.
 
-  // Delete the channel to trigger StasisEnd → endedBy='caller' (PoC: undefined cause = caller).
-  await fetch(`${ARI_BASE}/ari/channels/${channelId}?api_key=${ARI_CREDS.replace(':', ':')}`, {
+  // Delete the channel with reason=normal so Asterisk emits ChannelHangupRequest(cause=16)
+  // before StasisEnd — this lets deriveEndedBy resolve to 'caller' via Q.850 cause 16.
+  const deleteUrl = `${ARI_BASE}/ari/channels/${channelId}?reason=normal&api_key=${ARI_CREDS}`;
+  await fetch(deleteUrl, {
     method: 'DELETE',
     headers: { 'Authorization': authHeader },
   }).catch(() => null);
@@ -96,9 +98,13 @@ test('S-3 caller hangs up mid-screen-pop: endedBy=caller, recording finalized, b
   await expect(page.getByRole('button', { name: /pci pause/i })).toHaveCount(0);
 
   // Let SIPp finish (it may still be in the INVITE retransmit loop on host-dev).
-  await sippPromise;
-  // Note: SIPp exit code may be non-zero on host-dev due to the 100 Trying UDP quirk.
-  // The authoritative check is the DB assertions below.
+  const sipp = await sippPromise;
+  // In CI, SIPp's CANCEL path is fully bidirectional (Linux Docker, real UDP) and
+  // SIPp should exit 0. On host-dev, the 100 Trying UDP return-path quirk may cause
+  // SIPp to exit non-zero, so we skip the assertion there.
+  if (process.env.CI) {
+    expect(sipp.exitCode, `SIPp exited ${sipp.exitCode}: ${sipp.stderr}`).toBe(0);
+  }
 
   // DB assertions: endedBy='caller', endedAt populated.
   const db = getDb();

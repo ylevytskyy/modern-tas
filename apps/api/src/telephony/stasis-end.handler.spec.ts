@@ -4,9 +4,8 @@ import { deriveEndedBy } from './stasis-end.handler';
 describe('deriveEndedBy', () => {
   // Asterisk Q.850 hangup-cause codes:
   // 16 = Normal Clearing, 17 = User Busy, 19 = No Answer, 21 = Call Rejected
-  // 32 = No circuit (PJSIP TCP close without BYE), 34 = No circuit available (same)
 
-  it.each([16, 17, 19, 21, 32, 34])(
+  it.each([16, 17, 19, 21])(
     'returns "caller" for caller-initiated cause %i on inbound leg',
     (cause) => {
       expect(deriveEndedBy(cause, /* isInbound */ true)).toBe('caller');
@@ -25,11 +24,8 @@ describe('deriveEndedBy', () => {
     expect(deriveEndedBy(41, false)).toBe('system');
   });
 
-  it('returns "caller" when cause is undefined on inbound leg (PoC: caller disconnected)', () => {
-    expect(deriveEndedBy(undefined, true)).toBe('caller');
-  });
-
-  it('returns "system" when cause is undefined on outbound leg', () => {
-    expect(deriveEndedBy(undefined, false)).toBe('system');
+  it('returns "system" when cause is undefined', () => {
+    expect(deriveEndedBy(undefined as unknown as number, true)).toBe('system');
+    expect(deriveEndedBy(undefined as unknown as number, false)).toBe('system');
   });
 });
