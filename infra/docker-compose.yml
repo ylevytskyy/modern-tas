@@ -1,5 +1,6 @@
 # tas PoC stack — services grow through Tasks 8–15.
-# Chunk 1 scope: Postgres+Supavisor, Kamailio, Asterisk, rtpengine, MinIO, NATS, Redis, Temporal, Caddy.
+# Chunk 1 scope: Postgres+Supavisor, Asterisk, MinIO, NATS, Redis, Temporal, Caddy.
+# SBC tier (*.deferred/) removed per ADR-0025 — Asterisk-direct topology (Chunk 5 Phase 0).
 services:
   postgres:
     image: postgres:15
@@ -62,24 +63,6 @@ services:
       timeout: 3s
       retries: 15
 
-  kamailio:
-    build:
-      context: ./kamailio
-    # init: true so tini owns PID 1 and reaps healthcheck children — kamailio's SIGCHLD
-    # handler terminates the process whenever any child exits non-zero (incl. healthcheck
-    # retries during startup); under tini those reaps never reach kamailio.
-    init: true
-    volumes:
-      - ./kamailio/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
-      - ./kamailio/dispatcher.list:/etc/kamailio/dispatcher.list:ro
-    ports:
-      - "${KAMAILIO_SIP_HOST_PORT:-5060}:5060/udp"
-    healthcheck:
-      test: ["CMD", "kamcmd", "core.uptime"]
-      interval: 5s
-      timeout: 2s
-      retries: 10
-
   asterisk:
     build:
       context: ./asterisk
@@ -91,21 +74,13 @@ services:
       - ./asterisk/modules.conf:/etc/asterisk/modules.conf:ro
       - recordings:/var/spool/asterisk/recording
     ports:
+      - "${ASTERISK_SIP_HOST_PORT:-5060}:5060/udp"
       - "${ASTERISK_ARI_HOST_PORT:-8088}:8088"
     healthcheck:
       test: ["CMD-SHELL", "asterisk -rx 'core show uptime' | grep -q 'System uptime'"]
       interval: 5s
       timeout: 3s
       retries: 12
-
-  rtpengine:
-    build:
-      context: ./rtpengine
-    healthcheck:
-      test: ["CMD-SHELL", "ls /proc/1/exe > /dev/null 2>&1 || exit 1"]
-      interval: 5s
-      timeout: 2s
-      retries: 8
 
   minio:
     image: minio/minio:RELEASE.2024-03-15T01-07-19Z
