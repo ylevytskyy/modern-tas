@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx --inspect=0.0.0.0:9230 src/worker.ts 2>&1 | tee worker.log",
+    "dev": "tsx --env-file-if-exists=.env --inspect=0.0.0.0:9230 src/worker.ts 2>&1 | tee worker.log",
     "start": "tsx src/worker.ts 2>&1 | tee worker.log",
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit",

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx --inspect=0.0.0.0:9229 src/main.ts",
+    "dev": "tsx --env-file-if-exists=.env --inspect=0.0.0.0:9229 src/main.ts",
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts"
