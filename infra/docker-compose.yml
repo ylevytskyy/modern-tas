@@ -39,6 +39,15 @@ services:
 
   supavisor:
     image: supabase/supavisor:1.1.66
+    # Supavisor's /app/limits.sh calls `ulimit -n 100000` which fails on
+    # GitHub Actions runners ("cannot modify limit: Operation not permitted").
+    # Setting nofile at container-create time so limits.sh sees the value
+    # already in place and exits cleanly. Local-dev hosts usually allow the
+    # raise anyway; this is additive.
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
     depends_on:
       postgres:
         condition: service_healthy
