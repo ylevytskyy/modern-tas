@@ -24,7 +24,10 @@ services:
       MINIO_ACCESS_KEY: tas
       MINIO_SECRET_KEY: tas12345
       MINIO_USE_SSL: "false"
-      NODE_ENV: production
+      # NODE_ENV intentionally NOT set to "production" — the api's
+      # /v1/dev/operator-token endpoint guards on NODE_ENV !== 'production'
+      # (Chunk 4 design spec §2.2). All-in-docker is CI parity, not real prod;
+      # the e2e spec needs the dev token endpoint to function.
     ports:
       - "3000:3000"
     depends_on:
