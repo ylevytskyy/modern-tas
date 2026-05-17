@@ -69,6 +69,13 @@ export class AriLeaderClient {
   private ariHandle: AriClientHandle | null = null;
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
   private readonly ARI_APP = process.env.ARI_APP ?? 'tas';
+  /**
+   * Stores the Q.850 cause code from ChannelHangupRequest per channel.
+   * Asterisk's StasisEnd event does NOT include the hangup cause in its schema;
+   * we capture it from the preceding ChannelHangupRequest event so StasisEnd
+   * handlers can derive endedBy correctly.
+   */
+  private readonly _hangupCauses = new Map<string, number>();
 
   constructor(opts: AriLeaderClientOptions) {
     this.opts = opts;
@@ -161,9 +168,25 @@ export class AriLeaderClient {
       this.opts.onStasisStart(event);
     });
 
+    // ChannelHangupRequest fires BEFORE StasisEnd and carries the Q.850 cause code.
+    // Capture it so StasisEnd handlers can derive endedBy without relying on the
+    // StasisEnd event (which does NOT include cause in Asterisk's ARI schema).
+    handle.on('ChannelHangupRequest', (event: { channel: { id: string }; cause?: number }) => {
+      if (!this.isLeader) return;
+      if (event.cause !== undefined && event.channel?.id) {
+        this._hangupCauses.set(event.channel.id, event.cause);
+      }
+    });
+
     handle.on('StasisEnd', (event: StasisEndEvent) => {
       if (!this.isLeader) return; // guard: deposed leader drops in-flight events (ADR-0016)
-      if (this.opts.onStasisEnd) this.opts.onStasisEnd(event);
+      if (this.opts.onStasisEnd) {
+        const channelId = event.channel.id;
+        // Augment with the cause captured from ChannelHangupRequest (if any).
+        const cause = this._hangupCauses.get(channelId);
+        this._hangupCauses.delete(channelId); // clean up after use
+        this.opts.onStasisEnd({ ...event, cause });
+      }
     });
 
     await handle.start(this.ARI_APP);

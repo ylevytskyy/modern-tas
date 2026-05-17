@@ -10,13 +10,22 @@ import { NatsClientService } from '../nats/nats-client.service';
 import { NatsSubjects } from '@tas/shared-types';
 import type { NatsCallEndedPayload } from '@tas/shared-types';
 
-/** Q.850 codes emitted by caller-side hangup (Normal Clearing, User Busy, No Answer, Call Rejected). */
-const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21]);
+/**
+ * Q.850 codes emitted by caller-side hangup (Normal Clearing, User Busy, No Answer,
+ * Call Rejected) plus transport-close codes Asterisk PJSIP emits when the remote TCP
+ * peer closes without SIP signaling (32 = No circuit, 34 = No circuit available).
+ *
+ * Cause codes 32 and 34 appear in the ChannelHangupRequest event when SIPp's TCP
+ * connection closes after the scenario completes (no CANCEL/BYE sent). In the PoC
+ * topology (single inbound carrier, no operator legs), these always mean the caller
+ * disconnected. Chunk 7+ can narrow this further if outbound operator legs are added.
+ */
+const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21, 32, 34]);
 
 /**
  * Derives who ended the call from the Asterisk Q.850 hangup cause and channel direction.
  *
- * @param hangupCause - Q.850 cause code from the StasisEnd event (may be absent).
+ * @param hangupCause - Q.850 cause code from ChannelHangupRequest (may be absent).
  * @param isInbound   - true when the channel originates from the carrier (caller-side leg).
  *
  * NOTE on inbound detection (PoC / Chunk 6 topology):
@@ -24,12 +33,20 @@ const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21]);
  * There are no PJSIP operator endpoints in the current config, so every channel that
  * arrives at the `tas-inbound` Stasis app is an inbound (caller-side) leg.
  * When outbound operator legs are added (Chunk 7+), pass `isInbound = false` for those.
+ *
+ * NOTE on undefined cause:
+ * Asterisk's StasisEnd event does NOT include a cause code in its ARI schema.
+ * The cause is captured from the preceding ChannelHangupRequest event. When
+ * ChannelHangupRequest is absent (e.g., ARI channel delete in PoC test harness),
+ * cause is undefined. In the PoC, all inbound channels are carrier-side, so
+ * undefined cause on an inbound channel is treated as 'caller' (safe PoC assumption).
  */
 export function deriveEndedBy(
   hangupCause: number | undefined,
   isInbound: boolean,
 ): 'caller' | 'operator' | 'system' {
-  if (hangupCause === undefined) return 'system';
+  // PoC: no operator channels exist; undefined cause on inbound = caller disconnected.
+  if (hangupCause === undefined) return isInbound ? 'caller' : 'system';
   if (!CALLER_INITIATED_CAUSES.has(hangupCause)) return 'system';
   return isInbound ? 'caller' : 'operator';
 }
