@@ -39,6 +39,18 @@ export interface NatsStasisStartPayload {
   accountId: string;
 }
 
+/**
+ * Payload published to NatsSubjects.CALL_ENDED when an ARI StasisEnd event fires.
+ * Consumed by Temporal worker (cancels in-flight DispatchMessage workflows) and
+ * WS gateway (pushes call.ended to operator browser).
+ */
+export interface NatsCallEndedPayload {
+  callId: string;
+  tenantId: string;
+  endedBy: 'caller' | 'operator' | 'system';
+  endedAt: string;
+}
+
 /** WS payload shape for the `call.screenpop` event (sent to F03 operator UI). */
 export interface WsIncomingCallPayload {
   /** Discriminator field. Spec exit criterion: event.type === 'incoming_call'. */

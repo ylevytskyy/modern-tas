@@ -27,6 +27,8 @@ export interface AriLeaderClientOptions {
   ariClientFactory: (appName: string) => Promise<AriClientHandle>;
   /** Called when a StasisStart event fires (leader is active). NOT called if lease is lost. */
   onStasisStart: (event: StasisStartEvent) => void;
+  /** Called when a StasisEnd event fires (leader is active). NOT called if lease is lost. */
+  onStasisEnd?: (event: StasisEndEvent) => void;
   /** Called via process.nextTick when the lease is lost. Guaranteed to fire after WS close. */
   onLoseLease: () => void;
 }
@@ -45,6 +47,19 @@ export interface StasisStartEvent {
     caller: { number: string };
   };
   application: string;
+}
+
+export interface StasisEndEvent {
+  channel: {
+    id: string;
+    name: string;
+    dialplan: { context: string; exten: string };
+  };
+  application: string;
+  /** Q.850 hangup cause code — present when Asterisk emits cause information. */
+  cause?: number;
+  cause_txt?: string;
+  timestamp?: string;
 }
 
 export class AriLeaderClient {
@@ -72,6 +87,11 @@ export class AriLeaderClient {
   /** Wire or replace the StasisStart callback after construction (used by NestJS DI). */
   setStasisStartCallback(fn: (event: StasisStartEvent) => void): void {
     this.opts.onStasisStart = fn;
+  }
+
+  /** Wire or replace the StasisEnd callback after construction (used by NestJS DI). */
+  setStasisEndCallback(fn: (event: StasisEndEvent) => void): void {
+    this.opts.onStasisEnd = fn;
   }
 
   /** Start the heartbeat loop. */
@@ -139,6 +159,11 @@ export class AriLeaderClient {
     handle.on('StasisStart', (event: StasisStartEvent) => {
       if (!this.isLeader) return; // guard: deposed leader drops in-flight events (ADR-0016)
       this.opts.onStasisStart(event);
+    });
+
+    handle.on('StasisEnd', (event: StasisEndEvent) => {
+      if (!this.isLeader) return; // guard: deposed leader drops in-flight events (ADR-0016)
+      if (this.opts.onStasisEnd) this.opts.onStasisEnd(event);
     });
 
     await handle.start(this.ARI_APP);

@@ -71,6 +71,7 @@ export class StasisStartHandler implements OnModuleInit {
         didId,
         fromE164: callerE164,
         startedAt: new Date(),
+        routedThrough: [channelId],
       })
       .returning({ id: call.id });
 
