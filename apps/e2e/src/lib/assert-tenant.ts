@@ -16,8 +16,7 @@ export async function assertTenant(expectedTenantId: string, callId: string): Pr
     const whereCol = t.name === 'call' ? (t.table as any).id : (t.table as any).callId;
     const rows = await db.select().from(t.table).where(eq(whereCol, callId));
 
-    if (rows.length === 0 && t.name !== 'queueCall') {
-      // queueCall is the only optional table — present in S-1 but treated as soft
+    if (rows.length === 0) {
       throw new Error(`assertTenant: no rows in ${t.name} for callId=${callId}`);
     }
     for (const row of rows) {

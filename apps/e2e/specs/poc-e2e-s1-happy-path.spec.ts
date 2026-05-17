@@ -30,14 +30,15 @@ test('S-1 happy path: INVITE → screen-pop → submit → DispatchMessage compl
   const sippPromise = runScenario({ scenario: 'happy-path', callId: sipCallId });
 
   // 3. Assert screen-pop renders; capture real callId.
-  // Timeout: 40s to account for Docker `compose run` container startup and SIPp UDP
-  // retransmission behaviour on host-dev. SIPp retransmits the INVITE until Asterisk
-  // processes it (~30s on host-dev due to Docker network UDP path). The actual Asterisk
-  // StasisStart→NATS→WS→browser pipeline is sub-second once the channel is created.
-  const { callId } = await op.waitForScreenPop({ timeoutMs: 40_000 });
+  // CI budget: 3000ms — accounts for `docker compose run --rm sipp` container startup
+  // (~1-2s) plus the actual StasisStart→NATS→WS→browser pipeline (sub-second per
+  // Chunk 4 smoke tests). Local budget: 40000ms — accounts for Docker UDP retransmission
+  // quirk on host-dev where SIPp retransmits the INVITE until Asterisk processes it.
+  const CI = !!process.env.CI;
+  const SCREEN_POP_BUDGET_MS = CI ? 3_000 : 40_000;
+  const { callId } = await op.waitForScreenPop({ timeoutMs: SCREEN_POP_BUDGET_MS });
   const screenPopMs = Date.now() - inviteAt;
-  // 40s soft budget: total E2E from `runScenario()` call to screen-pop on host-dev
-  expect(screenPopMs, `screen-pop took ${screenPopMs}ms; budget 40000ms`).toBeLessThan(40_000);
+  expect(screenPopMs, `screen-pop took ${screenPopMs}ms; CI=${CI}; budget ${SCREEN_POP_BUDGET_MS}ms`).toBeLessThan(SCREEN_POP_BUDGET_MS);
 
   // 4. Operator accepts, types, submits
   await op.accept();
@@ -57,15 +58,15 @@ test('S-1 happy path: INVITE → screen-pop → submit → DispatchMessage compl
   const [att] = await db
     .select()
     .from(schema.dispatchAttempt)
-    .where(eq((schema.dispatchAttempt as any).messageId, messageId));
+    .where(eq(schema.dispatchAttempt.messageId, messageId));
   expect(att, 'dispatch_attempt row exists').toBeTruthy();
-  expect((att as any).deliveredAt ?? (att as any).delivered_at).toBeTruthy();
+  expect(att.deliveredAt).toBeTruthy();
 
   // 7. recording row + MinIO placeholder
   const [rec] = await db
     .select()
     .from(schema.recording)
-    .where(eq((schema.recording as any).callId, callId));
+    .where(eq(schema.recording.callId, callId));
   expect(rec, 'recording row exists').toBeTruthy();
   const minioKey = `recordings/${callId}.wav`;
   await expect.poll(() => objectExists(RECORDINGS_BUCKET, minioKey), { timeout: 5000 }).toBe(true);
