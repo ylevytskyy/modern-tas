@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Headers, HttpCode, Post, UnauthorizedException,
+  Body, Controller, Headers, HttpCode, Inject, Post, UnauthorizedException,
 } from '@nestjs/common';
 import { WsGateway } from '../ws/ws.gateway';
 
@@ -11,7 +11,7 @@ interface DeliverBody {
 
 @Controller('internal')
 export class DispatchDeliverController {
-  constructor(private readonly ws: WsGateway) {}
+  constructor(@Inject(WsGateway) private readonly ws: WsGateway) {}
 
   @Post('dispatch-deliver')
   @HttpCode(200)

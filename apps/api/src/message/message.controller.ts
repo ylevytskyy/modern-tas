@@ -15,7 +15,7 @@ import { TemporalClientService } from '../temporal/temporal-client.service';
 export class MessageController {
   constructor(
     @Inject(DB_TOKEN) private readonly db: Db,
-    private readonly temporal: TemporalClientService,
+    @Inject(TemporalClientService) private readonly temporal: TemporalClientService,
   ) {}
 
   @Post()
