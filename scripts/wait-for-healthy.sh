@@ -1,17 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-COMPOSE_FILE="${1:-infra/docker-compose.yml}"
+# Accept one or more compose files as arguments.
+# Each is passed as a separate -f flag to docker compose.
+# Falls back to the default infra compose file if none supplied.
+if [ $# -eq 0 ]; then
+  COMPOSE_ARGS=(-f infra/docker-compose.yml)
+  COMPOSE_DESC="infra/docker-compose.yml"
+else
+  COMPOSE_ARGS=()
+  COMPOSE_DESC=""
+  for f in "$@"; do
+    COMPOSE_ARGS+=(-f "$f")
+    COMPOSE_DESC="${COMPOSE_DESC:+$COMPOSE_DESC, }$f"
+  done
+fi
+
 TIMEOUT="${TIMEOUT_SECONDS:-180}"
 START=$(date +%s)
 
-echo "Waiting for all services in $COMPOSE_FILE to become healthy..."
+echo "Waiting for all services in $COMPOSE_DESC to become healthy..."
 
 while :; do
   # Parse health status from docker compose ps NDJSON output.
   # Docker Compose v2+ emits one JSON object per line (NDJSON), not a JSON array.
   # We read line-by-line to avoid json.load() breaking on multi-line input.
-  STATUS=$(docker compose -f "$COMPOSE_FILE" ps --format json 2>/dev/null || echo "")
+  STATUS=$(docker compose "${COMPOSE_ARGS[@]}" ps --format json 2>/dev/null || echo "")
   UNHEALTHY=$(echo "$STATUS" | \
     python3 -c "
 import sys, json
@@ -30,7 +44,7 @@ print('\n'.join(bad))
   ELAPSED=$(( $(date +%s) - START ))
   if [ "$ELAPSED" -gt "$TIMEOUT" ]; then
     echo "TIMEOUT after ${TIMEOUT}s waiting for: $UNHEALTHY"
-    docker compose -f "$COMPOSE_FILE" ps
+    docker compose "${COMPOSE_ARGS[@]}" ps
     exit 1
   fi
 

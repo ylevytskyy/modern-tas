@@ -5,10 +5,19 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": "./src/schema/index.ts",
-    "./client": "./src/client.ts"
+    ".": {
+      "import": "./dist/schema/index.js",
+      "require": "./dist/schema/index.js",
+      "default": "./dist/schema/index.js"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.js",
+      "default": "./dist/client.js"
+    }
   },
   "scripts": {
+    "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint TBD'",
     "test": "vitest run",
