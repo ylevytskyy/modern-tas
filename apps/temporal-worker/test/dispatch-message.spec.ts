@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { TestWorkflowEnvironment } from '@temporalio/testing';
 import { Worker } from '@temporalio/worker';
-import { dispatchMessage } from '../src/workflows/dispatch-message';
+import { DispatchMessage } from '../src/workflows/dispatch-message';
 import { resolve } from 'node:path';
 
 describe('DispatchMessage workflow', () => {
@@ -34,7 +34,7 @@ describe('DispatchMessage workflow', () => {
       activities,
     });
 
-    const handle = await env.client.workflow.start(dispatchMessage, {
+    const handle = await env.client.workflow.start(DispatchMessage, {
       taskQueue: 'test',
       workflowId: `wf-test-${Date.now()}`,
       args: [{

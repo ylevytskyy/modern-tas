@@ -19,7 +19,7 @@ const { deliverViaWs, markDelivered } = proxyActivities<{
   retry: { maximumAttempts: 3 },
 });
 
-export async function dispatchMessage(input: DispatchMessageInput): Promise<void> {
+export async function DispatchMessage(input: DispatchMessageInput): Promise<void> {
   await deliverViaWs({
     messageId: input.messageId,
     operatorId: input.operatorId,
