@@ -32,6 +32,13 @@ jobs:
       # runner (outside Docker) and needs dist artifacts on disk.
       - run: pnpm --filter @tas/shared-types --filter @tas/db --filter @tas/ari-client run build
 
+      # Fast-fail vitest unit tests before the slow compose boot. The api
+      # tests run later (testcontainers needs Docker; we co-locate them with
+      # the rest of the api-side checks).
+      - run: pnpm --filter @tas/temporal-worker run test
+      - run: pnpm --filter @tas/web run test
+      - run: pnpm --filter @tas/e2e run test
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
