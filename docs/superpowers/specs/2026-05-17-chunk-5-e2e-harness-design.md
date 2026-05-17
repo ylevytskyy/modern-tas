@@ -166,7 +166,7 @@ The scenario is intentionally minimal: `INVITE → wait for 100 Trying → pause
 
 - `goto(operatorId)` — navigates to `/operator?operatorId=<id>`, waits for `[data-testid="ws-ready"]` (the operator page sets it once `ws.readyState === OPEN`).
 - `waitForWsOpen()` — explicit step in case the spec wants to fire the INVITE on a different code path; idempotent with `goto`.
-- `waitForScreenPop({ callId, timeout = 1000 })` — waits for `[data-testid="screen-pop"][data-call-id=<callId>]`.
+- `waitForScreenPop({ timeoutMs = 1000 })` — waits for `[data-testid="screen-pop"][data-call-id]` (any value); returns `{ callId }` read off `data-call-id`. (The system-side `call.id` is Postgres-generated, not derived from the SIPp Call-ID header, so the test reads it back from the DOM instead of asserting it equals a pre-generated UUID.)
 - `accept()` — clicks `[data-testid="accept-call"]`.
 - `fillMessage(text)` — types into `[data-testid="message-textarea"]`.
 - `submit()` — clicks `[data-testid="message-submit"]`; uses `page.waitForResponse` to capture the `POST /v1/Message` response and returns its JSON body + status.
@@ -175,7 +175,8 @@ The spec orchestrates:
 
 ```ts
 test('S-1 happy path', async ({ page }) => {
-  const callId = uuidv4();
+  // sipCallId is forensic-correlation only; system-side call.id is Postgres-generated
+  const sipCallId = uuidv4();
   const op = new OperatorPage(page);
 
   // Browser open + WS connected BEFORE INVITE — eliminates WS race
@@ -184,10 +185,10 @@ test('S-1 happy path', async ({ page }) => {
 
   // Fire INVITE async — SIPp runs in parallel with the assertions below
   const inviteAt = Date.now();
-  const sippPromise = runScenario({ scenario: 'happy-path', callId });
+  const sippPromise = runScenario({ scenario: 'happy-path', callId: sipCallId });
 
   // Screen-pop budget: measured from INVITE-fire, not from goto()
-  await op.waitForScreenPop({ callId, timeout: 1000 });
+  const { callId } = await op.waitForScreenPop({ timeoutMs: 1000 });
   const elapsedScreenPop = Date.now() - inviteAt;
   expect(elapsedScreenPop).toBeLessThan(800);
 
