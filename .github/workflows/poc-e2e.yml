@@ -27,6 +27,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Build workspace packages so @tas/db etc. resolve to ./dist/ as their
+      # exports field declares. The Playwright spec imports @tas/db on the
+      # runner (outside Docker) and needs dist artifacts on disk.
+      - run: pnpm --filter @tas/shared-types --filter @tas/db --filter @tas/ari-client run build
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
