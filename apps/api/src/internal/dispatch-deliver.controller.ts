@@ -21,7 +21,7 @@ export class DispatchDeliverController {
   ): Promise<{ delivered: boolean }> {
     const expected = process.env.INTERNAL_API_TOKEN;
     if (!expected || token !== expected) throw new UnauthorizedException();
-    this.ws.sendToOperator(body.operatorId, body.payload as any);
-    return { delivered: true };
+    const delivered = this.ws.sendToOperator(body.operatorId, body.payload as any);
+    return { delivered };
   }
 }

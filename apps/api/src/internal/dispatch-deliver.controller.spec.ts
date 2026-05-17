@@ -12,6 +12,7 @@ describe('DispatchDeliverController', () => {
     const fakeGateway = {
       sendToOperator: (operatorId: string, payload: unknown) => {
         sentTo.push({ operatorId, payload });
+        return true;
       },
     } as unknown as WsGateway;
     const mod: TestingModule = await Test.createTestingModule({
@@ -27,6 +28,22 @@ describe('DispatchDeliverController', () => {
     });
     expect(out).toEqual({ delivered: true });
     expect(sentTo.at(-1)).toEqual({ operatorId: 'op-1', payload: { body: 'hi' } });
+  });
+
+  it('returns delivered:false when gateway reports socket not open', async () => {
+    const fakeGatewayDisconnected = {
+      sendToOperator: (_operatorId: string, _payload: unknown) => false,
+    } as unknown as WsGateway;
+    const { Test: NestTest } = await import('@nestjs/testing');
+    const mod = await NestTest.createTestingModule({
+      controllers: [DispatchDeliverController],
+      providers: [{ provide: WsGateway, useValue: fakeGatewayDisconnected }],
+    }).compile();
+    const ctrl = mod.get(DispatchDeliverController);
+    const out = await ctrl.deliver('unit-test-secret-token', {
+      messageId: 'm-2', operatorId: 'op-offline', payload: {},
+    });
+    expect(out).toEqual({ delivered: false });
   });
 
   it('throws 401 when the header is missing', async () => {
