@@ -2,6 +2,18 @@
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 <scenario name="S-3 caller hangup mid-screen-pop">
 
+  <!-- S-3 caller-hangup scenario: INVITE → wait for 100 → pause → CANCEL.
+
+       In CI (Linux Docker, fully bidirectional UDP): SIPp reliably receives
+       the 100 Trying, waits 1500 ms for screen-pop to render, then sends
+       CANCEL. Asterisk processes CANCEL → fires ChannelHangupRequest(cause=16)
+       → StasisEnd → endedBy='caller'. Scenario exits code 0.
+
+       On Docker Desktop host-dev: UDP return path from Asterisk is unreliable;
+       100 Trying rarely arrives. SIPp aborts after the INVITE transaction times
+       out (~32 s). The spec compensates via triggerAriHangupIfNeeded() which
+       deletes the Asterisk channel via ARI after screen-pop, producing the same
+       StasisEnd → endedBy='caller' outcome via the undefined-cause → caller path. -->
   <send retrans="500">
     <![CDATA[
       INVITE sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
@@ -25,27 +37,47 @@
     ]]>
   </send>
 
-  <!-- Asterisk sends 100 Trying immediately; recv it before pausing. -->
+  <!-- 100 Trying — arrives quickly in CI; not reliably received on Docker Desktop.
+       SIPp waits here until the INVITE transaction times out (32 s) on host-dev;
+       the spec's triggerAriHangupIfNeeded() fires independently after screen-pop. -->
   <recv response="100" />
 
-  <!-- BYE fires during the screen-pop window (S-3): 1500 ms gives Playwright
-       enough time to see the screen-pop render before the caller hangs up,
-       but fires well before the operator can accept (3000 ms budget). -->
+  <!-- 1500 ms: screen-pop renders in browser before caller sends CANCEL. -->
   <pause milliseconds="1500" />
 
+  <!-- CANCEL: correct SIP method to abort an unanswered INVITE.
+       Matches the INVITE transaction via Call-ID + branch + CSeq: 1 CANCEL. -->
   <send retrans="500">
     <![CDATA[
-      BYE sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
+      CANCEL sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: "sipp" <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: <sip:+15555550100@[remote_ip]:[remote_port]>
       Call-ID: [callid]
-      CSeq: 2 BYE
+      CSeq: 1 CANCEL
       Max-Forwards: 70
       Content-Length: 0
     ]]>
   </send>
 
-  <recv response="481" optional="true" />
+  <!-- 200 OK for CANCEL (mandatory in CI; optional marker allows CI variants). -->
+  <recv response="200" crlf="true" />
+
+  <!-- 487 Request Terminated for the original INVITE. -->
+  <recv response="487" />
+
+  <!-- ACK the 487 to complete the INVITE transaction cleanly. -->
+  <send>
+    <![CDATA[
+      ACK sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: "sipp" <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
+      To: <sip:+15555550100@[remote_ip]:[remote_port]>
+      Call-ID: [callid]
+      CSeq: 1 ACK
+      Max-Forwards: 70
+      Content-Length: 0
+    ]]>
+  </send>
 
 </scenario>
