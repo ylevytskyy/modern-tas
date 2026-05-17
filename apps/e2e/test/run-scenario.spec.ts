@@ -19,7 +19,7 @@ import { runScenario } from '../src/run-scenario.js';
 describe('runScenario argv shape', () => {
   beforeEach(() => spawnMock.mockClear());
 
-  it('invokes docker compose with the scenario file and -key field0 <callId>', async () => {
+  it('invokes docker compose with the scenario file and -key callid <callId>', async () => {
     const callId = '11111111-2222-3333-4444-555555555555';
     const result = await runScenario({ scenario: 'happy-path', callId });
 

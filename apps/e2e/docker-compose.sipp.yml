@@ -5,7 +5,8 @@
 # infra_default so Docker DNS resolves `asterisk`. The CLI target arg
 # must be `asterisk:5060` when running via Docker (not 127.0.0.1:5060).
 # ctaloni/sipp image (original plan tag) was unavailable; using
-# sieteunoseis/sipp:latest (SIPp v3.7.2) as replacement.
+# sieteunoseis/sipp (SIPp v3.7.2) as replacement.
+# Pinned to digest because no version tags exist on Docker Hub for this image.
 
 networks:
   default:
@@ -14,7 +15,7 @@ networks:
 
 services:
   sipp:
-    image: sieteunoseis/sipp:latest
+    image: sieteunoseis/sipp@sha256:9183ba7b21f49edcf028e30f9a086d5fa0fad3984caf9f15a05aea474de9bdd3
     volumes:
       - ./scenarios:/scenarios:ro
     entrypoint: ["sipp"]
