@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3 poc-up-all-docker poc-test-all-docker-up poc-e2e-s1
 
 COMPOSE_FILE := infra/docker-compose.yml
 
@@ -74,3 +74,21 @@ poc-test-chunk3:
 	NATS_URL=nats://localhost:4222 \
 	APP_JWT_SECRET=poc-only-not-prod \
 	pnpm --filter @tas/api exec vitest run --config vitest.integration.config.ts
+
+# Boot the full stack including apps as compose services (CI parity).
+# Requires INTERNAL_API_TOKEN and APP_JWT_SECRET in env.
+poc-up-all-docker:
+	docker compose -f $(COMPOSE_FILE) -f infra/docker-compose.all-in.yml up -d --build
+	@./scripts/wait-for-healthy.sh $(COMPOSE_FILE) infra/docker-compose.all-in.yml
+	@echo "Registering Supavisor tenant 'tas'..."
+	@$(MAKE) _supavisor-register-tenant
+
+# Curl smoke against the api service running in all-in-docker mode.
+poc-test-all-docker-up:
+	@curl -sf http://localhost:3000/v1/health > /dev/null \
+	  && echo "api /v1/health OK on all-in-docker" \
+	  || (echo "api /v1/health NOT reachable — check docker compose logs api" && exit 1)
+
+# Run the S-1 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
+poc-e2e-s1:
+	pnpm --filter @tas/e2e run test:e2e:s1

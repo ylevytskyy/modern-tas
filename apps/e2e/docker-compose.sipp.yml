@@ -1,0 +1,21 @@
+# SIPp container used by the e2e harness to drive INVITEs into Asterisk.
+# Joins the infra stack network so it can reach `asterisk` by hostname.
+# network_mode: "service:asterisk" is intentionally avoided — it requires
+# both services to be in the same compose project. Instead, we join
+# infra_default so Docker DNS resolves `asterisk`. The CLI target arg
+# must be `asterisk:5060` when running via Docker (not 127.0.0.1:5060).
+# ctaloni/sipp image (original plan tag) was unavailable; using
+# sieteunoseis/sipp (SIPp v3.7.2) as replacement.
+# Pinned to digest because no version tags exist on Docker Hub for this image.
+
+networks:
+  default:
+    name: infra_default
+    external: true
+
+services:
+  sipp:
+    image: sieteunoseis/sipp@sha256:9183ba7b21f49edcf028e30f9a086d5fa0fad3984caf9f15a05aea474de9bdd3
+    volumes:
+      - ./scenarios:/scenarios:ro
+    entrypoint: ["sipp"]

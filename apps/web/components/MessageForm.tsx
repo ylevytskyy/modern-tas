@@ -27,9 +27,9 @@ export function MessageForm({ onSubmit, disabled }: MessageFormProps) {
     <form onSubmit={handleSubmit} aria-label="message-form">
       <label>
         Message
-        <textarea value={text} onChange={(e) => setText(e.target.value)} />
+        <textarea data-testid="message-textarea" value={text} onChange={(e) => setText(e.target.value)} />
       </label>
-      <button type="submit" disabled={disabled || sending}>Send</button>
+      <button type="submit" data-testid="message-submit" disabled={disabled || sending}>Send</button>
     </form>
   );
 }

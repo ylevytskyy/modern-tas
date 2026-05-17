@@ -15,6 +15,7 @@ import { WsModule } from './ws/ws.module';
 import { RecordingModule } from './recording/recording.module';
 import { TemporalModule } from './temporal/temporal.module';
 import { DevModule } from './dev/dev.module';
+import { HealthModule } from './health/health.module';
 import { InternalModule } from './internal/internal.module';
 
 @Module({
@@ -34,6 +35,7 @@ import { InternalModule } from './internal/internal.module';
     RecordingModule,
     TemporalModule,
     DevModule,
+    HealthModule,
     InternalModule,
   ],
 })
