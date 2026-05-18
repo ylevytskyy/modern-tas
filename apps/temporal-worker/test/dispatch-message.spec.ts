@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { TestWorkflowEnvironment } from '@temporalio/testing';
 import { Worker } from '@temporalio/worker';
+import { CancelledFailure } from '@temporalio/common';
 import { DispatchMessage, callEndedSignal } from '../src/workflows/dispatch-message';
 import { resolve } from 'node:path';
 
@@ -67,9 +68,9 @@ describe('DispatchMessage workflow', () => {
     let signalSent = false;
 
     const activities = {
-      // Busy-polls until signal is sent, then returns.  In production,
-      // Temporal CancellationScope would interrupt this via heartbeat;
-      // for the test we simulate responsiveness with a simple flag.
+      // Busy-polls until signal is sent, then throws CancelledFailure.
+      // isCancellation(err) in the workflow returns true for CancelledFailure,
+      // so the cancellation path completes cleanly without re-throwing.
       deliverViaWs: async () => {
         calls.push('deliverViaWs:start');
         // Yield repeatedly until the test sends the signal.
@@ -77,10 +78,9 @@ describe('DispatchMessage workflow', () => {
           await new Promise((r) => setTimeout(r, 50));
           if (signalSent) {
             calls.push('deliverViaWs:saw-signal');
-            // Throw CancelledFailure-equivalent to trigger the cancellation path.
-            // Using a plain Error is sufficient since isCancellation() checks are
-            // in the workflow; the activity just needs to not return { delivered: true }.
-            throw new Error('SIMULATED_CANCEL');
+            // Throw CancelledFailure so isCancellation() in the workflow returns true,
+            // preventing the rethrow at line 74 of dispatch-message.ts.
+            throw new CancelledFailure('simulated cancellation');
           }
         }
         return { delivered: true };
