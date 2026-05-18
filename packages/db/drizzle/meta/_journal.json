@@ -50,6 +50,13 @@
       "when": 1779086075053,
       "tag": "0006_ancient_kronos",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1747612800000,
+      "tag": "0007_redaction_interval_integrity",
+      "breakpoints": true
     }
   ]
 }

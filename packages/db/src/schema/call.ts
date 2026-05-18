@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, timestamp, uniqueIndex, check } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { tenant, account, did } from "./tenancy";
 
@@ -23,10 +23,21 @@ export const recording = pgTable("recording", {
   endedAt: timestamp("ended_at", { withTimezone: true }),
 });
 
-export const recordingRedactionInterval = pgTable("recording_redaction_interval", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  recordingId: uuid("recording_id").notNull().references(() => recording.id),
-  startMs: integer("start_ms").notNull(),
-  endMs: integer("end_ms"),
-  reason: text("reason", { enum: ["operator_pci_pause", "auto_pii_ml"] }).notNull(),
-});
+export const recordingRedactionInterval = pgTable(
+  "recording_redaction_interval",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    recordingId: uuid("recording_id").notNull().references(() => recording.id),
+    startMs: integer("start_ms").notNull(),
+    endMs: integer("end_ms"),
+    reason: text("reason", { enum: ["operator_pci_pause", "auto_pii_ml"] }).notNull(),
+  },
+  (t) => ({
+    // I1: at most one open interval (end_ms IS NULL) per recording_id.
+    oneOpenPerRecording: uniqueIndex("recording_redaction_interval_one_open_per_recording")
+      .on(t.recordingId)
+      .where(sql`${t.endMs} IS NULL`),
+    // I2: end_ms must be >= start_ms when it is set.
+    endMsGteStartMs: check("chk_end_ms_gte_start_ms", sql`${t.endMs} IS NULL OR ${t.endMs} >= ${t.startMs}`),
+  }),
+);
