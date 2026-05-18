@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3 poc-up-all-docker poc-test-all-docker-up poc-e2e-s1
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3 poc-up-all-docker poc-test-all-docker-up poc-e2e-s1 poc-e2e-s3 poc-e2e
 
 COMPOSE_FILE := infra/docker-compose.yml
 
@@ -92,3 +92,10 @@ poc-test-all-docker-up:
 # Run the S-1 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
 poc-e2e-s1:
 	pnpm --filter @tas/e2e run test:e2e:s1
+
+# Run the S-3 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
+poc-e2e-s3:
+	pnpm --filter @tas/e2e run test:e2e:s3
+
+# Run all e2e scenario specs sequentially.
+poc-e2e: poc-e2e-s1 poc-e2e-s3
