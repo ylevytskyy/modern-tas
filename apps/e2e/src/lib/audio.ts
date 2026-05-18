@@ -22,8 +22,11 @@ export function parseWavDurationMs(buf: Buffer): number {
     if (chunkId === 'fmt ') {
       // fmt fields: audioFormat (offset+8), numChannels (+10), sampleRate (+12), byteRate (+16),
       // blockAlign (+20), bitsPerSample (+22). The +16 byteRate is what duration calc needs.
+      // Need bytes at offset+16 through offset+19 — guard before reading.
+      if (offset + 20 > buf.length) throw new Error('WAV parse: fmt chunk truncated');
       byteRate = buf.readUInt32LE(offset + 16);
     } else if (chunkId === 'data') {
+      if (chunkSize === 0xFFFFFFFF) throw new Error('WAV parse: RF64/streaming WAV not supported');
       dataSize = chunkSize;
       break;
     }
