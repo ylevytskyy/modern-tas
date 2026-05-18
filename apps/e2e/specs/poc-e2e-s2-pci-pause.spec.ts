@@ -54,12 +54,17 @@ const RECORDINGS_BUCKET  = 'tas-recordings';
 
 const CI = !!process.env.CI;
 const SCREEN_POP_BUDGET_MS  = CI ? 3_000 : 40_000;
-const PAUSE_ROW_TIMEOUT_MS  = 2_000;
+// Pause click → HTTP POST → ARI → DB write can exceed 2s on slow CI Docker.
+// 5 000 ms is still tight enough to catch real hangs on both environments.
+const PAUSE_ROW_TIMEOUT_MS  = CI ? 5_000 : 5_000;
 // On local-dev, StasisEnd → finalizeRecording → DB update can lag several seconds
 // after SIPp exits (Docker-bridge NAT + Asterisk retransmit delay). Match the
 // CI ? 5_000 : 15_000 pattern used by S-3 for the same finalization poll.
 const WAV_EXISTS_TIMEOUT_MS = CI ? 5_000 : 15_000;
-const SCENARIO_WALL_CLOCK_MS = 60_000;
+// Worst-case local: ~1s setup + 40s screen-pop + 2s accept + 2s wait + 5s pause-row poll
+// + 2s PAUSE_DURATION + 5s resume-row poll + ~0s sipp + 15s endedAt + 15s MinIO ≈ 87s.
+// 120s gives ~33s safety margin. CI worst-case ≈ 30s; 60s gives a 2× buffer.
+const SCENARIO_WALL_CLOCK_MS = CI ? 60_000 : 120_000;
 
 const PAUSE_DURATION_MS = 2_000;
 
