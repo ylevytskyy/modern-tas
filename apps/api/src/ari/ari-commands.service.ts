@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { AriLeaderClient, AriClientHandle } from '@tas/ari-client';
-import { ARI_LEADER_TOKEN } from './ari.module';
+import { ARI_LEADER_TOKEN } from './ari-tokens';
 
 @Injectable()
 export class AriCommandsService {
