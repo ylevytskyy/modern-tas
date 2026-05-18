@@ -195,6 +195,7 @@ export class AriLeaderClient {
   private _loseLeadership(reason: string): void {
     if (!this.isLeader) return;
     this.isLeader = false;
+    this._hangupCauses.clear(); // prevent stale cause codes from corrupting new calls (channel ID reuse)
     const handle = this.ariHandle;
     this.ariHandle = null;
     // Fire on next tick so WS close and onLoseLease run after current operation, before any I/O.
