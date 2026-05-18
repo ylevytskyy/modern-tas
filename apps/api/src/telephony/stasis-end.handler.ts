@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { eq, and, isNull, arrayContains } from 'drizzle-orm';
-import { call, recording } from '@tas/db';
+import { eq, arrayContains } from 'drizzle-orm';
+import { call } from '@tas/db';
 import type { Db } from '@tas/db/client';
 import { AriLeaderClient } from '@tas/ari-client';
 import type { StasisEndEvent } from '@tas/ari-client';
@@ -9,6 +9,7 @@ import { DB_TOKEN } from '../database/database.module';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NatsSubjects } from '@tas/shared-types';
 import type { NatsCallEndedPayload } from '@tas/shared-types';
+import { RecordingService } from '../recording/recording.service';
 
 /**
  * Q.850 codes emitted by caller-side hangup:
@@ -63,6 +64,7 @@ export class StasisEndHandler implements OnModuleInit {
     @Inject(ARI_LEADER_TOKEN) private readonly ari: AriLeaderClient,
     @Inject(DB_TOKEN) private readonly db: Db,
     private readonly nats: NatsClientService,
+    private readonly recordingService: RecordingService,
   ) {}
 
   onModuleInit(): void {
@@ -97,13 +99,9 @@ export class StasisEndHandler implements OnModuleInit {
         .set({ endedAt, endedBy })
         .where(eq(call.id, callRow.id));
 
-      // Finalize any open recording row.
-      // MixMonitor stop is handled by Asterisk automatically on channel hangup;
-      // we only need to mark the DB recording as ended.
-      await this.db
-        .update(recording)
-        .set({ endedAt })
-        .where(and(eq(recording.callId, callRow.id), isNull(recording.endedAt)));
+      // Finalize the recording: stop MixMonitor (via Channel.record stop), read the WAV from
+      // the shared volume, upload to MinIO, and mark recording.endedAt.
+      await this.recordingService.finalizeRecording(callRow.id);
 
       const payload: NatsCallEndedPayload = {
         callId: callRow.id,
