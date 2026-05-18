@@ -16,7 +16,7 @@ beforeAll(async () => {
     // Echo the registration frame, then push a synthetic screen-pop.
     ws.once('message', () => {
       ws.send(JSON.stringify({
-        event: 'call.screen_pop',
+        event: 'call.screenpop',
         data: { type: 'incoming_call', callId: 'c1', tenantId: 't1', accountId: 'a1', callerE164: '+15551234567' },
       }));
     });

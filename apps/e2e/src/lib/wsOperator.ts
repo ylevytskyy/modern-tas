@@ -10,6 +10,8 @@
  * first message to synchronise test timing.
  */
 
+import { WsEvents } from '@tas/shared-types';
+
 export type ScreenPopEvent = {
   callId: string;
   tenantId: string;
@@ -52,7 +54,7 @@ export class WsOperator {
       try {
         const raw = typeof msg.data === 'string' ? msg.data : (msg.data as Buffer).toString();
         const parsed = JSON.parse(raw) as { event?: string; data?: unknown };
-        if (parsed.event === 'call.screen_pop' && parsed.data) {
+        if (parsed.event === WsEvents.CALL_SCREEN_POP && parsed.data) {
           const ev = parsed.data as ScreenPopEvent;
           if (this.waiter) {
             const w = this.waiter;

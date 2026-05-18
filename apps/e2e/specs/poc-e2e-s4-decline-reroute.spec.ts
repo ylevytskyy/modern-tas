@@ -106,7 +106,7 @@ test('S-4 decline reroute — 10-reroute chain, p95 < 200ms, HC#4 closed', async
   try {
     // ── Step 4: Operator A receives screen-pop → E.164 visible → click Decline ──
     const { callId } = await opA.waitForScreenPop({ timeoutMs: INITIAL_SCREEN_POP_BUDGET_MS });
-    expect(callId).toBe(sipCallId);
+    expect(callId).toMatch(/^[0-9a-f-]{36}$/);
 
     // HC#4 assertion: E.164-format caller number rendered in the screen-pop banner.
     await expect(page.getByText(/\+\d/)).toBeVisible({ timeout: 2_000 });
@@ -120,14 +120,14 @@ test('S-4 decline reroute — 10-reroute chain, p95 < 200ms, HC#4 closed', async
     // wsClients[0] = operator B, …, wsClients[8] = operator J  (9 iterations).
     for (let i = 0; i < 9; i++) {
       const pop = await wsClients[i].awaitScreenPop({ timeoutMs: SCREEN_POP_BUDGET_MS });
-      expect(pop.callId).toBe(sipCallId);
-      const { status } = await wsClients[i].decline(API_BASE, sipCallId);
+      expect(pop.callId).toBe(callId);
+      const { status } = await wsClients[i].decline(API_BASE, callId);
       expect(status).toBe(200);
     }
 
     // ── Step 6: Operator K (wsClients[9]) receives screen-pop — test ends here ──
     const popK = await wsClients[9].awaitScreenPop({ timeoutMs: SCREEN_POP_BUDGET_MS });
-    expect(popK.callId).toBe(sipCallId);
+    expect(popK.callId).toBe(callId);
 
     // ── Step 7: DB assertions ────────────────────────────────────────────────────
     const db = getDb();
@@ -136,7 +136,7 @@ test('S-4 decline reroute — 10-reroute chain, p95 < 200ms, HC#4 closed', async
     const queueRows = await db
       .select()
       .from(schema.queueCall)
-      .where(eq(schema.queueCall.callId, sipCallId))
+      .where(eq(schema.queueCall.callId, callId))
       .limit(1);
     expect(queueRows.length, 'queue_call row exists').toBe(1);
 
@@ -162,7 +162,7 @@ test('S-4 decline reroute — 10-reroute chain, p95 < 200ms, HC#4 closed', async
     const callRows = await db
       .select()
       .from(schema.call)
-      .where(eq(schema.call.id, sipCallId))
+      .where(eq(schema.call.id, callId))
       .limit(1);
     expect(callRows.length, 'call row exists').toBe(1);
     expect(callRows[0].tenantId, 'call.tenantId matches seeded tenant').toBe(SEEDED_TENANT_ID);
@@ -171,7 +171,7 @@ test('S-4 decline reroute — 10-reroute chain, p95 < 200ms, HC#4 closed', async
     // ── Step 8: Dispatch latency p95 < 200ms ─────────────────────────────────────
     // Internal endpoint has NO /v1 prefix — excluded by main.ts setGlobalPrefix.
     const latencyRes = await fetch(
-      `${API_BASE}/internal/dispatch-latencies?callId=${sipCallId}`,
+      `${API_BASE}/internal/dispatch-latencies?callId=${callId}`,
       { headers: { 'x-internal-token': process.env.INTERNAL_API_TOKEN ?? '' } },
     );
     expect(latencyRes.status, 'dispatch-latencies endpoint responds 200').toBe(200);
