@@ -17,6 +17,7 @@ import { TemporalModule } from './temporal/temporal.module';
 import { DevModule } from './dev/dev.module';
 import { HealthModule } from './health/health.module';
 import { InternalModule } from './internal/internal.module';
+import { CallsModule } from './calls/calls.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { InternalModule } from './internal/internal.module';
     RedisModule,
     AriModule,
     AccountModule,
+    CallsModule,
     ContactModule,
     FormModule,
     MessageModule,
