@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-up-all-docker poc-test-all-docker-up poc-e2e-s1 poc-e2e-s2 poc-e2e-s3 poc-e2e
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-up-all-docker poc-test-all-docker-up poc-e2e-s1 poc-e2e-s2 poc-e2e-s3 poc-e2e-s4 poc-e2e
 
 COMPOSE_FILE := infra/docker-compose.yml
 
@@ -91,5 +91,11 @@ poc-e2e-s2:
 poc-e2e-s3:
 	pnpm --filter @tas/e2e run test:e2e:s3
 
+# Run the S-4 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
+# NOTE: the stack must be seeded with SEED_PROFILE=s4 before running this target.
+# Locally: SEED_PROFILE=s4 make poc-seed && make poc-e2e-s4
+poc-e2e-s4:
+	pnpm --filter @tas/e2e run test:e2e:s4
+
 # Run all e2e scenario specs sequentially.
-poc-e2e: poc-e2e-s1 poc-e2e-s2 poc-e2e-s3
+poc-e2e: poc-e2e-s1 poc-e2e-s2 poc-e2e-s3 poc-e2e-s4

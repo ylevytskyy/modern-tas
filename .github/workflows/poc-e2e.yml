@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario: [s1, s2, s3]
+        scenario: [s1, s2, s3, s4]
     env:
       INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
       APP_JWT_SECRET:     ${{ secrets.APP_JWT_SECRET }}
@@ -57,7 +57,13 @@ jobs:
       # doesn't burn the CI screen-pop budget on image fetch.
       - run: docker pull sieteunoseis/sipp@sha256:9183ba7b21f49edcf028e30f9a086d5fa0fad3984caf9f15a05aea474de9bdd3
 
-      - run: make poc-seed
+      - name: Seed database
+        run: |
+          if [ "${{ matrix.scenario }}" = "s4" ]; then
+            DATABASE_URL=postgres://tas:tas@localhost:5432/tas SEED_PROFILE=s4 pnpm --filter @tas/db run seed
+          else
+            make poc-seed
+          fi
 
       - run: pnpm --filter @tas/api run test
 
@@ -73,6 +79,66 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-failure-${{ matrix.scenario }}-${{ github.run_id }}
+          path: |
+            apps/e2e/playwright-report/
+            apps/e2e/test-results/
+            /tmp/compose-logs/
+
+      - if: always()
+        run: docker compose -f infra/docker-compose.yml -f infra/docker-compose.all-in.yml down -v || true
+
+  e2e-aggregate-sequential:
+    needs: e2e
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    timeout-minutes: 60
+    env:
+      INTERNAL_API_TOKEN: ${{ secrets.INTERNAL_API_TOKEN }}
+      APP_JWT_SECRET:     ${{ secrets.APP_JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @tas/shared-types --filter @tas/db --filter @tas/ari-client run build
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - run: pnpm --filter @tas/e2e exec playwright install --with-deps chromium
+
+      - run: make poc-up-all-docker
+
+      - run: docker pull sieteunoseis/sipp@sha256:9183ba7b21f49edcf028e30f9a086d5fa0fad3984caf9f15a05aea474de9bdd3
+
+      - name: Seed (s4 profile — covers s1..s4 operators)
+        run: DATABASE_URL=postgres://tas:tas@localhost:5432/tas SEED_PROFILE=s4 pnpm --filter @tas/db run seed
+
+      - name: Run aggregate sequential e2e (s1..s4)
+        run: make poc-e2e
+
+      - if: failure()
+        run: |
+          mkdir -p /tmp/compose-logs
+          docker compose -f infra/docker-compose.yml -f infra/docker-compose.all-in.yml \
+            logs --no-color --tail=2000 > /tmp/compose-logs/all.log || true
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-aggregate-failure-${{ github.run_id }}
           path: |
             apps/e2e/playwright-report/
             apps/e2e/test-results/
