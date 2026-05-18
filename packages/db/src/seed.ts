@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { makeDb } from "./client";
 import { tenant, account, did, contact, form, user, queue } from "./schema";
 
@@ -44,14 +45,17 @@ async function main() {
       '77777777-7777-7777-7777-777777777779',
       '77777777-7777-7777-7777-77777777777a',
     ];
-    await db.insert(user).values(
+    const inserted = await db.insert(user).values(
       operatorBthroughK.map((id, i) => ({
         id,
         tenantId: FIXED_IDS.tenant,
         email: `operator-${String.fromCharCode(98 + i)}@s4.test`,
         role: 'operator' as const,
       })),
-    ).onConflictDoNothing();
+    ).onConflictDoNothing().returning({ id: user.id });
+    console.log(`seed: s4 inserted ${inserted.length} operator rows (returning)`);
+    const verify = await db.execute<{ count: string }>(sql`SELECT count(*)::text AS count FROM "user" WHERE role = 'operator'`);
+    console.log(`seed: s4 verify — operator-role users in DB: ${JSON.stringify(verify)}`);
   }
 
   await db.insert(queue).values({ id: FIXED_IDS.queue, accountId: FIXED_IDS.account, name: "main", strategy: "fifo" }).onConflictDoNothing();
