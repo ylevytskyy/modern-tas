@@ -5,7 +5,7 @@ import { ArbiterService } from './arbiter.service';
 import { NatsClientService } from '../nats/nats-client.service';
 import { NATS_CLIENT_TOKEN } from '../nats/nats.module';
 import { WsGateway } from '../ws/ws.gateway';
-import type { WsIncomingCallPayload } from '@tas/shared-types';
+import type { NatsStasisStartPayload, WsIncomingCallPayload } from '@tas/shared-types';
 
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 
@@ -39,6 +39,7 @@ describe('ArbiterService', () => {
       channel: 'test-channel',
       tenantId: '11111111-1111-1111-1111-111111111111',
       accountId: '22222222-2222-2222-2222-222222222222',
+      fromE164: '',
     };
 
     await arbiter.dispatch(stasisPayload);
@@ -70,6 +71,22 @@ describe('ArbiterService', () => {
     expect(mockWsGateway.sendCallEnded).toHaveBeenCalledWith(
       SEEDED_OPERATOR_ID,
       { callId: 'cccccccc-cccc-cccc-cccc-cccccccccccc', endedBy: 'caller' },
+    );
+  });
+
+  it('forwards payload.fromE164 as callerE164 on the WS payload (HC#4)', async () => {
+    mockWsGateway.sendToOperator.mockClear();
+    const payload: NatsStasisStartPayload = {
+      callId: '11111111-1111-1111-1111-111111111111',
+      channel: 'PJSIP/sipp-00000001',
+      tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      accountId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+      fromE164: '+15551234567',
+    };
+    await arbiter.dispatch(payload);
+    expect(mockWsGateway.sendToOperator).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ callerE164: '+15551234567' }),
     );
   });
 });

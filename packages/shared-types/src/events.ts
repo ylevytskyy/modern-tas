@@ -38,6 +38,8 @@ export interface NatsStasisStartPayload {
   channel: string;
   tenantId: string;
   accountId: string;
+  /** Caller E.164 (Chunk 6 S-4 HC#4 — closes the `callerE164:''` hardcode). */
+  fromE164: string;
 }
 
 /**

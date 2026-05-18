@@ -89,6 +89,7 @@ describe('StasisStartHandler', () => {
         channel: channelId,
         tenantId: TENANT_ID,
         accountId: ACCOUNT_ID,
+        fromE164: '+15555550200',
       }),
     );
 

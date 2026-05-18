@@ -91,6 +91,7 @@ export class StasisStartHandler implements OnModuleInit {
       channel: channelId,
       tenantId,
       accountId,
+      fromE164: callerE164,
     };
     this.nats.publish(NatsSubjects.STASIS_START, payload);
   }
