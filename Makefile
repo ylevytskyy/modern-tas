@@ -1,4 +1,4 @@
-.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3 poc-up-all-docker poc-test-all-docker-up poc-e2e-s1 poc-e2e-s3 poc-e2e
+.PHONY: poc-up poc-down poc-seed poc-status poc-logs api-dev poc-jwt poc-test-chunk3 poc-up-all-docker poc-test-all-docker-up poc-e2e-s1 poc-e2e-s2 poc-e2e-s3 poc-e2e
 
 COMPOSE_FILE := infra/docker-compose.yml
 
