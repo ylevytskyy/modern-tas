@@ -60,7 +60,7 @@ jobs:
       - name: Seed database
         run: |
           if [ "${{ matrix.scenario }}" = "s4" ]; then
-            DATABASE_URL=postgres://tas:tas@localhost:5432/tas SEED_PROFILE=s4 pnpm --filter @tas/db run seed
+            SEED_PROFILE=s4 make poc-seed
           else
             make poc-seed
           fi
@@ -124,7 +124,7 @@ jobs:
       - run: docker pull sieteunoseis/sipp@sha256:9183ba7b21f49edcf028e30f9a086d5fa0fad3984caf9f15a05aea474de9bdd3
 
       - name: Seed (s4 profile — covers s1..s4 operators)
-        run: DATABASE_URL=postgres://tas:tas@localhost:5432/tas SEED_PROFILE=s4 pnpm --filter @tas/db run seed
+        run: SEED_PROFILE=s4 make poc-seed
 
       - name: Run aggregate sequential e2e (s1..s4)
         run: make poc-e2e
