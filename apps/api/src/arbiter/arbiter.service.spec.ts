@@ -254,4 +254,39 @@ describe('ArbiterService', () => {
       );
     });
   });
+
+  describe('latency ring buffer', () => {
+    it('records dispatch latency keyed by callId and exposes via getLatenciesForCall', async () => {
+      // Use a unique callId not shared with any other test to avoid ring-buffer cross-contamination.
+      const uniqueCallId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
+      mockDb.select = vi.fn()
+        .mockReturnValueOnce({
+          from: () => ({
+            where: () => ({
+              limit: () => Promise.resolve([{ attempts: [] }]),
+            }),
+          }),
+        })
+        .mockReturnValueOnce({
+          from: () => ({
+            where: () => ({
+              orderBy: () => ({
+                limit: () => Promise.resolve([{ id: '77777777-7777-7777-7777-777777777771' }]),
+              }),
+            }),
+          }),
+        });
+      await arbiter.dispatch({
+        callId: uniqueCallId,
+        channel: 'PJSIP/sipp-00000001',
+        tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        accountId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        fromE164: '+15551234567',
+      });
+      const samples = arbiter.getLatenciesForCall(uniqueCallId);
+      expect(samples).toHaveLength(1);
+      expect(samples[0]).toBeGreaterThanOrEqual(0);
+      expect(samples[0]).toBeLessThan(1000);
+    });
+  });
 });

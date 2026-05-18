@@ -23,6 +23,20 @@ export class ArbiterService implements OnModuleInit {
     @Inject(DB_TOKEN) private readonly db: Db,
   ) {}
 
+  private readonly latencyBuffer: Array<{ callId: string; latencyMs: number }> = [];
+  private readonly LATENCY_BUFFER_MAX = 100;
+
+  private recordLatency(callId: string, latencyMs: number): void {
+    this.latencyBuffer.push({ callId, latencyMs });
+    while (this.latencyBuffer.length > this.LATENCY_BUFFER_MAX) {
+      this.latencyBuffer.shift();
+    }
+  }
+
+  getLatenciesForCall(callId: string): number[] {
+    return this.latencyBuffer.filter((s) => s.callId === callId).map((s) => s.latencyMs);
+  }
+
   onModuleInit(): void {
     this.nats.subscribe<NatsStasisStartPayload>(
       NatsSubjects.STASIS_START,
@@ -35,6 +49,8 @@ export class ArbiterService implements OnModuleInit {
   }
 
   async dispatch(payload: NatsStasisStartPayload): Promise<void> {
+    // SLA window per design §6: dispatch entry to WS send return; includes DB query time.
+    const t0 = performance.now();
     const operatorId = await this.selectOperator(payload.callId);
     if (operatorId === null) {
       const exhausted: WsCallExhaustedPayload = {
@@ -52,6 +68,8 @@ export class ArbiterService implements OnModuleInit {
       callerE164: payload.fromE164,
     };
     this.wsGateway.sendToOperator(operatorId, wsPayload);
+    const t1 = performance.now();
+    this.recordLatency(payload.callId, t1 - t0);
   }
 
   async dispatchByCallId(callId: string): Promise<void> {
