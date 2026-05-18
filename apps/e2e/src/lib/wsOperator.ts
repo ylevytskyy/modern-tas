@@ -25,8 +25,15 @@ export class WsOperator {
   private pending: ScreenPopEvent[] = [];
   /** Resolve callback when awaitScreenPop() is waiting for the next event. */
   private waiter: ((ev: ScreenPopEvent) => void) | null = null;
+  // Explicit field assignment (not constructor parameter properties) — Playwright's
+  // Node strip-types loader does not support the `constructor(private readonly …)` shorthand.
+  private readonly url: string;
+  private readonly jwt: string;
 
-  constructor(private readonly url: string, private readonly jwt: string) {}
+  constructor(url: string, jwt: string) {
+    this.url = url;
+    this.jwt = jwt;
+  }
 
   /**
    * Opens the WebSocket connection (JWT in query param) and sends a no-op
