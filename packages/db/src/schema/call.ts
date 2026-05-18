@@ -27,6 +27,6 @@ export const recordingRedactionInterval = pgTable("recording_redaction_interval"
   id: uuid("id").defaultRandom().primaryKey(),
   recordingId: uuid("recording_id").notNull().references(() => recording.id),
   startMs: integer("start_ms").notNull(),
-  endMs: integer("end_ms").notNull(),
+  endMs: integer("end_ms"),
   reason: text("reason", { enum: ["operator_pci_pause", "auto_pii_ml"] }).notNull(),
 });
