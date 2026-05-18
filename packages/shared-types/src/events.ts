@@ -17,6 +17,7 @@ export const NatsSubjects = {
 export const WsEvents = {
   CALL_SCREEN_POP: 'call.screenpop',
   CALL_ENDED: 'call.ended',
+  CALL_EXHAUSTED: 'call.exhausted',
   MESSAGE_SENT: 'message.sent',
 } as const;
 
@@ -58,6 +59,12 @@ export interface NatsCallEndedPayload {
 export interface WsCallEndedPayload {
   callId: string;
   endedBy: 'caller' | 'operator' | 'system';
+}
+
+/** WS payload shape for the `call.exhausted` event (emitted when no operator is available). */
+export interface WsCallExhaustedPayload {
+  callId: string;
+  tenantId: string;
 }
 
 /** WS payload shape for the `call.screenpop` event (sent to F03 operator UI). */
