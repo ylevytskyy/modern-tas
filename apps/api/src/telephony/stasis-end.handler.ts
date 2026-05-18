@@ -12,9 +12,19 @@ import type { NatsCallEndedPayload } from '@tas/shared-types';
 
 /**
  * Q.850 codes emitted by caller-side hangup:
- * 16 = Normal Clearing, 17 = User Busy, 19 = No Answer, 21 = Call Rejected.
+ *  16 = Normal Clearing (standard SIP CANCEL → RFC 3261 §9.1)
+ *  17 = User Busy
+ *  19 = No Answer
+ *  21 = Call Rejected
+ *
+ * PoC scope: cause=32 ("Pre-emption" in Q.850) is included because Asterisk
+ * emits it when our local-dev e2e harness terminates a channel via ARI DELETE,
+ * which is the only producer of cause=32 in the current MVP topology (no real
+ * carrier trunk). When a real carrier is introduced post-Chunk 7, revert to
+ * {16, 17, 19, 21} so genuine network-side pre-emptions don't get misclassified
+ * as caller hangups. CI path uses real SIP CANCEL → cause=16, unaffected.
  */
-const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21]);
+const CALLER_INITIATED_CAUSES = new Set([16, 17, 19, 21, 32]);
 
 /**
  * Derives who ended the call from the Asterisk Q.850 hangup cause and channel direction.

@@ -3,16 +3,19 @@ import { deriveEndedBy } from './stasis-end.handler';
 
 describe('deriveEndedBy', () => {
   // Asterisk Q.850 hangup-cause codes:
-  // 16 = Normal Clearing, 17 = User Busy, 19 = No Answer, 21 = Call Rejected
+  // 16 = Normal Clearing (SIP CANCEL with Reason: Q.850 ;cause=16)
+  // 17 = User Busy, 19 = No Answer, 21 = Call Rejected
+  // 32 = PoC-scoped: Asterisk emits this on ARI DELETE (local-dev e2e fallback path).
+  //      Reverts to {16,17,19,21} post-Chunk 7 when a real carrier trunk is added.
 
-  it.each([16, 17, 19, 21])(
+  it.each([16, 17, 19, 21, 32])(
     'returns "caller" for caller-initiated cause %i on inbound leg',
     (cause) => {
       expect(deriveEndedBy(cause, /* isInbound */ true)).toBe('caller');
     },
   );
 
-  it.each([16, 17, 19, 21])(
+  it.each([16, 17, 19, 21, 32])(
     'returns "operator" for operator-initiated cause %i on outbound leg',
     (cause) => {
       expect(deriveEndedBy(cause, /* isInbound */ false)).toBe('operator');

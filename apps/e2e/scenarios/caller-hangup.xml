@@ -2,18 +2,18 @@
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 <scenario name="S-3 caller hangup mid-screen-pop">
 
-  <!-- S-3 caller-hangup scenario: INVITE → wait for 100 → pause → CANCEL.
+  <!-- S-3 caller-hangup scenario: INVITE → 100 → pause → CANCEL → 200+487 → ACK.
 
        In CI (Linux Docker, fully bidirectional UDP): SIPp reliably receives
        the 100 Trying, waits 1500 ms for screen-pop to render, then sends
-       CANCEL. Asterisk processes CANCEL → fires ChannelHangupRequest(cause=16)
-       → StasisEnd → endedBy='caller'. Scenario exits code 0.
+       CANCEL. Asterisk processes CANCEL with Reason: Q.850 ;cause=16 →
+       fires ChannelHangupRequest(cause=16) → StasisEnd → deriveEndedBy
+       returns 'caller'. Scenario exits code 0.
 
        On Docker Desktop host-dev: UDP return path from Asterisk is unreliable;
        100 Trying rarely arrives. SIPp aborts after the INVITE transaction times
-       out (~32 s). The spec compensates via triggerAriHangupIfNeeded() which
-       deletes the Asterisk channel via ARI after screen-pop, producing the same
-       StasisEnd → endedBy='caller' outcome via the undefined-cause → caller path. -->
+       out (~32 s). Local testing requires either a Linux Docker environment or
+       host-side Asterisk (make poc-up) for reliable SIPp ↔ Asterisk connectivity. -->
   <send retrans="500">
     <![CDATA[
       INVITE sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
@@ -37,16 +37,17 @@
     ]]>
   </send>
 
-  <!-- 100 Trying — arrives quickly in CI; not reliably received on Docker Desktop.
-       SIPp waits here until the INVITE transaction times out (32 s) on host-dev;
-       the spec's triggerAriHangupIfNeeded() fires independently after screen-pop. -->
+  <!-- 100 Trying: Asterisk sends this immediately on receiving the INVITE.
+       SIPp waits for it before proceeding to the pause + CANCEL.
+       In CI (Linux Docker) this arrives reliably within milliseconds. -->
   <recv response="100" />
 
   <!-- 1500 ms: screen-pop renders in browser before caller sends CANCEL. -->
   <pause milliseconds="1500" />
 
-  <!-- CANCEL: correct SIP method to abort an unanswered INVITE.
-       Matches the INVITE transaction via Call-ID + branch + CSeq: 1 CANCEL. -->
+  <!-- CANCEL: correct SIP method to abort an unanswered INVITE per RFC 3261 §9.1.
+       Reason: Q.850 ;cause=16 (Normal call clearing) instructs Asterisk to emit
+       ChannelHangupRequest(cause=16) → deriveEndedBy(16, isInbound=true) = 'caller'. -->
   <send retrans="500">
     <![CDATA[
       CANCEL sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
@@ -55,12 +56,13 @@
       To: <sip:+15555550100@[remote_ip]:[remote_port]>
       Call-ID: [callid]
       CSeq: 1 CANCEL
+      Reason: Q.850 ;cause=16 ;text="Normal call clearing"
       Max-Forwards: 70
       Content-Length: 0
     ]]>
   </send>
 
-  <!-- 200 OK for CANCEL (mandatory in CI; optional marker allows CI variants). -->
+  <!-- 200 OK for CANCEL: confirms Asterisk received and will process the CANCEL. -->
   <recv response="200" crlf="true" />
 
   <!-- 487 Request Terminated for the original INVITE. -->

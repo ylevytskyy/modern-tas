@@ -8,12 +8,19 @@ import { eq } from 'drizzle-orm';
 
 const SEEDED_TENANT_ID   = '11111111-1111-1111-1111-111111111111';
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
-const CI = !!process.env.CI;
 // CI budget is tight (3s) — accounts for docker compose startup + pipeline latency.
-// Local budget is generous (40s) — accounts for Docker UDP retransmit quirk on host-dev.
+// Local budget is generous (40s) — accounts for Docker Desktop UDP retransmit quirk on host-dev.
+const CI = !!process.env.CI;
 const SCREEN_POP_BUDGET_MS = CI ? 3_000 : 40_000;
 const ENDED_POLL_TIMEOUT_MS = CI ? 5_000 : 15_000;
 const SCENARIO_WALL_CLOCK_MS = 45_000;
+
+// Dual-path test: in CI (Linux conntrack), SIPp CANCEL reaches Asterisk over
+// UDP and produces ChannelHangupRequest(cause=16). On local-dev (Docker Desktop
+// bridge NAT drops retransmitted provisional responses), SIPp times out and we
+// fall back to terminating the channel via ARI DELETE, which produces
+// ChannelHangupRequest(cause=32). Both map to endedBy='caller' via the
+// PoC-scoped derivation in stasis-end.handler.ts.
 
 /**
  * On Docker Desktop host-dev, SIPp cannot reliably receive the 100 Trying response
@@ -41,8 +48,7 @@ async function triggerAriHangupIfNeeded(callId: string): Promise<void> {
 
   const channels = await resp.json() as Array<{ id: string; protocol_id: string; state: string }>;
 
-  // Find the channel whose SIP Call-ID is NOT our sipCallId. Actually we need to
-  // match by the call row's routedThrough field. Query the DB for the channel ID.
+  // Find the channel whose Asterisk channel ID matches the call's routedThrough field.
   const db = getDb();
   const [callRow] = await db.select({ routedThrough: schema.call.routedThrough }).from(schema.call).where(eq(schema.call.id, callId));
   if (!callRow || !callRow.routedThrough?.length) return;
@@ -54,8 +60,9 @@ async function triggerAriHangupIfNeeded(callId: string): Promise<void> {
   const channel = channels.find((c) => c.id === channelId);
   if (!channel) return; // Already hung up by SIPp CANCEL — normal CI path.
 
-  // Delete the channel with reason=normal so Asterisk emits ChannelHangupRequest(cause=16)
-  // before StasisEnd — this lets deriveEndedBy resolve to 'caller' via Q.850 cause 16.
+  // Delete the channel with reason=normal. Asterisk will emit ChannelHangupRequest(cause=32)
+  // before StasisEnd regardless of the reason param (ARI DELETE always produces cause=32).
+  // This is accepted in the PoC topology — see CALLER_INITIATED_CAUSES in stasis-end.handler.ts.
   const deleteUrl = `${ARI_BASE}/ari/channels/${channelId}?reason=normal&api_key=${ARI_CREDS}`;
   await fetch(deleteUrl, {
     method: 'DELETE',
@@ -102,7 +109,7 @@ test('S-3 caller hangs up mid-screen-pop: endedBy=caller, recording finalized, b
   // In CI, SIPp's CANCEL path is fully bidirectional (Linux Docker, real UDP) and
   // SIPp should exit 0. On host-dev, the 100 Trying UDP return-path quirk may cause
   // SIPp to exit non-zero, so we skip the assertion there.
-  if (process.env.CI) {
+  if (CI) {
     expect(sipp.exitCode, `SIPp exited ${sipp.exitCode}: ${sipp.stderr}`).toBe(0);
   }
 
