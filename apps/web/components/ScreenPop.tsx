@@ -6,6 +6,7 @@ export interface ScreenPopProps {
   call: WsIncomingCallPayload | null;
   accepted: boolean;
   paused: boolean;
+  pciPending?: boolean;
   onAccept: () => void;
   onPciToggle: () => void;
   callEnded?: Pick<WsCallEndedPayload, 'endedBy'>;
@@ -16,7 +17,7 @@ export function ScreenPop(props: ScreenPopProps) {
   if (!props.call) {
     return <section aria-label="screen-pop"><p>Waiting for call…</p></section>;
   }
-  const { call, accepted, paused, onAccept, onPciToggle, callEnded, onBannerDismiss } = props;
+  const { call, accepted, paused, pciPending, onAccept, onPciToggle, callEnded, onBannerDismiss } = props;
   return (
     <section aria-label="screen-pop" data-testid="screen-pop" data-call-id={call.callId}>
       {callEnded && (
@@ -34,7 +35,7 @@ export function ScreenPop(props: ScreenPopProps) {
       {!callEnded && !accepted && <button onClick={onAccept} data-testid="accept-call">Accept</button>}
       {!callEnded && accepted && (
         <>
-          <button onClick={onPciToggle}>{paused ? 'Resume' : 'PCI pause'}</button>
+          <button onClick={onPciToggle} disabled={!!pciPending}>{paused ? 'Resume' : 'PCI pause'}</button>
           {paused && <span role="status">Paused</span>}
         </>
       )}

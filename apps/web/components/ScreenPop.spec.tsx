@@ -102,4 +102,23 @@ describe('ScreenPop', () => {
     );
     expect(screen.queryByRole('alert')).toBeNull();
   });
+
+  it('PCI button is disabled when pciPending=true, blocking a second click', async () => {
+    let callCount = 0;
+    render(
+      <ScreenPop
+        call={PAYLOAD}
+        onAccept={() => {}}
+        onPciToggle={() => { callCount++; }}
+        accepted={true}
+        paused={false}
+        pciPending={true}
+      />,
+    );
+    const btn = screen.getByRole('button', { name: /pci pause/i });
+    expect(btn).toBeDisabled();
+    // userEvent respects the disabled attribute — click is swallowed
+    await userEvent.click(btn);
+    expect(callCount).toBe(0);
+  });
 });
