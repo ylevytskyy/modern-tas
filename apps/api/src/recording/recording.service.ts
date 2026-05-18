@@ -75,7 +75,12 @@ export class RecordingService {
       this.logger.warn(`finalizeRecording: WAV for call ${callId} is zero-byte; uploading anyway`);
     }
 
-    await this.minio.putObject(MINIO_BUCKET, rec.path, wavBytes);
+    try {
+      await this.minio.putObject(MINIO_BUCKET, rec.path, wavBytes);
+    } catch (err) {
+      this.logger.error(`finalizeRecording: minio.putObject failed for call ${callId}: ${String(err)}`);
+    }
+
     await this.db.update(recording).set({ endedAt: new Date() }).where(eq(recording.id, rec.id));
   }
 }

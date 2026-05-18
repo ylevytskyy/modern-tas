@@ -79,4 +79,17 @@ describe('RecordingService.finalizeRecording', () => {
     expect(deps.minio.putObject).not.toHaveBeenCalled();
     expect(deps.dbState.updates).toHaveLength(1);
   });
+
+  it('still marks recording.endedAt and does not propagate when minio.putObject throws', async () => {
+    deps.dbState.rows.push({ id: 'rec-1', path: `recordings/${callId}.wav`, callId, tenantId: 't' });
+    vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('RIFF....WAVE'));
+    deps.minio.putObject.mockRejectedValue(new Error('MinIO unreachable'));
+
+    // Should not throw
+    await expect(svc.finalizeRecording(callId)).resolves.toBeUndefined();
+
+    // endedAt must still be committed
+    expect(deps.dbState.updates).toHaveLength(1);
+    expect(deps.dbState.updates[0].endedAt).toBeInstanceOf(Date);
+  });
 });
