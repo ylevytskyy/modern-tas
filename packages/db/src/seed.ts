@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import { makeDb } from "./client";
 import { tenant, account, did, contact, form, user, queue } from "./schema";
 
@@ -22,7 +21,6 @@ const FORM_SCHEMA = {
 
 async function main() {
   const db = makeDb(process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas");
-  console.log(`seed: SEED_PROFILE=${process.env.SEED_PROFILE ?? '(unset)'}`);
 
   await db.insert(tenant).values({ id: FIXED_IDS.tenant, name: "demo-tenant" }).onConflictDoNothing();
   await db.insert(account).values({ id: FIXED_IDS.account, tenantId: FIXED_IDS.tenant, name: "Demo Account" }).onConflictDoNothing();
@@ -32,7 +30,6 @@ async function main() {
   await db.insert(user).values({ id: FIXED_IDS.operator, tenantId: FIXED_IDS.tenant, email: "operator@demo.test", role: "operator" }).onConflictDoNothing();
 
   if (process.env.SEED_PROFILE === 's4') {
-    console.log('seed: applying s4 profile — adding operators B-K');
     const operatorBthroughK = [
       '77777777-7777-7777-7777-777777777771',
       '77777777-7777-7777-7777-777777777772',
@@ -45,17 +42,14 @@ async function main() {
       '77777777-7777-7777-7777-777777777779',
       '77777777-7777-7777-7777-77777777777a',
     ];
-    const inserted = await db.insert(user).values(
+    await db.insert(user).values(
       operatorBthroughK.map((id, i) => ({
         id,
         tenantId: FIXED_IDS.tenant,
         email: `operator-${String.fromCharCode(98 + i)}@s4.test`,
         role: 'operator' as const,
       })),
-    ).onConflictDoNothing().returning({ id: user.id });
-    console.log(`seed: s4 inserted ${inserted.length} operator rows (returning)`);
-    const verify = await db.execute<{ count: string }>(sql`SELECT count(*)::text AS count FROM "user" WHERE role = 'operator'`);
-    console.log(`seed: s4 verify — operator-role users in DB: ${JSON.stringify(verify)}`);
+    ).onConflictDoNothing();
   }
 
   await db.insert(queue).values({ id: FIXED_IDS.queue, accountId: FIXED_IDS.account, name: "main", strategy: "fifo" }).onConflictDoNothing();

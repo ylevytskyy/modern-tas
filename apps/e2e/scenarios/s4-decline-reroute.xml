@@ -12,11 +12,11 @@
     <![CDATA[
       INVITE sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      From: "sipp" <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
+      From: "+15555550200" <sip:+15555550200@[local_ip]:[local_port]>;tag=[call_number]
       To: <sip:+15555550100@[remote_ip]:[remote_port]>
       Call-ID: [callid]
       CSeq: 1 INVITE
-      Contact: <sip:sipp@[local_ip]:[local_port]>
+      Contact: <sip:+15555550200@[local_ip]:[local_port]>
       Max-Forwards: 70
       Content-Type: application/sdp
       Content-Length: [len]
@@ -47,7 +47,7 @@
     <![CDATA[
       CANCEL sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      From: "sipp" <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
+      From: "+15555550200" <sip:+15555550200@[local_ip]:[local_port]>;tag=[call_number]
       To: <sip:+15555550100@[remote_ip]:[remote_port]>
       Call-ID: [callid]
       CSeq: 1 CANCEL
@@ -68,7 +68,7 @@
     <![CDATA[
       ACK sip:+15555550100@[remote_ip]:[remote_port] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      From: "sipp" <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
+      From: "+15555550200" <sip:+15555550200@[local_ip]:[local_port]>;tag=[call_number]
       To: <sip:+15555550100@[remote_ip]:[remote_port]>
       Call-ID: [callid]
       CSeq: 1 ACK

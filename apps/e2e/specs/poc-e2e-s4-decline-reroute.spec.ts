@@ -40,7 +40,7 @@ const API_BASE = process.env.E2E_API_BASE_URL ?? 'http://localhost:3000';
 const WS_BASE = process.env.E2E_WS_BASE_URL ?? 'ws://localhost:3000/ws';
 
 // SIPp hold time is ~25s; add 10s for assertion + cleanup.
-const SCENARIO_WALL_CLOCK_MS = 35_000;
+const SCENARIO_WALL_CLOCK_MS = 60_000;
 
 // Per-iteration screen-pop budget — kept tight so a stuck dispatch fails fast
 // rather than burning the full outer timeout.

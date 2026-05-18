@@ -56,7 +56,7 @@ export default function OperatorPage() {
     setDeclinePending(true);
     setDeclineError(null);
     try {
-      const res = await fetch(`/v1/calls/${call.callId}/decline`, {
+      const res = await fetch(`${API_BASE_URL}/v1/calls/${call.callId}/decline`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
