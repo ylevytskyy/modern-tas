@@ -30,11 +30,9 @@ export default function OperatorPage() {
   useEffect(() => {
     if (!token) return;
     const client = createWsClient({ url: WS_URL, token });
-    let clearTimer: ReturnType<typeof setTimeout> | undefined;
 
     client.onOpen(() => setWsReady(true));
     client.onScreenPop((payload) => {
-      clearTimeout(clearTimer);  // cancel any pending call.ended auto-clear
       setCall(payload);
       setAccepted(false);
       setPaused(false);
@@ -42,10 +40,8 @@ export default function OperatorPage() {
     });
     client.onCallEnded((payload) => {
       setCallEnded(payload);
-      clearTimer = setTimeout(() => { setCall(null); setCallEnded(undefined); }, 5000);
     });
     return () => {
-      clearTimeout(clearTimer);
       client.close();
     };
   }, [token]);
@@ -75,6 +71,7 @@ export default function OperatorPage() {
         onAccept={() => setAccepted(true)}
         onPciToggle={() => setPaused((p) => !p)}
         callEnded={callEnded}
+        onBannerDismiss={() => { setCall(null); setCallEnded(undefined); }}
       />
       <MessageForm onSubmit={submitMessage} disabled={!accepted || !call} />
     </main>
