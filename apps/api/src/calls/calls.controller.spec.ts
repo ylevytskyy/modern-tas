@@ -6,6 +6,10 @@ function makeDeps() {
     pauseRecording: vi.fn().mockResolvedValue(undefined),
     resumeRecording: vi.fn().mockResolvedValue(undefined),
   };
+  const arbiter = {
+    dispatchByCallId: vi.fn().mockResolvedValue(undefined),
+    getLatenciesForCall: vi.fn().mockReturnValue([]),
+  };
   const dbState: { recordings: any[]; intervals: any[] } = { recordings: [], intervals: [] };
   // selectQueueRefs lets each test stage a sequence of select results
   // (CallsController.pause does ONE select; resume does TWO).
@@ -14,11 +18,13 @@ function makeDeps() {
   // Track whether insert/update were called
   let insertCalled = false;
   let updateCalled = false;
-  const resetCallTrackers = () => { insertCalled = false; updateCalled = false; };
+  let lastUpdateSet: any = null;
+  const resetCallTrackers = () => { insertCalled = false; updateCalled = false; lastUpdateSet = null; };
   const select = vi.fn().mockImplementation(() => ({
     from: () => ({
       where: () => ({
         limit: () => Promise.resolve(selectQueue.shift() ?? []),
+        for: () => ({ limit: () => Promise.resolve(selectQueue.shift() ?? []) }),
         orderBy: () => ({ limit: () => Promise.resolve(selectQueue.shift() ?? []) }),
       }),
     }),
@@ -26,13 +32,15 @@ function makeDeps() {
   const db: any = {
     select,
     insert: () => ({ values: (v: any) => { insertCalled = true; dbState.intervals.push(v); return Promise.resolve(); } }),
-    update: () => ({ set: (v: any) => ({ where: () => { updateCalled = true; dbState.intervals.push({ __update: v }); return Promise.resolve(); } }) }),
+    update: () => ({ set: (v: any) => ({ where: () => { updateCalled = true; lastUpdateSet = v; dbState.intervals.push({ __update: v }); return Promise.resolve(); } }) }),
     _stageSelect: stageSelect,
     _wasInsertCalled: () => insertCalled,
     _wasUpdateCalled: () => updateCalled,
+    _getLastUpdateSet: () => lastUpdateSet,
     _resetCallTrackers: resetCallTrackers,
   };
-  return { ari, db, dbState };
+  db.transaction = async (fn: any) => fn(db);
+  return { ari, db, arbiter, dbState };
 }
 
 describe('CallsController', () => {
@@ -44,7 +52,7 @@ describe('CallsController', () => {
 
   beforeEach(() => {
     deps = makeDeps();
-    ctrl = new CallsController(deps.db as any, deps.ari as any);
+    ctrl = new CallsController(deps.db as any, deps.ari as any, deps.arbiter as any);
   });
 
   it('POST /pause inserts a redaction-interval row (end_ms NULL) and calls ari.pauseRecording', async () => {
@@ -266,5 +274,72 @@ describe('CallsController', () => {
       ctrl.resume(callId, { user: { tenantId, operatorId } } as any),
     ).rejects.toBeInstanceOf(TypeError);
     expect(deps.db._wasUpdateCalled()).toBe(false);
+  });
+
+  describe('POST /v1/calls/:id/decline', () => {
+    it('200: appends decline entry to attempts and calls arbiter.dispatchByCallId', async () => {
+      const { ari, db, arbiter } = makeDeps();
+      const callId = '11111111-1111-1111-1111-111111111111';
+      const operatorId = '66666666-6666-6666-6666-666666666666';
+      db._stageSelect(
+        [{ id: callId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' }],
+        [{ id: 'qc1', tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', callId, attempts: [] }],
+      );
+      const controller = new CallsController(db, ari as any, arbiter as any);
+      const req: any = { user: { sub: operatorId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' } };
+      const res = await controller.decline(callId, req);
+      expect(res).toEqual({ ok: true });
+      expect(arbiter.dispatchByCallId).toHaveBeenCalledWith(callId);
+      expect(db._wasUpdateCalled()).toBe(true);
+      const updateSet = db._getLastUpdateSet();
+      expect(Array.isArray(updateSet.attempts)).toBe(true);
+      expect(updateSet.attempts).toHaveLength(1);
+      const entry = JSON.parse(updateSet.attempts[0]);
+      expect(entry).toMatchObject({
+        operatorId: '66666666-6666-6666-6666-666666666666',
+        outcome: 'declined',
+      });
+      expect(typeof entry.at).toBe('string');
+      expect(() => new Date(entry.at).toISOString()).not.toThrow();
+    });
+
+    it('404: returns NotFound when callId does not exist', async () => {
+      const { ari, db, arbiter } = makeDeps();
+      db._stageSelect([]); // call row lookup empty
+      const controller = new CallsController(db, ari as any, arbiter as any);
+      const req: any = { user: { sub: '66666666-6666-6666-6666-666666666666', tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' } };
+      await expect(controller.decline('00000000-0000-0000-0000-000000000000', req))
+        .rejects.toMatchObject({ status: 404 });
+    });
+
+    it('409: returns Conflict when attempts already contains an accepted entry', async () => {
+      const { ari, db, arbiter } = makeDeps();
+      const callId = '11111111-1111-1111-1111-111111111111';
+      const operatorId = '66666666-6666-6666-6666-666666666666';
+      db._stageSelect(
+        [{ id: callId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' }],
+        [{ id: 'qc1', tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', callId,
+           attempts: [JSON.stringify({ operatorId, outcome: 'accepted', at: '2026-05-18T12:00:00.000Z' })] }],
+      );
+      const controller = new CallsController(db, ari as any, arbiter as any);
+      const req: any = { user: { sub: operatorId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' } };
+      await expect(controller.decline(callId, req)).rejects.toMatchObject({ status: 409 });
+      expect(arbiter.dispatchByCallId).not.toHaveBeenCalled();
+    });
+
+    it('400: returns BadRequest when caller has already declined (double-decline guard)', async () => {
+      const { ari, db, arbiter } = makeDeps();
+      const callId = '11111111-1111-1111-1111-111111111111';
+      const operatorId = '77777777-7777-7777-7777-777777777771';
+      db._stageSelect(
+        [{ id: callId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' }],
+        [{ id: 'qc1', tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', callId,
+           attempts: [JSON.stringify({ operatorId, outcome: 'declined', at: '2026-05-18T12:00:00.000Z' })] }],
+      );
+      const controller = new CallsController(db, ari as any, arbiter as any);
+      const req: any = { user: { sub: operatorId, tenantId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' } };
+      await expect(controller.decline(callId, req)).rejects.toMatchObject({ status: 400 });
+      expect(arbiter.dispatchByCallId).not.toHaveBeenCalled();
+    });
   });
 });
