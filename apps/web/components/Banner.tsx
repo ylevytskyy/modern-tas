@@ -23,7 +23,7 @@ export function Banner({ variant, message, onDismiss, timeoutMs = 5000 }: Banner
   }, [timeoutMs]);
   if (!visible) return null;
   return (
-    <div role="status" className={`banner banner--${variant}`}>
+    <div role="alert" className={`banner banner--${variant}`}>
       {message}
     </div>
   );

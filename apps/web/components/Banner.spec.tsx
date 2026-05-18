@@ -6,23 +6,23 @@ describe('Banner', () => {
   beforeEach(() => { vi.useFakeTimers(); });
   afterEach(() => { vi.useRealTimers(); });
 
-  it('renders the message with role=status for a11y', () => {
+  it('renders the message with role=alert for a11y', () => {
     render(<Banner variant="warning" message="Caller hung up" />);
-    const node = screen.getByRole('status');
+    const node = screen.getByRole('alert');
     expect(node).toHaveTextContent('Caller hung up');
   });
 
   it('applies a variant-specific class', () => {
     render(<Banner variant="warning" message="x" />);
-    expect(screen.getByRole('status').className).toContain('banner--warning');
+    expect(screen.getByRole('alert').className).toContain('banner--warning');
   });
 
   it('auto-dismisses after 5s and calls onDismiss', () => {
     const onDismiss = vi.fn();
     render(<Banner variant="info" message="x" onDismiss={onDismiss} />);
-    expect(screen.queryByRole('status')).not.toBeNull();
+    expect(screen.queryByRole('alert')).not.toBeNull();
     act(() => { vi.advanceTimersByTime(5000); });
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 

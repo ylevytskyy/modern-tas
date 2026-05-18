@@ -72,7 +72,7 @@ describe('ScreenPop', () => {
         callEnded={{ endedBy: 'caller' }}
       />,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Caller hung up');
+    expect(screen.getByRole('alert')).toHaveTextContent('Caller hung up');
     expect(screen.queryByRole('button', { name: /accept/i })).toBeNull();
   });
 
@@ -87,7 +87,7 @@ describe('ScreenPop', () => {
         callEnded={{ endedBy: 'system' }}
       />,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Call ended');
+    expect(screen.getByRole('alert')).toHaveTextContent('Call ended');
   });
 
   it('does not show the banner when callEnded is undefined', () => {
@@ -100,6 +100,6 @@ describe('ScreenPop', () => {
         accepted={false}
       />,
     );
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });
