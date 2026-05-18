@@ -95,7 +95,7 @@ test('S-3 caller hangs up mid-screen-pop: endedBy=caller, recording finalized, b
   await triggerAriHangupIfNeeded(callId);
 
   // Wait for the "Caller hung up" banner (driven by WS call.ended push).
-  const banner = page.getByRole('status').filter({ hasText: /caller hung up/i });
+  const banner = page.getByRole('alert').filter({ hasText: /caller hung up/i });
   await expect(banner).toBeVisible({ timeout: ENDED_POLL_TIMEOUT_MS });
 
   // Accept button must be hidden once the banner is up (callEnded state hides it).
