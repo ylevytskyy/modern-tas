@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import type { WsIncomingCallPayload } from '@tas/shared-types';
+import type { WsIncomingCallPayload, WsCallEndedPayload } from '@tas/shared-types';
 import { ScreenPop } from '@/components/ScreenPop';
 import { MessageForm } from '@/components/MessageForm';
 import { createWsClient } from '@/lib/ws';
@@ -17,6 +17,7 @@ export default function OperatorPage() {
   const [accepted, setAccepted] = useState(false);
   const [paused, setPaused] = useState(false);
   const [wsReady, setWsReady] = useState(false);
+  const [callEnded, setCallEnded] = useState<WsCallEndedPayload | undefined>(undefined);
 
   useEffect(() => {
     let active = true;
@@ -29,13 +30,20 @@ export default function OperatorPage() {
   useEffect(() => {
     if (!token) return;
     const client = createWsClient({ url: WS_URL, token });
+
     client.onOpen(() => setWsReady(true));
     client.onScreenPop((payload) => {
       setCall(payload);
       setAccepted(false);
       setPaused(false);
+      setCallEnded(undefined);
     });
-    return () => client.close();
+    client.onCallEnded((payload) => {
+      setCallEnded(payload);
+    });
+    return () => {
+      client.close();
+    };
   }, [token]);
 
   async function submitMessage(body: string): Promise<void> {
@@ -62,6 +70,8 @@ export default function OperatorPage() {
         paused={paused}
         onAccept={() => setAccepted(true)}
         onPciToggle={() => setPaused((p) => !p)}
+        callEnded={callEnded}
+        onBannerDismiss={() => { setCall(null); setCallEnded(undefined); }}
       />
       <MessageForm onSubmit={submitMessage} disabled={!accepted || !call} />
     </main>

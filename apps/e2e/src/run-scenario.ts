@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export interface RunScenarioParams {
-  scenario: 'happy-path';
+  scenario: 'happy-path' | 'caller-hangup';
   callId: string;
   target?: string;     // defaults to asterisk:5060 (Docker DNS in infra_default network)
 }
@@ -53,7 +53,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(2);
   }
   runScenario({
-    scenario: argv[scenarioIdx + 1] as 'happy-path',
+    scenario: argv[scenarioIdx + 1] as 'happy-path' | 'caller-hangup',
     callId: argv[callIdIdx + 1],
     target: targetIdx >= 0 ? argv[targetIdx + 1] : undefined,
   })

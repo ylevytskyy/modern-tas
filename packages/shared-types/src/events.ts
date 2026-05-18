@@ -16,6 +16,7 @@ export const NatsSubjects = {
 /** WS event names (sent to F03 operator UI) */
 export const WsEvents = {
   CALL_SCREEN_POP: 'call.screenpop',
+  CALL_ENDED: 'call.ended',
   MESSAGE_SENT: 'message.sent',
 } as const;
 
@@ -37,6 +38,24 @@ export interface NatsStasisStartPayload {
   channel: string;
   tenantId: string;
   accountId: string;
+}
+
+/**
+ * Payload published to NatsSubjects.CALL_ENDED when an ARI StasisEnd event fires.
+ * Consumed by Temporal worker (cancels in-flight DispatchMessage workflows) and
+ * WS gateway (pushes call.ended to operator browser).
+ */
+export interface NatsCallEndedPayload {
+  callId: string;
+  tenantId: string;
+  endedBy: 'caller' | 'operator' | 'system';
+  endedAt: string;
+}
+
+/** WS payload shape for the `call.ended` event (sent to F03 operator UI). */
+export interface WsCallEndedPayload {
+  callId: string;
+  endedBy: 'caller' | 'operator' | 'system';
 }
 
 /** WS payload shape for the `call.screenpop` event (sent to F03 operator UI). */

@@ -160,6 +160,12 @@ importers:
       '@temporalio/activity':
         specifier: 1.11.0
         version: 1.11.0
+      '@temporalio/client':
+        specifier: 1.11.0
+        version: 1.11.0
+      '@temporalio/common':
+        specifier: 1.11.0
+        version: 1.11.0
       '@temporalio/worker':
         specifier: 1.11.0
         version: 1.11.0(tslib@2.8.1)
@@ -169,6 +175,9 @@ importers:
       drizzle-orm:
         specifier: 0.30.4
         version: 0.30.4(postgres@3.4.4)
+      nats:
+        specifier: ^2.29.3
+        version: 2.29.3
       postgres:
         specifier: 3.4.4
         version: 3.4.4

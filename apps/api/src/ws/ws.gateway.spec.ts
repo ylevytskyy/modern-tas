@@ -48,6 +48,31 @@ describe('WsGateway', () => {
     expect(result).toBe(false);
   });
 
+  it('sendCallEnded: sends call.ended event on open WS connection and returns true', () => {
+    const OPERATOR_ID = 'call-ended-operator';
+    const mockSend = vi.fn();
+    const mockSocket = { readyState: 1, send: mockSend } as any;
+
+    gateway.registerConnection(OPERATOR_ID, mockSocket);
+
+    const result = gateway.sendCallEnded(OPERATOR_ID, {
+      callId: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+      endedBy: 'caller',
+    });
+
+    expect(result).toBe(true);
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const sent = JSON.parse(mockSend.mock.calls[0][0] as string);
+    expect(sent.event).toBe(WsEvents.CALL_ENDED);
+    expect(sent.data.callId).toBe('dddddddd-dddd-dddd-dddd-dddddddddddd');
+    expect(sent.data.endedBy).toBe('caller');
+  });
+
+  it('sendCallEnded: returns false when operator has no connection', () => {
+    const result = gateway.sendCallEnded('no-such-operator', { callId: 'x', endedBy: 'system' });
+    expect(result).toBe(false);
+  });
+
   it('sendToOperator: returns false when socket is not OPEN (readyState !== 1)', () => {
     const OPERATOR_ID = 'closed-socket-operator';
     const mockSend = vi.fn();

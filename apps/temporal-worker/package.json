@@ -13,9 +13,12 @@
     "@tas/db": "workspace:*",
     "@tas/shared-types": "workspace:*",
     "@temporalio/activity": "1.11.0",
+    "@temporalio/client": "1.11.0",
+    "@temporalio/common": "1.11.0",
     "@temporalio/worker": "1.11.0",
     "@temporalio/workflow": "1.11.0",
     "drizzle-orm": "0.30.4",
+    "nats": "^2.29.3",
     "postgres": "3.4.4"
   },
   "devDependencies": {

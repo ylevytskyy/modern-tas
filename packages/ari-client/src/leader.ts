@@ -27,6 +27,8 @@ export interface AriLeaderClientOptions {
   ariClientFactory: (appName: string) => Promise<AriClientHandle>;
   /** Called when a StasisStart event fires (leader is active). NOT called if lease is lost. */
   onStasisStart: (event: StasisStartEvent) => void;
+  /** Called when a StasisEnd event fires (leader is active). NOT called if lease is lost. */
+  onStasisEnd?: (event: StasisEndEvent) => void;
   /** Called via process.nextTick when the lease is lost. Guaranteed to fire after WS close. */
   onLoseLease: () => void;
 }
@@ -47,6 +49,19 @@ export interface StasisStartEvent {
   application: string;
 }
 
+export interface StasisEndEvent {
+  channel: {
+    id: string;
+    name: string;
+    dialplan: { context: string; exten: string };
+  };
+  application: string;
+  /** Q.850 hangup cause code — present when Asterisk emits cause information. */
+  cause?: number;
+  cause_txt?: string;
+  timestamp?: string;
+}
+
 export class AriLeaderClient {
   private readonly opts: AriLeaderClientOptions;
   /** @internal exposed for unit tests via isLeaderForTest getter */
@@ -54,6 +69,13 @@ export class AriLeaderClient {
   private ariHandle: AriClientHandle | null = null;
   private intervalHandle: ReturnType<typeof setInterval> | null = null;
   private readonly ARI_APP = process.env.ARI_APP ?? 'tas';
+  /**
+   * Stores the Q.850 cause code from ChannelHangupRequest per channel.
+   * Asterisk's StasisEnd event does NOT include the hangup cause in its schema;
+   * we capture it from the preceding ChannelHangupRequest event so StasisEnd
+   * handlers can derive endedBy correctly.
+   */
+  private readonly _hangupCauses = new Map<string, number>();
 
   constructor(opts: AriLeaderClientOptions) {
     this.opts = opts;
@@ -72,6 +94,11 @@ export class AriLeaderClient {
   /** Wire or replace the StasisStart callback after construction (used by NestJS DI). */
   setStasisStartCallback(fn: (event: StasisStartEvent) => void): void {
     this.opts.onStasisStart = fn;
+  }
+
+  /** Wire or replace the StasisEnd callback after construction (used by NestJS DI). */
+  setStasisEndCallback(fn: (event: StasisEndEvent) => void): void {
+    this.opts.onStasisEnd = fn;
   }
 
   /** Start the heartbeat loop. */
@@ -141,12 +168,34 @@ export class AriLeaderClient {
       this.opts.onStasisStart(event);
     });
 
+    // ChannelHangupRequest fires BEFORE StasisEnd and carries the Q.850 cause code.
+    // Capture it so StasisEnd handlers can derive endedBy without relying on the
+    // StasisEnd event (which does NOT include cause in Asterisk's ARI schema).
+    handle.on('ChannelHangupRequest', (event: { channel: { id: string }; cause?: number }) => {
+      if (!this.isLeader) return;
+      if (event.cause !== undefined && event.channel?.id) {
+        this._hangupCauses.set(event.channel.id, event.cause);
+      }
+    });
+
+    handle.on('StasisEnd', (event: StasisEndEvent) => {
+      if (!this.isLeader) return; // guard: deposed leader drops in-flight events (ADR-0016)
+      if (this.opts.onStasisEnd) {
+        const channelId = event.channel.id;
+        // Augment with the cause captured from ChannelHangupRequest (if any).
+        const cause = this._hangupCauses.get(channelId);
+        this._hangupCauses.delete(channelId); // clean up after use
+        this.opts.onStasisEnd({ ...event, cause });
+      }
+    });
+
     await handle.start(this.ARI_APP);
   }
 
   private _loseLeadership(reason: string): void {
     if (!this.isLeader) return;
     this.isLeader = false;
+    this._hangupCauses.clear(); // prevent stale cause codes from corrupting new calls (channel ID reuse)
     const handle = this.ariHandle;
     this.ariHandle = null;
     // Fire on next tick so WS close and onLoseLease run after current operation, before any I/O.

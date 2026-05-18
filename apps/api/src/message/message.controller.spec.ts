@@ -75,7 +75,7 @@ describe('MessageController', () => {
     expect(opts.taskQueue).toBe('dispatch-message');
     expect(opts.workflowId).toBe(`dispatch-${result.id}`);
     expect(opts.args[0]).toMatchObject({
-      messageId: result.id, operatorId: OPERATOR_ID, tenantId: TENANT_ID,
+      messageId: result.id, operatorId: OPERATOR_ID, tenantId: TENANT_ID, callId: CALL_ID,
     });
   });
 });

@@ -47,6 +47,7 @@ export class MessageController {
         messageId: row.id,
         operatorId: dto.operatorId,
         tenantId: req.user.tenantId,
+        callId: dto.callId,
         payload: { callId: dto.callId, body: dto.body },
       }],
     });

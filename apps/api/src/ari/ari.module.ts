@@ -33,6 +33,9 @@ export const ARI_LEADER_TOKEN = 'ARI_LEADER';
             // TODO Chunk 7: StasisStart events that fire before TelephonyModule.onModuleInit() wires the
             //               callback are silently dropped (PoC limitation; non-deterministic race, low probability).
           },
+          onStasisEnd: () => {
+            // No-op at module level; wired by StasisEndHandler.onModuleInit() via setStasisEndCallback().
+          },
           onLoseLease: () => {
             // No-op at module level; leader closes the WS internally in _loseLeadership().
           },

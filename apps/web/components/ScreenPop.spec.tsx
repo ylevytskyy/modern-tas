@@ -60,4 +60,46 @@ describe('ScreenPop', () => {
     render(<ScreenPop call={null} onAccept={() => {}} onPciToggle={() => {}} accepted={false} paused={false} />);
     expect(screen.getByText(/waiting for call/i)).toBeInTheDocument();
   });
+
+  it('shows Caller hung up banner and hides Accept on callEnded prop', () => {
+    render(
+      <ScreenPop
+        call={PAYLOAD}
+        onAccept={() => {}}
+        onPciToggle={() => {}}
+        paused={false}
+        accepted={false}
+        callEnded={{ endedBy: 'caller' }}
+      />,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Caller hung up');
+    expect(screen.queryByRole('button', { name: /accept/i })).toBeNull();
+  });
+
+  it('shows generic Call ended banner when endedBy is operator or system', () => {
+    render(
+      <ScreenPop
+        call={{ callId: 'c1', callerE164: '+15551234567', type: 'incoming_call', tenantId: 't1', accountId: 'a1' }}
+        onAccept={() => {}}
+        onPciToggle={() => {}}
+        paused={false}
+        accepted={false}
+        callEnded={{ endedBy: 'system' }}
+      />,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Call ended');
+  });
+
+  it('does not show the banner when callEnded is undefined', () => {
+    render(
+      <ScreenPop
+        call={PAYLOAD}
+        onAccept={() => {}}
+        onPciToggle={() => {}}
+        paused={false}
+        accepted={false}
+      />,
+    );
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
 });
