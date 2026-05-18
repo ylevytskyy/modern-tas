@@ -21,6 +21,7 @@ const FORM_SCHEMA = {
 
 async function main() {
   const db = makeDb(process.env.DATABASE_URL ?? "postgres://tas:tas@localhost:5432/tas");
+  console.log(`seed: SEED_PROFILE=${process.env.SEED_PROFILE ?? '(unset)'}`);
 
   await db.insert(tenant).values({ id: FIXED_IDS.tenant, name: "demo-tenant" }).onConflictDoNothing();
   await db.insert(account).values({ id: FIXED_IDS.account, tenantId: FIXED_IDS.tenant, name: "Demo Account" }).onConflictDoNothing();
@@ -30,6 +31,7 @@ async function main() {
   await db.insert(user).values({ id: FIXED_IDS.operator, tenantId: FIXED_IDS.tenant, email: "operator@demo.test", role: "operator" }).onConflictDoNothing();
 
   if (process.env.SEED_PROFILE === 's4') {
+    console.log('seed: applying s4 profile — adding operators B-K');
     const operatorBthroughK = [
       '77777777-7777-7777-7777-777777777771',
       '77777777-7777-7777-7777-777777777772',
