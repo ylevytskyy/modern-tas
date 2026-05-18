@@ -34,8 +34,10 @@ const OPERATORS_B_THROUGH_K: string[] = [
 ];
 
 // API and WS base URLs — align with Docker Compose port mapping for the API.
-const API_BASE = process.env.E2E_API_BASE_URL ?? 'http://localhost:3001';
-const WS_BASE = process.env.E2E_WS_BASE_URL ?? 'ws://localhost:3001/ws';
+// API is on 3000 (per `infra/docker-compose.all-in.yml: ports: ["3000:3000"]`);
+// 3001 is the Next.js web container, which does not expose /v1/dev/operator-token.
+const API_BASE = process.env.E2E_API_BASE_URL ?? 'http://localhost:3000';
+const WS_BASE = process.env.E2E_WS_BASE_URL ?? 'ws://localhost:3000/ws';
 
 // SIPp hold time is ~25s; add 10s for assertion + cleanup.
 const SCENARIO_WALL_CLOCK_MS = 35_000;
