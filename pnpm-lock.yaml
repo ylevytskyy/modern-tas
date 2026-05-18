@@ -139,6 +139,9 @@ importers:
       '@types/uuid':
         specifier: 9.0.8
         version: 9.0.8
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
       tsx:
         specifier: 4.7.1
         version: 4.7.1
@@ -148,6 +151,9 @@ importers:
       vitest:
         specifier: 1.4.0
         version: 1.4.0(@types/node@24.12.4)
+      ws:
+        specifier: ^8.20.1
+        version: 8.20.1
 
   apps/temporal-worker:
     dependencies:
