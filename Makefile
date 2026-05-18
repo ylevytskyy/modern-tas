@@ -93,9 +93,13 @@ poc-test-all-docker-up:
 poc-e2e-s1:
 	pnpm --filter @tas/e2e run test:e2e:s1
 
+# Run the S-2 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
+poc-e2e-s2:
+	pnpm --filter @tas/e2e run test:e2e:s2
+
 # Run the S-3 e2e spec. Assumes either poc-up + host dev OR poc-up-all-docker.
 poc-e2e-s3:
 	pnpm --filter @tas/e2e run test:e2e:s3
 
 # Run all e2e scenario specs sequentially.
-poc-e2e: poc-e2e-s1 poc-e2e-s3
+poc-e2e: poc-e2e-s1 poc-e2e-s2 poc-e2e-s3
