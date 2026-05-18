@@ -1,8 +1,11 @@
 import { Global, Module } from '@nestjs/common';
 import { AriLeaderClient } from '@tas/ari-client';
 import Redis from 'ioredis';
+import { AriCommandsService } from './ari-commands.service';
+import { ARI_LEADER_TOKEN } from './ari-tokens';
 
-export const ARI_LEADER_TOKEN = 'ARI_LEADER';
+// Re-export for backwards compatibility (other modules import the token from here).
+export { ARI_LEADER_TOKEN } from './ari-tokens';
 
 @Global()
 @Module({
@@ -44,7 +47,8 @@ export const ARI_LEADER_TOKEN = 'ARI_LEADER';
         return leader;
       },
     },
+    AriCommandsService,
   ],
-  exports: [ARI_LEADER_TOKEN],
+  exports: [ARI_LEADER_TOKEN, AriCommandsService],
 })
 export class AriModule {}

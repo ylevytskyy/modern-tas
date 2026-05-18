@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { Client } from 'minio';
 
 const endpoint = process.env.E2E_MINIO_ENDPOINT ?? 'localhost';
@@ -21,4 +22,11 @@ export async function objectExists(bucket: string, key: string): Promise<boolean
     if (err.code === 'NotFound' || err.code === 'NoSuchKey') return false;
     throw err;
   }
+}
+
+export async function downloadObject(bucket: string, key: string): Promise<Buffer> {
+  const stream = await getMinio().getObject(bucket, key);
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream as AsyncIterable<Buffer>) chunks.push(chunk);
+  return Buffer.concat(chunks);
 }

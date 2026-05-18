@@ -8,9 +8,51 @@ import { objectExists } from '../src/lib/minio.js';
 import { assertTenant } from '../src/lib/assert-tenant.js';
 import { eq } from 'drizzle-orm';
 
+/**
+ * Terminate the active Asterisk channel for the call via ARI DELETE.
+ *
+ * Docker-bridge-NAT workaround: SIPp sends BYE but Asterisk's 200 OK can't
+ * reach SIPp (conntrack entry expires / bridge NAT pathology), so the SIP
+ * dialog lingers and Asterisk retransmits BYE for ~60s before giving up.
+ * Deleting the channel via ARI forces an immediate ChannelHangupRequest +
+ * StasisEnd, letting finalizeRecording run and upload the WAV to MinIO.
+ *
+ * No-ops if the channel is already gone.
+ */
+async function triggerAriHangupIfNeeded(callId: string): Promise<void> {
+  const ARI_BASE = process.env.ARI_BASE_URL ?? 'http://localhost:8088';
+  const ARI_CREDS = process.env.ARI_CREDS ?? 'tas:tas';
+  const authHeader = 'Basic ' + Buffer.from(ARI_CREDS).toString('base64');
+
+  const resp = await fetch(`${ARI_BASE}/ari/channels?api_key=${ARI_CREDS.replace(':', ':')}`, {
+    headers: { 'Authorization': authHeader },
+  }).catch(() => null);
+  if (!resp || !resp.ok) return;
+
+  const channels = await resp.json() as Array<{ id: string; protocol_id: string; state: string }>;
+
+  const db = getDb();
+  const [callRow] = await db.select({ routedThrough: schema.call.routedThrough }).from(schema.call).where(eq(schema.call.id, callId));
+  if (!callRow || !callRow.routedThrough?.length) return;
+
+  const channelId = callRow.routedThrough[0];
+  const channel = channels.find((c) => c.id === channelId);
+  if (!channel) return;
+
+  const deleteUrl = `${ARI_BASE}/ari/channels/${channelId}?reason=normal&api_key=${ARI_CREDS}`;
+  await fetch(deleteUrl, {
+    method: 'DELETE',
+    headers: { 'Authorization': authHeader },
+  }).catch(() => null);
+}
+
 const SEEDED_TENANT_ID   = '11111111-1111-1111-1111-111111111111';
 const SEEDED_OPERATOR_ID = '66666666-6666-6666-6666-666666666666';
 const RECORDINGS_BUCKET  = 'tas-recordings';
+// On local-dev, StasisEnd → finalizeRecording → MinIO upload can lag several seconds
+// after SIPp exits (Docker-bridge NAT + Asterisk retransmit delay). 15s matches
+// the budget used by S-2/S-3 for the same finalization poll.
+const WAV_EXISTS_TIMEOUT_MS = (!!process.env.CI) ? 5_000 : 15_000;
 
 test.afterAll(async () => { await closeDb(); });
 
@@ -62,18 +104,24 @@ test('S-1 happy path: INVITE → screen-pop → submit → DispatchMessage compl
   expect(att, 'dispatch_attempt row exists').toBeTruthy();
   expect(att.deliveredAt).toBeTruthy();
 
-  // 7. recording row + MinIO placeholder
+  // 7. recording row (written at StasisStart)
   const [rec] = await db
     .select()
     .from(schema.recording)
     .where(eq(schema.recording.callId, callId));
   expect(rec, 'recording row exists').toBeTruthy();
-  const minioKey = `recordings/${callId}.wav`;
-  await expect.poll(() => objectExists(RECORDINGS_BUCKET, minioKey), { timeout: 5000 }).toBe(true);
 
-  // 8. tenant_id matches on every per-tenant table touched
-  await assertTenant(SEEDED_TENANT_ID, callId);
-
-  // 9. Let SIPp finish to keep teardown clean
+  // 8. Let SIPp send BYE; then force ARI channel teardown if needed, and assert WAV uploaded.
+  // Recording finalization (read WAV → upload → set endedAt) is now performed by
+  // StasisEndHandler.finalizeRecording (Chunk 6 / S-2), so the MinIO object only
+  // appears after channel hangup. triggerAriHangupIfNeeded handles the Docker-bridge-NAT
+  // pathology where Asterisk can't return 200 OK to SIPp's BYE, leaving the dialog open
+  // indefinitely — same workaround used by S-2/S-3.
   await sippPromise;
+  await triggerAriHangupIfNeeded(callId);
+  const minioKey = `recordings/${callId}.wav`;
+  await expect.poll(() => objectExists(RECORDINGS_BUCKET, minioKey), { timeout: WAV_EXISTS_TIMEOUT_MS }).toBe(true);
+
+  // 9. tenant_id matches on every per-tenant table touched
+  await assertTenant(SEEDED_TENANT_ID, callId);
 });

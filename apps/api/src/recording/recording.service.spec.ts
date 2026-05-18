@@ -1,67 +1,95 @@
-// RED: fails because RecordingService does not exist.
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RecordingService } from './recording.service';
-import { DB_TOKEN } from '../database/database.module';
-import { makeDb } from '@tas/db/client';
-import { tenant, account, did, call, recording } from '@tas/db';
-import { eq } from 'drizzle-orm';
+import { Buffer } from 'node:buffer';
+import { promises as fs } from 'node:fs';
 
-const TENANT_ID = '11111111-1111-1111-1111-111111111111';
-const ACCOUNT_ID = '22222222-2222-2222-2222-222222222222';
-const DID_ID = '33333333-3333-3333-3333-333333333333';
-const CALL_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+vi.mock('node:fs', () => ({
+  promises: { readFile: vi.fn() },
+}));
 
-describe('RecordingService', () => {
-  let service: RecordingService;
-  let module: TestingModule;
-  let db: ReturnType<typeof makeDb>;
-
-  const mockMinioClient = {
-    putObject: vi.fn().mockResolvedValue({ etag: 'abc', versionId: null }),
+function makeDeps() {
+  const minio = {
     bucketExists: vi.fn().mockResolvedValue(true),
     makeBucket: vi.fn().mockResolvedValue(undefined),
+    putObject: vi.fn().mockResolvedValue({ etag: 'etag-1' }),
   };
+  const ari = {
+    startRecording: vi.fn().mockResolvedValue(undefined),
+    stopRecording: vi.fn().mockResolvedValue(undefined),
+    pauseRecording: vi.fn().mockResolvedValue(undefined),
+    resumeRecording: vi.fn().mockResolvedValue(undefined),
+  };
+  const dbState: { rows: any[]; updates: any[]; inserts: any[] } = { rows: [], updates: [], inserts: [] };
+  const db: any = {
+    insert: () => ({
+      values: (v: any) => { dbState.inserts.push(v); return Promise.resolve(); },
+    }),
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          limit: () => Promise.resolve(dbState.rows),
+        }),
+      }),
+    }),
+    update: () => ({
+      set: (v: any) => ({
+        where: () => { dbState.updates.push(v); return Promise.resolve(); },
+      }),
+    }),
+  };
+  return { minio, ari, db, dbState };
+}
 
-  beforeAll(async () => {
-    db = makeDb(process.env.DATABASE_URL!);
-    await db.insert(tenant).values({ id: TENANT_ID, name: 'demo-tenant' }).onConflictDoNothing();
-    await db.insert(account).values({ id: ACCOUNT_ID, tenantId: TENANT_ID, name: 'Demo Account' }).onConflictDoNothing();
-    await db.insert(did).values({ id: DID_ID, accountId: ACCOUNT_ID, e164: '+15555550100' }).onConflictDoNothing();
-    await db.insert(call).values({
-      id: CALL_ID,
-      tenantId: TENANT_ID,
-      accountId: ACCOUNT_ID,
-      didId: DID_ID,
-      fromE164: '+15555550200',
-      startedAt: new Date(),
-    }).onConflictDoNothing();
+describe('RecordingService.finalizeRecording', () => {
+  const callId = 'call-abc';
+  let deps: ReturnType<typeof makeDeps>;
+  let svc: RecordingService;
 
-    module = await Test.createTestingModule({
-      providers: [
-        RecordingService,
-        { provide: DB_TOKEN, useValue: db },
-        { provide: 'MINIO_CLIENT', useValue: mockMinioClient },
-      ],
-    }).compile();
-    service = module.get(RecordingService);
+  beforeEach(() => {
+    deps = makeDeps();
+    svc = new RecordingService(deps.db as any, deps.minio as any, deps.ari as any);
+    vi.mocked(fs.readFile).mockReset();
   });
 
-  afterAll(async () => { await module.close(); });
+  it('reads the WAV from the shared volume and uploads to MinIO', async () => {
+    deps.dbState.rows.push({ id: 'rec-1', path: `recordings/${callId}.wav`, callId, tenantId: 't' });
+    vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('RIFF....WAVE'));
 
-  it('startRecording: inserts recording row with correct tenant_id and uploads placeholder to MinIO', async () => {
-    await service.startRecording({ callId: CALL_ID, channelId: 'test-channel', tenantId: TENANT_ID });
+    await svc.finalizeRecording(callId);
 
-    const [rec] = await db.select().from(recording).where(eq(recording.callId, CALL_ID));
-    expect(rec).toBeDefined();
-    expect(rec.tenantId).toBe(TENANT_ID);
-    expect(rec.path).toBe(`recordings/${CALL_ID}.wav`);
-    expect(rec.startedAt).toBeInstanceOf(Date);
+    expect(deps.ari.stopRecording).toHaveBeenCalledWith(callId);
+    expect(fs.readFile).toHaveBeenCalledWith(`/var/spool/asterisk/recording/${callId}.wav`);
+    expect(deps.minio.putObject).toHaveBeenCalledWith('tas-recordings', `recordings/${callId}.wav`, Buffer.from('RIFF....WAVE'));
+    expect(deps.dbState.updates).toHaveLength(1);
+    expect(deps.dbState.updates[0].endedAt).toBeInstanceOf(Date);
+  });
 
-    expect(mockMinioClient.putObject).toHaveBeenCalledWith(
-      'tas-recordings',
-      `recordings/${CALL_ID}.wav`,
-      expect.any(Buffer),
-    );
+  it('no-ops when the recording row is missing', async () => {
+    await svc.finalizeRecording(callId);
+    expect(deps.ari.stopRecording).not.toHaveBeenCalled();
+    expect(deps.minio.putObject).not.toHaveBeenCalled();
+  });
+
+  it('still marks recording.endedAt when file read fails', async () => {
+    deps.dbState.rows.push({ id: 'rec-1', path: `recordings/${callId}.wav`, callId, tenantId: 't' });
+    vi.mocked(fs.readFile).mockRejectedValue(new Error('ENOENT'));
+
+    await svc.finalizeRecording(callId);
+
+    expect(deps.minio.putObject).not.toHaveBeenCalled();
+    expect(deps.dbState.updates).toHaveLength(1);
+  });
+
+  it('still marks recording.endedAt and does not propagate when minio.putObject throws', async () => {
+    deps.dbState.rows.push({ id: 'rec-1', path: `recordings/${callId}.wav`, callId, tenantId: 't' });
+    vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('RIFF....WAVE'));
+    deps.minio.putObject.mockRejectedValue(new Error('MinIO unreachable'));
+
+    // Should not throw
+    await expect(svc.finalizeRecording(callId)).resolves.toBeUndefined();
+
+    // endedAt must still be committed
+    expect(deps.dbState.updates).toHaveLength(1);
+    expect(deps.dbState.updates[0].endedAt).toBeInstanceOf(Date);
   });
 });

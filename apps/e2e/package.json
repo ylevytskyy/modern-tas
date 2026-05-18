@@ -7,6 +7,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:e2e:s1": "playwright test specs/poc-e2e-s1-happy-path.spec.ts",
+    "test:e2e:s2": "playwright test specs/poc-e2e-s2-pci-pause.spec.ts",
     "test:e2e:s3": "playwright test specs/poc-e2e-s3-caller-hangup.spec.ts",
     "scenario": "tsx src/run-scenario.ts",
     "lint:sipp": "docker compose -f docker-compose.sipp.yml run --rm sipp -sf /scenarios/happy-path.xml -dry-run 127.0.0.1:5060 || true"

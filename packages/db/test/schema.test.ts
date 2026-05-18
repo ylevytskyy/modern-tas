@@ -94,3 +94,113 @@ describe("schema/0003 — call+recording+message+dispatch", () => {
     expect(da.channel).toBe("in_app");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Helpers shared by the 0007 constraint tests
+// ---------------------------------------------------------------------------
+async function makeRecording(db: ReturnType<typeof makeDb>, suffix: string) {
+  const [t] = await db.insert(tenant).values({ name: `t-${suffix}` }).returning();
+  const [a] = await db.insert(account).values({ tenantId: t.id, name: `a-${suffix}` }).returning();
+  const [d] = await db.insert(did).values({ accountId: a.id, e164: `+1555${suffix}` }).returning();
+  const [cl] = await db.insert(call).values({
+    tenantId: t.id,
+    accountId: a.id,
+    didId: d.id,
+    fromE164: `+1556${suffix}`,
+    startedAt: new Date(),
+  }).returning();
+  const [r] = await db.insert(recording).values({
+    tenantId: t.id,
+    callId: cl.id,
+    path: `rec/${suffix}.wav`,
+    startedAt: new Date(),
+  }).returning();
+  return { db, r };
+}
+
+describe("schema/0007 — recording_redaction_interval integrity constraints", () => {
+  // I1: partial unique index — at most one open interval per recording_id
+  it("rejects a second open interval (end_ms IS NULL) for the same recording_id", async () => {
+    const db = makeDb(URL);
+    const { r } = await makeRecording(db, "20001");
+    await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 0,
+      endMs: null,
+      reason: "operator_pci_pause",
+    });
+    await expect(
+      db.insert(recordingRedactionInterval).values({
+        recordingId: r.id,
+        startMs: 5000,
+        endMs: null,
+        reason: "operator_pci_pause",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("allows a second open interval after closing the first", async () => {
+    const db = makeDb(URL);
+    const { r } = await makeRecording(db, "20002");
+    const [first] = await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 0,
+      endMs: null,
+      reason: "operator_pci_pause",
+    }).returning();
+    // Close the first interval
+    await db
+      .update(recordingRedactionInterval)
+      .set({ endMs: 5000 })
+      .where(
+        (await import("drizzle-orm")).eq(recordingRedactionInterval.id, first.id),
+      );
+    // Now a second open interval should succeed
+    const [second] = await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 6000,
+      endMs: null,
+      reason: "operator_pci_pause",
+    }).returning();
+    expect(second.endMs).toBeNull();
+  });
+
+  // I2: CHECK constraint — end_ms >= start_ms when end_ms is not null
+  it("rejects an interval where end_ms < start_ms", async () => {
+    const db = makeDb(URL);
+    const { r } = await makeRecording(db, "20003");
+    await expect(
+      db.insert(recordingRedactionInterval).values({
+        recordingId: r.id,
+        startMs: 100,
+        endMs: 50,          // violates: end_ms < start_ms
+        reason: "operator_pci_pause",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("allows an interval with end_ms IS NULL (check constraint: NULL branch)", async () => {
+    const db = makeDb(URL);
+    const { r } = await makeRecording(db, "20004");
+    const [ri] = await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 100,
+      endMs: null,
+      reason: "operator_pci_pause",
+    }).returning();
+    expect(ri.endMs).toBeNull();
+  });
+
+  it("allows a normal closed interval (start_ms=0, end_ms=2000)", async () => {
+    const db = makeDb(URL);
+    const { r } = await makeRecording(db, "20005");
+    const [ri] = await db.insert(recordingRedactionInterval).values({
+      recordingId: r.id,
+      startMs: 0,
+      endMs: 2000,
+      reason: "operator_pci_pause",
+    }).returning();
+    expect(ri.startMs).toBe(0);
+    expect(ri.endMs).toBe(2000);
+  });
+});

@@ -30,6 +30,8 @@ services:
       # the e2e spec needs the dev token endpoint to function.
     ports:
       - "3000:3000"
+    volumes:
+      - recordings:/var/spool/asterisk/recording:ro
     depends_on:
       supavisor: { condition: service_healthy }
       nats:      { condition: service_healthy }
@@ -78,3 +80,4 @@ services:
       temporal:  { condition: service_healthy }
       supavisor: { condition: service_healthy }
       nats:      { condition: service_healthy }
+

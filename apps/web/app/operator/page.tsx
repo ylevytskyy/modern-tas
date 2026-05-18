@@ -5,7 +5,7 @@ import { ScreenPop } from '@/components/ScreenPop';
 import { MessageForm } from '@/components/MessageForm';
 import { createWsClient } from '@/lib/ws';
 import { fetchOperatorToken } from '@/lib/token';
-import { postMessage } from '@/lib/api';
+import { pauseCall, resumeCall, postMessage } from '@/lib/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
 const WS_URL       = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3000/ws';
@@ -16,6 +16,7 @@ export default function OperatorPage() {
   const [call, setCall] = useState<WsIncomingCallPayload | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [isPciPending, setIsPciPending] = useState(false);
   const [wsReady, setWsReady] = useState(false);
   const [callEnded, setCallEnded] = useState<WsCallEndedPayload | undefined>(undefined);
 
@@ -69,7 +70,25 @@ export default function OperatorPage() {
         accepted={accepted}
         paused={paused}
         onAccept={() => setAccepted(true)}
-        onPciToggle={() => setPaused((p) => !p)}
+        pciPending={isPciPending}
+        onPciToggle={async () => {
+          if (!token || !call) return;
+          const next = !paused;
+          setIsPciPending(true);
+          try {
+            if (next) {
+              await pauseCall({ apiBaseUrl: API_BASE_URL, token, callId: call.callId });
+            } else {
+              await resumeCall({ apiBaseUrl: API_BASE_URL, token, callId: call.callId });
+            }
+            setPaused(next);
+          } catch (err) {
+            console.error('pause/resume failed', err);
+            // Don't flip local state — keeps UI consistent with backend.
+          } finally {
+            setIsPciPending(false);
+          }
+        }}
         callEnded={callEnded}
         onBannerDismiss={() => { setCall(null); setCallEnded(undefined); }}
       />

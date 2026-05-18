@@ -1,0 +1,1 @@
+ALTER TABLE "recording_redaction_interval" ALTER COLUMN "end_ms" DROP NOT NULL;

@@ -38,6 +38,15 @@ export interface AriClientHandle {
   stop?(appName?: string): void;
   start(appName: string): Promise<void>;
   on(event: string, handler: (...args: any[]) => void): void;
+  /** ari-client@2.2.0 dynamically attaches namespaces from Asterisk's swagger; we type the ones S-2 uses. */
+  channels?: {
+    record(opts: { channelId: string; name: string; format: string; ifExists?: 'overwrite' | 'fail' | 'append' }): Promise<{ name: string }>;
+  };
+  recordings?: {
+    pause(opts: { recordingName: string }): Promise<void>;
+    unpause(opts: { recordingName: string }): Promise<void>;
+    stop(opts: { recordingName: string }): Promise<void>;
+  };
 }
 
 export interface StasisStartEvent {
@@ -89,6 +98,11 @@ export class AriLeaderClient {
   /** Exposed for unit tests only — do not use in production code. */
   get isLeaderForTest(): boolean {
     return this.isLeader;
+  }
+
+  /** Expose the live ARI handle for command issuance. Returns null if not leader. */
+  get handleForCommands(): AriClientHandle | null {
+    return this.isLeader ? this.ariHandle : null;
   }
 
   /** Wire or replace the StasisStart callback after construction (used by NestJS DI). */

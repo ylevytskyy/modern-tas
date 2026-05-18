@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { RecordingService } from './recording.service';
+import { AriModule } from '../ari/ari.module';
 import { Client as MinioClient } from 'minio';
 
 @Module({
+  imports: [AriModule],
   providers: [
     RecordingService,
     {
