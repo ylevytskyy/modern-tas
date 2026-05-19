@@ -146,7 +146,7 @@ export class CallsController {
         throw new ConflictException('call-already-accepted');
       }
       if (parsed.some((a) => a.operatorId === req.user.sub && a.outcome === 'declined')) {
-        throw new BadRequestException('wrong-operator');
+        throw new BadRequestException('already-declined');
       }
 
       const entry = JSON.stringify({
@@ -161,6 +161,12 @@ export class CallsController {
         .where(eq(queueCall.id, queueRows[0].id));
     });
 
+    // HAZARD: the decline entry is durably committed above. If dispatchByCallId
+    // throws here (DB error, WS send failure), the operator sees a 500 but
+    // attempts[] already records their decline — a subsequent retry will hit the
+    // 'already-declined' guard. The call is stuck until SIPp CANCEL or manual
+    // re-dispatch. Not a problem for the S-4 e2e (single happy path); revisit
+    // before any production deploy.
     await this.arbiter.dispatchByCallId(callId);
     return { ok: true };
   }
