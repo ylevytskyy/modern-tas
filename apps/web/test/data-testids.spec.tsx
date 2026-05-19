@@ -15,7 +15,7 @@ const sampleCall: WsIncomingCallPayload = {
 describe('Playwright data-testid contract', () => {
   it('ScreenPop renders [data-testid="screen-pop"][data-call-id=callId] when a call is active', () => {
     const { getByTestId } = render(
-      <ScreenPop call={sampleCall} accepted={false} paused={false} onAccept={() => {}} onPciToggle={() => {}} />,
+      <ScreenPop call={sampleCall} accepted={false} paused={false} onAccept={() => {}} onDecline={() => {}} onPciToggle={() => {}} />,
     );
     const el = getByTestId('screen-pop');
     expect(el.getAttribute('data-call-id')).toBe(sampleCall.callId);
@@ -23,7 +23,7 @@ describe('Playwright data-testid contract', () => {
 
   it('ScreenPop renders [data-testid="accept-call"] when call is not accepted', () => {
     const { getByTestId } = render(
-      <ScreenPop call={sampleCall} accepted={false} paused={false} onAccept={() => {}} onPciToggle={() => {}} />,
+      <ScreenPop call={sampleCall} accepted={false} paused={false} onAccept={() => {}} onDecline={() => {}} onPciToggle={() => {}} />,
     );
     expect(getByTestId('accept-call')).toBeTruthy();
   });

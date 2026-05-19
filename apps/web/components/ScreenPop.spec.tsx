@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WsIncomingCallPayload } from '@tas/shared-types';
 import { ScreenPop } from './ScreenPop';
@@ -14,7 +14,7 @@ const PAYLOAD: WsIncomingCallPayload = {
 
 describe('ScreenPop', () => {
   it('renders the caller E.164 and call id', () => {
-    render(<ScreenPop call={PAYLOAD} onAccept={() => {}} onPciToggle={() => {}} accepted={false} paused={false} />);
+    render(<ScreenPop call={PAYLOAD} onAccept={() => {}} onDecline={() => {}} onPciToggle={() => {}} accepted={false} paused={false} />);
     expect(screen.getByText(/\+15555550100/)).toBeInTheDocument();
     expect(screen.getByText(/c-1/)).toBeInTheDocument();
   });
@@ -24,6 +24,7 @@ describe('ScreenPop', () => {
     render(<ScreenPop
       call={PAYLOAD}
       onAccept={() => { accepted = true; }}
+      onDecline={() => {}}
       onPciToggle={() => {}}
       accepted={false}
       paused={false}
@@ -37,6 +38,7 @@ describe('ScreenPop', () => {
     render(<ScreenPop
       call={PAYLOAD}
       onAccept={() => {}}
+      onDecline={() => {}}
       onPciToggle={() => { toggled = true; }}
       accepted={true}
       paused={false}
@@ -49,6 +51,7 @@ describe('ScreenPop', () => {
     render(<ScreenPop
       call={PAYLOAD}
       onAccept={() => {}}
+      onDecline={() => {}}
       onPciToggle={() => {}}
       accepted={true}
       paused={true}
@@ -57,7 +60,7 @@ describe('ScreenPop', () => {
   });
 
   it('renders an empty/idle state when call is null', () => {
-    render(<ScreenPop call={null} onAccept={() => {}} onPciToggle={() => {}} accepted={false} paused={false} />);
+    render(<ScreenPop call={null} onAccept={() => {}} onDecline={() => {}} onPciToggle={() => {}} accepted={false} paused={false} />);
     expect(screen.getByText(/waiting for call/i)).toBeInTheDocument();
   });
 
@@ -66,6 +69,7 @@ describe('ScreenPop', () => {
       <ScreenPop
         call={PAYLOAD}
         onAccept={() => {}}
+        onDecline={() => {}}
         onPciToggle={() => {}}
         paused={false}
         accepted={false}
@@ -81,6 +85,7 @@ describe('ScreenPop', () => {
       <ScreenPop
         call={{ callId: 'c1', callerE164: '+15551234567', type: 'incoming_call', tenantId: 't1', accountId: 'a1' }}
         onAccept={() => {}}
+        onDecline={() => {}}
         onPciToggle={() => {}}
         paused={false}
         accepted={false}
@@ -95,6 +100,7 @@ describe('ScreenPop', () => {
       <ScreenPop
         call={PAYLOAD}
         onAccept={() => {}}
+        onDecline={() => {}}
         onPciToggle={() => {}}
         paused={false}
         accepted={false}
@@ -109,6 +115,7 @@ describe('ScreenPop', () => {
       <ScreenPop
         call={PAYLOAD}
         onAccept={() => {}}
+        onDecline={() => {}}
         onPciToggle={() => { callCount++; }}
         accepted={true}
         paused={false}
@@ -120,5 +127,52 @@ describe('ScreenPop', () => {
     // userEvent respects the disabled attribute — click is swallowed
     await userEvent.click(btn);
     expect(callCount).toBe(0);
+  });
+
+  it('renders a Decline button next to Accept when call is unaccepted', () => {
+    const onDecline = vi.fn();
+    render(
+      <ScreenPop
+        call={{ type: 'incoming_call', callId: 'c1', tenantId: 't1', accountId: 'a1', callerE164: '+15551234567' }}
+        accepted={false}
+        paused={false}
+        onAccept={() => {}}
+        onDecline={onDecline}
+        onPciToggle={() => {}}
+      />,
+    );
+    const button = screen.getByTestId('decline-call');
+    expect(button).toBeInTheDocument();
+    fireEvent.click(button);
+    expect(onDecline).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides Decline button after accepted', () => {
+    render(
+      <ScreenPop
+        call={{ type: 'incoming_call', callId: 'c1', tenantId: 't1', accountId: 'a1', callerE164: '+15551234567' }}
+        accepted={true}
+        paused={false}
+        onAccept={() => {}}
+        onDecline={() => {}}
+        onPciToggle={() => {}}
+      />,
+    );
+    expect(screen.queryByTestId('decline-call')).not.toBeInTheDocument();
+  });
+
+  it('disables Decline button when declinePending is true', () => {
+    render(
+      <ScreenPop
+        call={{ type: 'incoming_call', callId: 'c1', tenantId: 't1', accountId: 'a1', callerE164: '+15551234567' }}
+        accepted={false}
+        paused={false}
+        onAccept={() => {}}
+        onDecline={() => {}}
+        declinePending={true}
+        onPciToggle={() => {}}
+      />,
+    );
+    expect(screen.getByTestId('decline-call')).toBeDisabled();
   });
 });

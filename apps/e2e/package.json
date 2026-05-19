@@ -9,6 +9,7 @@
     "test:e2e:s1": "playwright test specs/poc-e2e-s1-happy-path.spec.ts",
     "test:e2e:s2": "playwright test specs/poc-e2e-s2-pci-pause.spec.ts",
     "test:e2e:s3": "playwright test specs/poc-e2e-s3-caller-hangup.spec.ts",
+    "test:e2e:s4": "SEED_PROFILE=s4 playwright test specs/poc-e2e-s4-decline-reroute.spec.ts",
     "scenario": "tsx src/run-scenario.ts",
     "lint:sipp": "docker compose -f docker-compose.sipp.yml run --rm sipp -sf /scenarios/happy-path.xml -dry-run 127.0.0.1:5060 || true"
   },
@@ -26,8 +27,10 @@
     "@playwright/test": "1.46.1",
     "@types/node": "^24",
     "@types/uuid": "9.0.8",
+    "@types/ws": "^8.18.1",
     "tsx": "4.7.1",
     "typescript": "5.4.2",
-    "vitest": "1.4.0"
+    "vitest": "1.4.0",
+    "ws": "^8.20.1"
   }
 }

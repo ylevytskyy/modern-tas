@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as jsonwebtoken from 'jsonwebtoken';
 import type { WebSocket } from 'ws';
 import { WsEvents } from '@tas/shared-types';
-import type { WsIncomingCallPayload, WsCallEndedPayload } from '@tas/shared-types';
+import type { WsIncomingCallPayload, WsCallEndedPayload, WsCallExhaustedPayload } from '@tas/shared-types';
 
 @Injectable()
 export class WsGateway {
@@ -40,5 +40,17 @@ export class WsGateway {
     if (!ws || ws.readyState !== 1 /* OPEN */) return false;
     ws.send(JSON.stringify({ event: WsEvents.CALL_ENDED, data: payload }));
     return true;
+  }
+
+  sendCallExhausted(payload: WsCallExhaustedPayload): void {
+    for (const ws of this.connections.values()) {
+      if (ws.readyState === 1 /* OPEN */) {
+        ws.send(JSON.stringify({ event: WsEvents.CALL_EXHAUSTED, data: payload }));
+      }
+    }
+  }
+
+  connectedOperatorIds(): string[] {
+    return Array.from(this.connections.keys());
   }
 }

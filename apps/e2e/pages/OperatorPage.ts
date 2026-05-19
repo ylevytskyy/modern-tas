@@ -36,6 +36,10 @@ export class OperatorPage {
     await this.page.locator('[data-testid="accept-call"]').click();
   }
 
+  async decline(): Promise<void> {
+    await this.page.getByTestId('decline-call').click();
+  }
+
   async fillMessage(text: string): Promise<void> {
     await this.page.locator('[data-testid="message-textarea"]').fill(text);
   }

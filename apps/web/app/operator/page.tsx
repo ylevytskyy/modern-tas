@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { WsIncomingCallPayload, WsCallEndedPayload } from '@tas/shared-types';
 import { ScreenPop } from '@/components/ScreenPop';
+import { Banner } from '@/components/Banner';
 import { MessageForm } from '@/components/MessageForm';
 import { createWsClient } from '@/lib/ws';
 import { fetchOperatorToken } from '@/lib/token';
@@ -19,6 +20,8 @@ export default function OperatorPage() {
   const [isPciPending, setIsPciPending] = useState(false);
   const [wsReady, setWsReady] = useState(false);
   const [callEnded, setCallEnded] = useState<WsCallEndedPayload | undefined>(undefined);
+  const [declinePending, setDeclinePending] = useState(false);
+  const [declineError, setDeclineError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -47,6 +50,33 @@ export default function OperatorPage() {
     };
   }, [token]);
 
+  const onDecline = useCallback(async () => {
+    if (!call) return;
+    if (declinePending) return;
+    setDeclinePending(true);
+    setDeclineError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/v1/calls/${call.callId}/decline`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ message: 'decline failed' }));
+        setDeclineError(body.message ?? `HTTP ${res.status}`);
+        return;
+      }
+      // Optimistic close — clear local screen-pop state.
+      setCall(null);
+    } catch (err) {
+      setDeclineError((err as Error).message);
+    } finally {
+      setDeclinePending(false);
+    }
+  }, [call, token, declinePending]);
+
   async function submitMessage(body: string): Promise<void> {
     if (!token || !call) return;
     await postMessage({
@@ -65,11 +95,14 @@ export default function OperatorPage() {
     <main data-ws-ready={wsReady ? 'true' : 'false'}>
       {wsReady && <span data-testid="ws-ready" hidden />}
       <h1>Operator</h1>
+      {declineError && <Banner variant="warning" message={declineError} onDismiss={() => setDeclineError(null)} />}
       <ScreenPop
         call={call}
         accepted={accepted}
         paused={paused}
         onAccept={() => setAccepted(true)}
+        onDecline={onDecline}
+        declinePending={declinePending}
         pciPending={isPciPending}
         onPciToggle={async () => {
           if (!token || !call) return;

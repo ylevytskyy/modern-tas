@@ -28,6 +28,30 @@ async function main() {
   await db.insert(contact).values({ id: FIXED_IDS.contact, accountId: FIXED_IDS.account, name: "Alice Demo", phone: "+15555550200" }).onConflictDoNothing();
   await db.insert(form).values({ id: FIXED_IDS.form, accountId: FIXED_IDS.account, name: "Default", schema: FORM_SCHEMA }).onConflictDoNothing();
   await db.insert(user).values({ id: FIXED_IDS.operator, tenantId: FIXED_IDS.tenant, email: "operator@demo.test", role: "operator" }).onConflictDoNothing();
+
+  if (process.env.SEED_PROFILE === 's4') {
+    const operatorBthroughK = [
+      '77777777-7777-7777-7777-777777777771',
+      '77777777-7777-7777-7777-777777777772',
+      '77777777-7777-7777-7777-777777777773',
+      '77777777-7777-7777-7777-777777777774',
+      '77777777-7777-7777-7777-777777777775',
+      '77777777-7777-7777-7777-777777777776',
+      '77777777-7777-7777-7777-777777777777',
+      '77777777-7777-7777-7777-777777777778',
+      '77777777-7777-7777-7777-777777777779',
+      '77777777-7777-7777-7777-77777777777a',
+    ];
+    await db.insert(user).values(
+      operatorBthroughK.map((id, i) => ({
+        id,
+        tenantId: FIXED_IDS.tenant,
+        email: `operator-${String.fromCharCode(98 + i)}@s4.test`,
+        role: 'operator' as const,
+      })),
+    ).onConflictDoNothing();
+  }
+
   await db.insert(queue).values({ id: FIXED_IDS.queue, accountId: FIXED_IDS.account, name: "main", strategy: "fifo" }).onConflictDoNothing();
 
   console.log("seed: ok");

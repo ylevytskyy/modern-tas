@@ -1,12 +1,13 @@
 import {
   Controller, Post, Param, Req, UseGuards, Inject, NotFoundException, HttpCode,
-  ConflictException, ServiceUnavailableException,
+  ConflictException, ServiceUnavailableException, BadRequestException,
 } from '@nestjs/common';
 import { eq, and, isNull, desc } from 'drizzle-orm';
 import { DB_TOKEN } from '../database/database.module';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AriCommandsService } from '../ari/ari-commands.service';
-import { recording, recordingRedactionInterval } from '@tas/db';
+import { ArbiterService } from '../arbiter/arbiter.service';
+import { recording, recordingRedactionInterval, call, queueCall } from '@tas/db';
 import type { Db } from '@tas/db/client';
 import type { Request } from 'express';
 import type { RequestUser } from '../auth/request-user.interface';
@@ -44,6 +45,7 @@ export class CallsController {
   constructor(
     @Inject(DB_TOKEN) private readonly db: Db,
     private readonly ari: AriCommandsService,
+    private readonly arbiter: ArbiterService,
   ) {}
 
   @Post(':id/pause')
@@ -110,6 +112,56 @@ export class CallsController {
       .set({ endMs })
       .where(eq(recordingRedactionInterval.id, open.id));
 
+    return { ok: true };
+  }
+
+  @Post(':id/decline')
+  @HttpCode(200)
+  async decline(
+    @Param('id') callId: string,
+    @Req() req: Request & { user: RequestUser },
+  ): Promise<{ ok: true }> {
+    await this.db.transaction(async (tx) => {
+      const callRows = await tx
+        .select()
+        .from(call)
+        .where(and(eq(call.id, callId), eq(call.tenantId, req.user.tenantId)))
+        .limit(1);
+      if (callRows.length === 0) throw new NotFoundException('call not found');
+
+      const queueRows = await tx
+        .select()
+        .from(queueCall)
+        .where(and(eq(queueCall.callId, callId), eq(queueCall.tenantId, req.user.tenantId)))
+        .for('update')
+        .limit(1);
+      if (queueRows.length === 0) throw new NotFoundException('queue_call not found');
+
+      const attempts = queueRows[0].attempts;
+      const parsed = attempts
+        .map((s: string) => { try { return JSON.parse(s) as { operatorId: string; outcome: string; at: string }; } catch { return null; } })
+        .filter((x: { operatorId: string; outcome: string; at: string } | null): x is { operatorId: string; outcome: string; at: string } => x !== null);
+
+      if (parsed.some((a) => a.outcome === 'accepted')) {
+        throw new ConflictException('call-already-accepted');
+      }
+      if (parsed.some((a) => a.operatorId === req.user.sub && a.outcome === 'declined')) {
+        throw new BadRequestException('wrong-operator');
+      }
+
+      const entry = JSON.stringify({
+        operatorId: req.user.sub,
+        outcome: 'declined',
+        at: new Date().toISOString(),
+      });
+
+      await tx
+        .update(queueCall)
+        .set({ attempts: [...attempts, entry] })
+        .where(eq(queueCall.id, queueRows[0].id));
+    });
+
+    await this.arbiter.dispatchByCallId(callId);
     return { ok: true };
   }
 }
